@@ -121,6 +121,12 @@
 									$("#usersSave").removeClass("disabled");
 								});
 
+						$("#pw-change-switch").bootstrapSwitch().on(
+								'switchChange.bootstrapSwitch',
+								function(event, state) {
+
+								});
+
 						$('.form-control').change(function() {
 							$("#usersSave").removeClass("disabled");
 						});
@@ -332,7 +338,39 @@ body {
 							</tr>
 						</tbody>
 					</table>
-
+					<div id="roleEditPanel" class="panel panel-info edit-panel">
+						<div class="panel-heading">
+							<span th:text="#{userEditPanelHeader}"></span><span
+								id="userEditPanelHeadingName"></span>
+						</div>
+						<div class="panel-body">
+							<div class="container-fluid">
+								<div class="form-group">
+									<label for="inputEmail" class="control-label col-xs-2"><span
+										th:text="#{userEmailLabel}"></span></label>
+									<div class="col-xs-10">
+										<input type="email" class="form-control" id="email"
+											th:placeholder="#{userEmailLabel}" />
+									</div>
+								</div>
+							</div>
+							<div class="container-fluid">
+								<div class="form-group">
+									<label for="inputPassword" class="control-label col-xs-2"><span
+										th:text="#{userChangePwOnNextLogonLabel}"></span></label>
+									<div class="col-xs-10">
+										<input class="changePwOnNextLogonSwitch" id="pw-change-switch"
+											type="checkbox" data-size="mini" data-on-color="success"
+											data-off-color="warning"></input>
+									</div>
+								</div>
+							</div>
+							<button id="buttonUserEditDone" class="btn btn-primary btn-done"
+								type="button">
+								<span th:text="#{buttonDone}"></span>
+							</button>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>

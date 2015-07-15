@@ -46,14 +46,14 @@ public class UserDto extends BaseObjectDto
         return password;
     }
 
+    public boolean getType()
+    {
+        return type;
+    }
+
     public boolean isEnabled()
     {
         return enabled;
-    }
-
-    public boolean isType()
-    {
-        return type;
     }
 
     public void setEnabled(boolean enabled)

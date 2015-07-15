@@ -53,7 +53,7 @@ public class UserMapper
         {
             User entity = new User();
             entity.setLogin(dto.getLogin());
-            entity.setType(dto.isType());
+            entity.setType(dto.getType());
             entity.setLastname(dto.getLastname());
             entity.setFirstname(dto.getFirstname());
             entity.setEnabled(dto.isEnabled());
@@ -69,7 +69,7 @@ public class UserMapper
     {
         User entity = new User();
         entity.setLogin(dto.getLogin());
-        entity.setType(dto.isType());
+        entity.setType(dto.getType());
         entity.setLastname(dto.getLastname());
         entity.setFirstname(dto.getFirstname());
         entity.setEnabled(dto.isEnabled());

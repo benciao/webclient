@@ -3,10 +3,14 @@ package com.ecg.webclient.feature.administration.viewmodell;
 public class BaseObjectDto
 {
     private Object  rid;
-    private boolean delete = false;
+    private Boolean delete = false;
 
-    public boolean getDelete()
+    public Boolean getDelete()
     {
+        if (delete == null)
+        {
+            delete = false;
+        }
         return delete;
     }
 
@@ -15,7 +19,7 @@ public class BaseObjectDto
         return rid;
     }
 
-    public void setDelete(boolean delete)
+    public void setDelete(Boolean delete)
     {
         this.delete = delete;
     }
