@@ -58,7 +58,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter
     public LocaleResolver localeResolver()
     {
         SessionLocaleResolver slr = new SessionLocaleResolver();
-        slr.setDefaultLocale(Locale.ENGLISH);
+        slr.setDefaultLocale(Locale.GERMAN);
         return slr;
     }
 }

@@ -83,6 +83,22 @@
 																$("#usersSave")
 																		.removeClass(
 																				"disabled");
+
+																// Editierfenster ausblenden
+																var userName = $(
+																		"#login-"
+																				+ collectionIndex[1])
+																		.val();
+																var userEditPanel = $(
+																		"#userEditPanelHeadingName")
+																		.text();
+
+																if (" "
+																		+ userName == userEditPanel) {
+																	$(
+																			"#userEditPanel")
+																			.hide();
+																}
 																row.hide();
 															});
 
@@ -109,7 +125,56 @@
 
 											$("#hiddenSwitch-" + rowIndex).val(
 													false);
+
+											$('.a_edit')
+													.click(
+															function(event) {
+																var collectionIndex = $(
+																		event.target)
+																		.parent()
+																		.attr(
+																				'id')
+																		.split(
+																				"-");
+
+																var userName = $(
+																		"#login-"
+																				+ collectionIndex[1])
+																		.val();
+
+																// Headertext setzen
+																$(
+																		"#userEditPanelHeadingName")
+																		.text(
+																				" "
+																						+ userName);
+
+																$(
+																		"#userEditPanel")
+																		.show();
+																$("#pwChangeArea").hide();
+																$("#pw-change-switch").bootstrapSwitch('state', false);
+															});
+
+											$('.a_edit')
+													.click(
+															function(event) {
+																var row = $(
+																		event.target)
+																		.parent()
+																		.parent()
+																		.parent();
+																row
+																		.addClass(
+																				'highlight')
+																		.siblings()
+																		.removeClass(
+																				'highlight');
+															});
 										});
+
+						$("#userEditPanel").hide();
+						$("#pwChangeArea").hide();
 
 						$("[name='user-state-switch']").bootstrapSwitch().on(
 								'switchChange.bootstrapSwitch',
@@ -121,9 +186,20 @@
 									$("#usersSave").removeClass("disabled");
 								});
 
+						$("#pw-change-on-next-login-switch").bootstrapSwitch()
+								.on('switchChange.bootstrapSwitch',
+										function(event, state) {
+
+										});
+
 						$("#pw-change-switch").bootstrapSwitch().on(
 								'switchChange.bootstrapSwitch',
 								function(event, state) {
+									if (state) {
+										$("#pwChangeArea").show();
+									} else {
+										$("#pwChangeArea").hide();
+									}
 
 								});
 
@@ -135,19 +211,55 @@
 							$("#usersForm").submit();
 						});
 
-						$('.a_delete').click(
+						$('.a_delete')
+								.click(
+										function(event) {
+											var collectionIndex = $(
+													event.target).parent()
+													.attr('id').split("-");
+
+											var row = $(event.target).parent()
+													.parent().parent();
+
+											$(
+													"#hiddenDelete-"
+															+ collectionIndex[1])
+													.val(true);
+											$("#usersSave").removeClass(
+													"disabled");
+
+											// Editierfenster ausblenden
+											var userName = $(
+													"#login-"
+															+ collectionIndex[1])
+													.val();
+											var userEditPanel = $(
+													"#userEditPanelHeadingName")
+													.text();
+
+											if (" " + userName == userEditPanel) {
+												$("#userEditPanel").hide();
+											}
+
+											row.hide();
+										});
+
+						$('.a_edit').click(
 								function(event) {
 									var collectionIndex = $(event.target)
 											.parent().attr('id').split("-");
 
-									var row = $(event.target).parent().parent()
-											.parent();
+									var userName = $(
+											"#login-" + collectionIndex[1])
+											.val();
 
-									$("#hiddenDelete-" + collectionIndex[1])
-											.val(true);
-									$("#usersSave").removeClass("disabled");
+									// Headertext setzen
+									$("#userEditPanelHeadingName").text(
+											" " + userName);
 
-									row.hide();
+									$("#userEditPanel").show();
+									$("#pwChangeArea").hide();
+									$("#pw-change-switch").bootstrapSwitch('state', false);
 								});
 
 						$('.a_edit').click(
@@ -157,6 +269,17 @@
 									row.addClass('highlight').siblings()
 											.removeClass('highlight');
 								});
+
+						$('#buttonUserEditDone').click(function(event) {
+
+							$("#userEditPanel").hide();
+							$("table tbody tr").removeClass('highlight');
+						});
+
+						$("#password").on("keyup", function() {
+							var pass = $(this).val();
+							updateProgressBar(scorePassword(pass));
+						});
 
 					});
 
@@ -338,31 +461,75 @@ body {
 							</tr>
 						</tbody>
 					</table>
-					<div id="roleEditPanel" class="panel panel-info edit-panel">
+					<div id="userEditPanel" class="panel panel-info">
 						<div class="panel-heading">
 							<span th:text="#{userEditPanelHeader}"></span><span
 								id="userEditPanelHeadingName"></span>
 						</div>
 						<div class="panel-body">
 							<div class="container-fluid">
-								<div class="form-group">
-									<label for="inputEmail" class="control-label col-xs-2"><span
-										th:text="#{userEmailLabel}"></span></label>
-									<div class="col-xs-10">
-										<input type="email" class="form-control" id="email"
-											th:placeholder="#{userEmailLabel}" />
+								<div class="row margin-content">
+
+									<div class="col-md-6">
+										<ul class="list-group">
+											<li class="list-group-item"><div>
+													<label class="control-label"><span
+														th:text="#{userEmailLabel}"></span></label>
+													<div>
+														<input type="email" class="form-control" id="email"
+															th:placeholder="#{userEmailLabel}" />
+													</div>
+												</div></li>
+											<li class="list-group-item"><div>
+													<label class="control-label"><span
+														th:text="#{userChangePwOnNextLogonLabel}"></span></label>
+													<div>
+														<input class="changePwOnNextLogonSwitch form-control"
+															id="pw-change-on-next-login-switch" type="checkbox"
+															data-size="mini" data-on-color="success"
+															data-off-color="warning"></input>
+													</div>
+												</div></li>
+											<li class="list-group-item"><div>
+													<label class="control-label"><span
+														th:text="#{userChangePw}"></span></label>
+													<div>
+														<input class="changePwSwitch form-control"
+															id="pw-change-switch" type="checkbox" data-size="mini"
+															data-on-color="success" data-off-color="warning"></input>
+													</div>
+													<div id="pwChangeArea">
+														<div>
+															<label class="control-label"><span
+																th:text="#{userPwLabel}"></span></label> <input type="password"
+																class="form-control" id="password"
+																th:placeholder="#{userPwLabel}" />
+														</div>
+														<div>
+															<label class="control-label"><span
+																th:text="#{userPasswordConfirmLabel}"></span></label> <input
+																type="password" class="form-control"
+																id="password-confirm"
+																th:placeholder="#{userPasswordConfirmLabel}" />
+														</div>
+														<div>
+															<label class="control-label"><span
+																th:text="#{userPasswordScore}"></span></label>
+															<div class="progress">
+																<div class="progress-bar" role="progressbar"
+																	id="password_progress_bar" aria-valuemin="0"
+																	aria-valuemax="100" style="width: 0%;"
+																	aria-valuenow="0"></div>
+															</div>
+														</div>
+													</div>
+												</div></li>
+										</ul>
 									</div>
-								</div>
-							</div>
-							<div class="container-fluid">
-								<div class="form-group">
-									<label for="inputPassword" class="control-label col-xs-2"><span
-										th:text="#{userChangePwOnNextLogonLabel}"></span></label>
-									<div class="col-xs-10">
-										<input class="changePwOnNextLogonSwitch" id="pw-change-switch"
-											type="checkbox" data-size="mini" data-on-color="success"
-											data-off-color="warning"></input>
-									</div>
+
+
+									<div class="col-md-6"></div>
+
 								</div>
 							</div>
 							<button id="buttonUserEditDone" class="btn btn-primary btn-done"

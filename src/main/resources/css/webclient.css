@@ -323,3 +323,7 @@ a {
 .table-striped tbody tr.highlight td {
 	background-color: #F5B951;
 }
+
+.margin-content{
+	margin: 15px;
+}
