@@ -6,20 +6,20 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.feature.administration.persistence.odb.OdbClientRepository;
+import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.mapper.ClientMapper;
 
 @Component
 public class Util
 {
-    private List<ClientDto>  clients;
-    private boolean          isMenuMinimized;
-    private ClientDto        selectedClient;
-    private OdbClientRepository clientRepository;
+    private List<ClientDto>   clients;
+    private boolean           isMenuMinimized;
+    private ClientDto         selectedClient;
+    private IClientRepository clientRepository;
 
     @Autowired
-    public Util(OdbClientRepository clientRepository)
+    public Util(IClientRepository clientRepository)
     {
         this.clientRepository = clientRepository;
 

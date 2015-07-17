@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -292,6 +293,24 @@ public class AdministrationController
         clientConfig.setClients(ClientMapper.mapToDtos(clientRepository.getAllClients()));
         model.addAttribute("clientConfig", clientConfig);
         return "administration/clientConfig";
+    }
+
+    /**
+     * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten gehörende Gruppen.
+     * 
+     * @param model
+     * @param surname
+     * @return
+     */
+    @RequestMapping(value = "/user/clientgroups/{clientId}", method = RequestMethod.GET)
+    public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
+    {
+        clientId = "#" + clientId;
+        List<Group> groups = groupRepository.getAllGroupsForClient(clientId);
+
+        model.addAttribute("groups", GroupMapper.mapToDtos(groups));
+
+        return "administration/user :: clientGroups";
     }
 
     /**

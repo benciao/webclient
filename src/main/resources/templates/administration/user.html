@@ -152,8 +152,14 @@
 																$(
 																		"#userEditPanel")
 																		.show();
-																$("#pwChangeArea").hide();
-																$("#pw-change-switch").bootstrapSwitch('state', false);
+																$(
+																		"#pwChangeArea")
+																		.hide();
+																$(
+																		"#pw-change-switch")
+																		.bootstrapSwitch(
+																				'state',
+																				false);
 															});
 
 											$('.a_edit')
@@ -259,7 +265,8 @@
 
 									$("#userEditPanel").show();
 									$("#pwChangeArea").hide();
-									$("#pw-change-switch").bootstrapSwitch('state', false);
+									$("#pw-change-switch").bootstrapSwitch(
+											'state', false);
 								});
 
 						$('.a_edit').click(
@@ -281,7 +288,37 @@
 							updateProgressBar(scorePassword(pass));
 						});
 
+						$("#clientGroupSelect").change(function() {
+							var clientId = $(this).val();
+							retrieveClientGroups(clientId);
+						});
+
+						$("#clientGroupSelect").ready(
+								function() {
+									var clientId = $(
+											"#clientGroupSelect option:first")
+											.val();
+									retrieveClientGroups(clientId);
+								});
 					});
+
+	function retrieveClientGroups(clientId) {
+		var url = '/admin/user/clientgroups';
+
+		// notwendig, da Steuerzeichen
+		var collectionIndex = clientId.split("#");
+
+		url = url + '/' + collectionIndex[1];
+
+		$("#clientGroupsResult").load(
+				url,
+				function() {
+					$(".groupSwitch").bootstrapSwitch().on(
+							'switchChange.bootstrapSwitch',
+							function(event, state) {
+							});
+				});
+	}
 
 	/*]]>*/
 </script>
@@ -474,6 +511,15 @@ body {
 										<ul class="list-group">
 											<li class="list-group-item"><div>
 													<label class="control-label"><span
+														th:text="#{clientDefault}"></span></label> <select
+														id="defaultClientGroupSelect" class="form-control">
+														<option th:each="client : ${beans.util.getClients()}"
+															th:value="${client.rid}" th:text="${client.name}">
+														</option>
+													</select>
+												</div></li>
+											<li class="list-group-item"><div>
+													<label class="control-label"><span
 														th:text="#{userEmailLabel}"></span></label>
 													<div>
 														<input type="email" class="form-control" id="email"
@@ -528,19 +574,66 @@ body {
 									</div>
 
 
-									<div class="col-md-6"></div>
+									<div class="col-md-6">
+										<label class="control-label"><span
+											th:text="#{userEditGroupAssignmentHeader}"></span></label>
+										<div class="panel panel-default">
+											<div class="row margin-content">
+												<label class="control-label"><span
+													th:text="#{clientSelection}"></span></label> <select
+													id="clientGroupSelect" class="form-control">
+													<option th:each="client : ${beans.util.getClients()}"
+														th:value="${client.rid}" th:text="${client.name}">
+													</option>
+												</select>
 
+												<!-- Results block -->
+												<div id="clientGroupsResult"></div>
+											</div>
+										</div>
+
+									</div>
 								</div>
+								<button id="buttonUserEditDone" class="btn btn-primary btn-done"
+									type="button">
+									<span th:text="#{buttonDone}"></span>
+								</button>
 							</div>
-							<button id="buttonUserEditDone" class="btn btn-primary btn-done"
-								type="button">
-								<span th:text="#{buttonDone}"></span>
-							</button>
 						</div>
 					</div>
 				</form>
 			</div>
 		</div>
+	</div>
+
+	<div th:fragment="clientGroups" th:unless="${#lists.isEmpty(groups)}"
+		class="userEditClientGroups">
+		<table class="table table-hover table-striped table-condensed"
+			id="groupAssignmentTable">
+			<thead>
+				<tr>
+					<th><span th:text="#{groupsTableName}"></span></th>
+					<th><span th:text="#{groupsTableDescription}"></span></th>
+					<th><span th:text="#{groupAssigned}"></span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="groupItem" th:each="group, stat : ${groups}">
+					<td th:text="${group.name}"></td>
+					<td th:text="${group.description}"></td>
+					<td><input class="groupSwitch"
+						th:id="${'group-switch-'+stat.index}" type="checkbox"
+						name="group-assignment-switch" data-size="mini"
+						data-on-color="success" data-off-color="warning"></input> <input
+						class="hiddenGroupSwitchValue" type="hidden"
+						th:id="${'hiddenGroupSwitchValue-'+stat.index}" value="false" /><input
+						class="hiddenGroupRid" th:id="${'hiddenGroupRid-'+stat.index}"
+						type="hidden" th:value="${group.rid}" /> <input
+						class="hiddenGroupRid" th:id="${'hiddenGroupRid-'+stat.index}"
+						type="hidden" value="" /></td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </body>
 </html>
