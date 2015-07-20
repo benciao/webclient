@@ -122,81 +122,9 @@
 											$("#hiddenSwitch-" + rowIndex).val(
 													false);
 
-											$('.a_edit')
-													.click(
-															function(event) {
-																var collectionIndex = $(
-																		event.target)
-																		.parent()
-																		.attr(
-																				'id')
-																		.split(
-																				"-");
-
-																var groupName = $(
-																		"#name-"
-																				+ collectionIndex[1])
-																		.val();
-
-																var assignedRoleRids = $(
-																		"#hiddenRoleRids-"
-																				+ collectionIndex[1])
-																		.val();
-
-																// Headertext setzen
-																$(
-																		"#roleEditPanelHeadingName")
-																		.text(
-																				" "
-																						+ groupName);
-
-																// bereits zugeordnete Rollen initialisieren
-																$("tr.roleItem")
-																		.each(
-																				function() {
-																					var roleRid = $(
-																							this)
-																							.find(
-																									"input.hiddenRoleRid")
-																							.val();
-																					$(
-																							this)
-																							.find(
-																									"input.roleSwitch")
-																							.bootstrapSwitch(
-																									'state',
-																									isRoleAssigned(
-																											roleRid,
-																											assignedRoleRids));
-
-																					$(
-																							this)
-																							.find(
-																									"input.hiddenGroupRid")
-																							.val(
-																									collectionIndex[1]);
-																				});
-
-																$(
-																		"#roleEditPanel")
-																		.show();
-															});
-
-											$('.a_edit')
-													.click(
-															function(event) {
-																var row = $(
-																		event.target)
-																		.parent()
-																		.parent()
-																		.parent();
-																row
-																		.addClass(
-																				'highlight')
-																		.siblings()
-																		.removeClass(
-																				'highlight');
-															});
+											$('.a_edit').click(function(event) {
+												onEditClick(event);
+											});
 										});
 
 						$("[name='group-state-switch']").bootstrapSwitch().on(
@@ -256,12 +184,11 @@
 						$("[name='role-assignment-switch']")
 								.bootstrapSwitch()
 								.on(
-										'switchClick.bootstrapSwitch',
+										'switchChange.bootstrapSwitch',
 										function(event, state) {
-
 											var collectionIndex = event.target.id
 													.split("-");
-											
+
 											$(
 													"#hiddenRoleSwitchValue-"
 															+ collectionIndex[1])
@@ -278,6 +205,7 @@
 																		.find(
 																				"input.hiddenRoleRid")
 																		.val();
+
 																var isAssigned = $(
 																		this)
 																		.find(
@@ -311,68 +239,15 @@
 													"disabled");
 										});
 
-						$('.a_edit')
-								.click(
-										function(event) {
-											var collectionIndex = $(
-													event.target).parent()
-													.attr('id').split("-");
-
-											var groupName = $(
-													"#name-"
-															+ collectionIndex[1])
-													.val();
-
-											var assignedRoleRids = $(
-													"#hiddenRoleRids-"
-															+ collectionIndex[1])
-													.val();
-
-											// Headertext setzen
-											$("#roleEditPanelHeadingName")
-													.text(" " + groupName);
-
-											// bereits zugeordnete Rollen initialisieren
-											$("tr.roleItem")
-													.each(
-															function() {
-																var roleRid = $(
-																		this)
-																		.find(
-																				"input.hiddenRoleRid")
-																		.val();
-																$(this)
-																		.find(
-																				"input.roleSwitch")
-																		.bootstrapSwitch(
-																				'state',
-																				isRoleAssigned(
-																						roleRid,
-																						assignedRoleRids));
-
-																$(this)
-																		.find(
-																				"input.hiddenGroupRid")
-																		.val(
-																				collectionIndex[1]);
-															});
-
-											$("#roleEditPanel").show();
-										});
+						$('.a_edit').click(function(event) {
+							onEditClick(event);
+						});
 
 						$('#buttonRoleAssignmentDone').click(function(event) {
 
 							$("#roleEditPanel").hide();
 							$("table tbody tr").removeClass('highlight');
 						});
-
-						$('.a_edit').click(
-								function(event) {
-									var row = $(event.target).parent().parent()
-											.parent();
-									row.addClass('highlight').siblings()
-											.removeClass('highlight');
-								});
 
 					});
 
@@ -386,6 +261,37 @@
 		}
 
 		return false;
+	}
+
+	function onEditClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var groupName = $("#name-" + collectionIndex[1]).val();
+
+		var assignedRoleRids = $("#hiddenRoleRids-" + collectionIndex[1]).val();
+
+		// Headertext setzen
+		$("#roleEditPanelHeadingName").text(" " + groupName);
+
+		// GruppenId an allen Rollen setzen (notwendig wegen onChange Event an Switches)
+		$("tr.roleItem").each(function() {
+			$(this).find("input.hiddenGroupRid").val(collectionIndex[1]);
+		});
+
+		// bereits zugeordnete Rollen initialisieren
+		$("tr.roleItem").each(
+				function() {
+					var roleRid = $(this).find("input.hiddenRoleRid").val();
+
+					$(this).find("input.roleSwitch").bootstrapSwitch('state',
+							isRoleAssigned(roleRid, assignedRoleRids));
+
+				});
+
+		$("#roleEditPanel").show();
+
+		var row = $(event.target).parent().parent().parent();
+		row.addClass('highlight').siblings().removeClass('highlight');
 	}
 
 	/*]]>*/
@@ -421,10 +327,12 @@ body {
 							<div class="panel-body">
 								<table class="table">
 									<tr>
-										<td><a href="/admin/client"><span th:text="#{menuTreeClientConfig}"></span></a></td>
+										<td><a href="/admin/client"><span
+												th:text="#{menuTreeClientConfig}"></span></a></td>
 									</tr>
 									<tr>
-										<td><a href="/admin/clientp"><span th:text="#{menuTreeClientProperties}"></span></a></td>
+										<td><a href="/admin/clientp"><span
+												th:text="#{menuTreeClientProperties}"></span></a></td>
 									</tr>
 								</table>
 							</div>
@@ -442,13 +350,16 @@ body {
 							<div class="panel-body">
 								<table class="table">
 									<tr>
-										<td><a href="/admin/user"><span th:text="#{menuTreeUserConfig}"></span></a></td>
+										<td><a href="/admin/user"><span
+												th:text="#{menuTreeUserConfig}"></span></a></td>
 									</tr>
 									<tr class="warning">
-										<td><a href="/admin/usergroup"><span th:text="#{menuTreeUserGroups}"></span></a></td>
+										<td><a href="/admin/usergroup"><span
+												th:text="#{menuTreeUserGroups}"></span></a></td>
 									</tr>
 									<tr>
-										<td><a href="/admin/userrole"><span th:text="#{menuTreeUserRoles}"></span></a></td>
+										<td><a href="/admin/userrole"><span
+												th:text="#{menuTreeUserRoles}"></span></a></td>
 									</tr>
 								</table>
 							</div>

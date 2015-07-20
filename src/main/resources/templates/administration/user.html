@@ -57,50 +57,10 @@
 																	+ "</td>"
 																	+ "</tr>");
 
-											$('#a_delete-' + rowIndex)
-													.click(
-															function(event) {
-																var collectionIndex = $(
-																		event.target)
-																		.parent()
-																		.attr(
-																				'id')
-																		.split(
-																				"-");
-
-																var row = $(
-																		event.target)
-																		.parent()
-																		.parent()
-																		.parent();
-
-																$(
-																		"#hiddenDelete-"
-																				+ collectionIndex[1])
-																		.val(
-																				true);
-
-																$("#usersSave")
-																		.removeClass(
-																				"disabled");
-
-																// Editierfenster ausblenden
-																var userName = $(
-																		"#login-"
-																				+ collectionIndex[1])
-																		.val();
-																var userEditPanel = $(
-																		"#userEditPanelHeadingName")
-																		.text();
-
-																if (" "
-																		+ userName == userEditPanel) {
-																	$(
-																			"#userEditPanel")
-																			.hide();
-																}
-																row.hide();
-															});
+											$('#a_delete-' + rowIndex).click(
+													function(event) {
+														onDeleteClick(event);
+													});
 
 											$('#switch-' + rowIndex)
 													.bootstrapSwitch()
@@ -126,57 +86,10 @@
 											$("#hiddenSwitch-" + rowIndex).val(
 													false);
 
-											$('.a_edit')
-													.click(
-															function(event) {
-																var collectionIndex = $(
-																		event.target)
-																		.parent()
-																		.attr(
-																				'id')
-																		.split(
-																				"-");
+											$('.a_edit').click(function(event) {
+												editOnClick(event);
+											});
 
-																var userName = $(
-																		"#login-"
-																				+ collectionIndex[1])
-																		.val();
-
-																// Headertext setzen
-																$(
-																		"#userEditPanelHeadingName")
-																		.text(
-																				" "
-																						+ userName);
-
-																$(
-																		"#userEditPanel")
-																		.show();
-																$(
-																		"#pwChangeArea")
-																		.hide();
-																$(
-																		"#pw-change-switch")
-																		.bootstrapSwitch(
-																				'state',
-																				false);
-															});
-
-											$('.a_edit')
-													.click(
-															function(event) {
-																var row = $(
-																		event.target)
-																		.parent()
-																		.parent()
-																		.parent();
-																row
-																		.addClass(
-																				'highlight')
-																		.siblings()
-																		.removeClass(
-																				'highlight');
-															});
 										});
 
 						$("#userEditPanel").hide();
@@ -192,10 +105,17 @@
 									$("#usersSave").removeClass("disabled");
 								});
 
-						$("#pw-change-on-next-login-switch").bootstrapSwitch()
-								.on('switchChange.bootstrapSwitch',
+						$('input[name="pw-change-on-next-login-switch"]')
+								.bootstrapSwitch()
+								.on(
+										'switchChange.bootstrapSwitch',
 										function(event, state) {
-
+											var userIndex = $(
+													"#hiddenUserIndex").val();
+											$(
+													"#hiddenChangePasswordOnNextLogin-"
+															+ userIndex).val(
+													state);
 										});
 
 						$("#pw-change-switch").bootstrapSwitch().on(
@@ -217,65 +137,13 @@
 							$("#usersForm").submit();
 						});
 
-						$('.a_delete')
-								.click(
-										function(event) {
-											var collectionIndex = $(
-													event.target).parent()
-													.attr('id').split("-");
+						$('.a_delete').click(function(event) {
+							onDeleteClick(event);
+						});
 
-											var row = $(event.target).parent()
-													.parent().parent();
-
-											$(
-													"#hiddenDelete-"
-															+ collectionIndex[1])
-													.val(true);
-											$("#usersSave").removeClass(
-													"disabled");
-
-											// Editierfenster ausblenden
-											var userName = $(
-													"#login-"
-															+ collectionIndex[1])
-													.val();
-											var userEditPanel = $(
-													"#userEditPanelHeadingName")
-													.text();
-
-											if (" " + userName == userEditPanel) {
-												$("#userEditPanel").hide();
-											}
-
-											row.hide();
-										});
-
-						$('.a_edit').click(
-								function(event) {
-									var collectionIndex = $(event.target)
-											.parent().attr('id').split("-");
-
-									var userName = $(
-											"#login-" + collectionIndex[1])
-											.val();
-
-									// Headertext setzen
-									$("#userEditPanelHeadingName").text(
-											" " + userName);
-
-									$("#userEditPanel").show();
-									$("#pwChangeArea").hide();
-									$("#pw-change-switch").bootstrapSwitch(
-											'state', false);
-								});
-
-						$('.a_edit').click(
-								function(event) {
-									var row = $(event.target).parent().parent()
-											.parent();
-									row.addClass('highlight').siblings()
-											.removeClass('highlight');
-								});
+						$('.a_edit').click(function(event) {
+							editOnClick(event);
+						});
 
 						$('#buttonUserEditDone').click(function(event) {
 
@@ -318,6 +186,45 @@
 							function(event, state) {
 							});
 				});
+	}
+
+	function editOnClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var userName = $("#login-" + collectionIndex[1]).val();
+
+		// Headertext setzen
+		$("#userEditPanelHeadingName").text(" " + userName);
+
+		$("#userEditPanel").show();
+		$("#pwChangeArea").hide();
+		$("#pw-change-switch").bootstrapSwitch('state', false);
+
+		// Zuordnung EditPanel zu Benutzer festlegen
+		$("#hiddenUserIndex").val(collectionIndex[1]);
+
+		// Row highlighting
+		var row = $(event.target).parent().parent().parent();
+		row.addClass('highlight').siblings().removeClass('highlight');
+	}
+
+	function onDeleteClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var row = $(event.target).parent().parent().parent();
+
+		$("#hiddenDelete-" + collectionIndex[1]).val(true);
+		$("#usersSave").removeClass("disabled");
+
+		// Editierfenster ausblenden
+		var userName = $("#login-" + collectionIndex[1]).val();
+		var userEditPanel = $("#userEditPanelHeadingName").text();
+
+		if (" " + userName == userEditPanel) {
+			$("#userEditPanel").hide();
+		}
+
+		row.hide();
 	}
 
 	/*]]>*/
@@ -494,7 +401,18 @@ body {
 									type="hidden" th:id="${'hiddenRid-'+stat.index}"
 									th:field="*{users[__${stat.index}__].rid}" /><input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
-									th:field="*{users[__${stat.index}__].delete}" /></td>
+									th:field="*{users[__${stat.index}__].delete}" /><input
+									type="hidden" th:id="${'hiddenGroupRids-'+stat.index}"
+									th:field="*{users[__${stat.index}__].groupRids}" /> <input
+									type="hidden" th:id="${'hiddenEmail-'+stat.index}"
+									th:field="*{users[__${stat.index}__].email}" /> <input
+									type="hidden" th:id="${'hiddenDefaultClient-'+stat.index}"
+									th:field="*{users[__${stat.index}__].defaultClient}" /> <input
+									type="hidden"
+									th:id="${'hiddenChangePasswordOnNextLogin-'+stat.index}"
+									th:field="*{users[__${stat.index}__].changePasswordOnNextLogin}" /><input
+									type="hidden" th:id="${'hiddenPassword-'+stat.index}"
+									th:field="*{users[__${stat.index}__].password}" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -531,7 +449,7 @@ body {
 														th:text="#{userChangePwOnNextLogonLabel}"></span></label>
 													<div>
 														<input class="changePwOnNextLogonSwitch form-control"
-															id="pw-change-on-next-login-switch" type="checkbox"
+															name="pw-change-on-next-login-switch" type="checkbox"
 															data-size="mini" data-on-color="success"
 															data-off-color="warning"></input>
 													</div>
@@ -601,6 +519,7 @@ body {
 							</div>
 						</div>
 					</div>
+					<input id="hiddenUserIndex" type="hidden" value="" />
 				</form>
 			</div>
 		</div>
@@ -628,9 +547,7 @@ body {
 						class="hiddenGroupSwitchValue" type="hidden"
 						th:id="${'hiddenGroupSwitchValue-'+stat.index}" value="false" /><input
 						class="hiddenGroupRid" th:id="${'hiddenGroupRid-'+stat.index}"
-						type="hidden" th:value="${group.rid}" /> <input
-						class="hiddenGroupRid" th:id="${'hiddenGroupRid-'+stat.index}"
-						type="hidden" value="" /></td>
+						type="hidden" th:value="${group.rid}" /></td>
 				</tr>
 			</tbody>
 		</table>
