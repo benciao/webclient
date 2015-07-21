@@ -105,8 +105,7 @@
 									$("#usersSave").removeClass("disabled");
 								});
 
-						$('input[name="pw-change-on-next-login-switch"]')
-								.bootstrapSwitch()
+						$("#pw-change-on-next-login-switch").bootstrapSwitch()
 								.on(
 										'switchChange.bootstrapSwitch',
 										function(event, state) {
@@ -126,8 +125,28 @@
 									} else {
 										$("#pwChangeArea").hide();
 									}
-
 								});
+
+						$("#defaultClientGroupSelect")
+								.change(
+										function(event, state) {
+											var userIndex = $(
+													"#hiddenUserIndex").val();
+											var selected = $(
+													"#defaultClientGroupSelect")
+													.val();
+											$(
+													"#hiddenDefaultClient-"
+															+ userIndex).val(
+													selected);
+										});
+
+						$("#email").change(function(event, state) {
+							var userIndex = $("#hiddenUserIndex").val();
+							var value = $("#email").val();
+
+							$("#hiddenEmail-" + userIndex).val(value);
+						});
 
 						$('.form-control').change(function() {
 							$("#usersSave").removeClass("disabled");
@@ -168,6 +187,44 @@
 											.val();
 									retrieveClientGroups(clientId);
 								});
+
+						$("#password-confirm")
+								.keyup(
+										function(event) {
+											var userIndex = $(
+													"#hiddenUserIndex").val();
+
+											if (validatePassword()) {
+												if ($("#pw-change-switch")
+														.bootstrapSwitch(
+																'state')) {
+													$(
+															"#hiddenPassword-"
+																	+ userIndex)
+															.val(
+																	$(
+																			"#password-confirm")
+																			.val());
+													$("#password-confirm")
+															.removeClass(
+																	'invalidPassword');
+
+												} else {
+													$(
+															"#hiddenPassword-"
+																	+ userIndex)
+															.val(null);
+												}
+											} else {
+												$(
+														"#hiddenPassword-"
+																+ userIndex)
+														.val(null);
+												$("#password-confirm")
+														.addClass(
+																'invalidPassword');
+											}
+										});
 					});
 
 	function retrieveClientGroups(clientId) {
@@ -206,6 +263,30 @@
 		// Row highlighting
 		var row = $(event.target).parent().parent().parent();
 		row.addClass('highlight').siblings().removeClass('highlight');
+
+		// PW Change Switch setzen
+		var state = $("#hiddenChangePasswordOnNextLogin-" + collectionIndex[1])
+				.val();
+		$("#pw-change-on-next-login-switch").bootstrapSwitch('state',
+				(state == 'false') ? false : true);
+
+		// DefaultClient setzen
+		var currentSelectedClient = $(
+				"#hiddenDefaultClient-" + collectionIndex[1]).val();
+		$("#defaultClientGroupSelect").val(currentSelectedClient);
+
+		// Email setzen
+		var emailValue = $("#hiddenEmail-" + collectionIndex[1]).val();
+		$("#email").val(emailValue);
+
+		// Passwort setzen
+		var pw = $("#hiddenPassword-" + collectionIndex[1]).val();
+
+		if (pw) {
+			$("#password").val(pw);
+			$("#password-confirm").val(pw);
+			$("#pw-change-switch").bootstrapSwitch('state', true);
+		}
 	}
 
 	function onDeleteClick(event) {
@@ -449,7 +530,8 @@ body {
 														th:text="#{userChangePwOnNextLogonLabel}"></span></label>
 													<div>
 														<input class="changePwOnNextLogonSwitch form-control"
-															name="pw-change-on-next-login-switch" type="checkbox"
+															name="pw-change-on-next-login-switch"
+															id="pw-change-on-next-login-switch" type="checkbox"
 															data-size="mini" data-on-color="success"
 															data-off-color="warning"></input>
 													</div>

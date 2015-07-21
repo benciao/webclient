@@ -327,3 +327,7 @@ a {
 .margin-content{
 	margin: 15px;
 }
+
+.invalidPassword {
+	background-color: #dca7a7;
+}

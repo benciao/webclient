@@ -80,6 +80,13 @@ function updateProgressBar(score) {
 	progress_bar.style.width = score + '%';
 }
 
+function validatePassword() {
+	var pw = $("#password").val();
+	var confirmedPw = $("#password-confirm").val();
+
+	return pw == confirmedPw;
+}
+
 $(document).ready(function() {
 
 	$("#clientSelect").change(function() {

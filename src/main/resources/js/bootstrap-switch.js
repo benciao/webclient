@@ -132,7 +132,7 @@
       };
 
       BootstrapSwitch.prototype.state = function(value, skip) {
-        if (typeof value === "undefined") {
+    	  if (typeof value === "undefined") {
           return this.options.state;
         }
         if (this.options.disabled || this.options.readonly) {
