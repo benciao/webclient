@@ -235,14 +235,97 @@
 
 		url = url + '/' + collectionIndex[1];
 
-		$("#clientGroupsResult").load(
-				url,
-				function() {
-					$(".groupSwitch").bootstrapSwitch().on(
-							'switchChange.bootstrapSwitch',
-							function(event, state) {
-							});
-				});
+		$("#clientGroupsResult")
+				.load(
+						url,
+						function() {
+							$("[name='group-assignment-switch']")
+									.bootstrapSwitch()
+									.on(
+											'switchChange.bootstrapSwitch',
+											function(event, state) {
+												var collectionIndex = event.target.id
+														.split("-");
+
+												$(
+														"#hiddenGroupSwitchValue-"
+																+ collectionIndex[1])
+														.val(state);
+
+												var userIndex = $(
+														"#hiddenUserIndex")
+														.val();
+
+												var assignedGroupRids = $(
+														"#hiddenGroupRids-"
+																+ userIndex)
+														.val();
+
+												// Status der Switches auslesen und zugeordnete Gruppen speichern
+												$("tr.groupItem")
+														.each(
+																function() {
+																	
+																	alert("alter zustand:" + assignedGroupRids);
+																	var groupRid = $(
+																			this)
+																			.find(
+																					"input.hiddenGroupRid")
+																			.val();
+
+																	var isAssigned = $(
+																			this)
+																			.find(
+																					"input.groupSwitch")
+																			.bootstrapSwitch(
+																					'state');
+																	
+																	alert("gruppe:" + groupRid);
+																	
+																	if (isAssigned) {
+																		alert("einschalten");
+																		if (assignedGroupRids.length == 0) {
+																			assignedGroupRids = assignedGroupRids
+																					+ groupRid;
+																		} else {
+																			if (!isGroupAssigned(
+																					groupRid,
+																					assignedGroupRids)) {
+																				assignedGroupRids = assignedGroupRids
+																						+ ","
+																						+ groupRid;
+																			}
+																		}
+																	} else {
+																		alert("ausschalten");
+																		if (isGroupAssigned(
+																				groupRid,
+																				assignedGroupRids)) {
+																			assignedGroupRids = removeGroupRid(
+																					assignedGroupRids,
+																					groupRid);
+																		}
+																	}
+																});
+												
+												alert("neuer zustand:" + assignedGroupRids);
+
+												$(
+														"#hiddenGroupRids-"
+																+ userIndex)
+														.val(assignedGroupRids);
+
+												$("#usersSave").removeClass(
+														"disabled");
+											});
+
+							var userIndex = $("#hiddenUserIndex").val();
+
+							if (userIndex) {
+								// bereits zugeordnete Gruppen initialisieren
+								setAssignedGroups(userIndex);
+							}
+						});
 	}
 
 	function editOnClick(event) {
@@ -287,6 +370,9 @@
 			$("#password-confirm").val(pw);
 			$("#pw-change-switch").bootstrapSwitch('state', true);
 		}
+
+		// bereits zugeordnete Gruppen initialisieren
+		setAssignedGroups(collectionIndex[1]);
 	}
 
 	function onDeleteClick(event) {
@@ -306,6 +392,54 @@
 		}
 
 		row.hide();
+	}
+
+	function setAssignedGroups(userIndex) {
+		var assignedGroupRids = $("#hiddenGroupRids-" + userIndex).val();
+
+		$("tr.groupItem").each(
+				function() {
+					var groupRid = $(this).find("input.hiddenGroupRid").val();
+
+					$(this).find("input.groupSwitch").bootstrapSwitch('state',
+							isGroupAssigned(groupRid, assignedGroupRids));
+
+				});
+	}
+
+	function isGroupAssigned(rid, assignedRids) {
+
+		var ridsArray = assignedRids.split(",");
+
+		for (var i = 0; i < ridsArray.length; i++) {
+			if (ridsArray[i] == rid) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	function removeGroupRid(groupRids, ridToRemove) {
+		var groupRidsArray = groupRids.split(",");
+
+		var index = groupRidsArray.indexOf(ridToRemove);
+
+		if (index > -1) {
+			groupRidsArray.splice(index, 1);
+			var result = "";
+
+			for (var i = 0; i < groupRidsArray.length; i++) {
+				if (result.length == 0) {
+					result = result + groupRidsArray[i];
+				} else {
+					result = result + "," + groupRidsArray[i];
+				}
+			}
+
+		} else {
+			return groupRids;
+		}
 	}
 
 	/*]]>*/
@@ -626,10 +760,10 @@ body {
 						th:id="${'group-switch-'+stat.index}" type="checkbox"
 						name="group-assignment-switch" data-size="mini"
 						data-on-color="success" data-off-color="warning"></input> <input
-						class="hiddenGroupSwitchValue" type="hidden"
-						th:id="${'hiddenGroupSwitchValue-'+stat.index}" value="false" /><input
-						class="hiddenGroupRid" th:id="${'hiddenGroupRid-'+stat.index}"
-						type="hidden" th:value="${group.rid}" /></td>
+						type="hidden" th:id="${'hiddenGroupSwitchValue-'+stat.index}"
+						value="false" /><input class="hiddenGroupRid"
+						th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
+						th:value="${group.rid}" /></td>
 				</tr>
 			</tbody>
 		</table>
