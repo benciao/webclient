@@ -53,7 +53,12 @@
 																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='user-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='users[" + rowIndex + "].enabled' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"'' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><a href='#' class='a_login-as' id='a_login-as-"+ rowIndex +"'' title='[[#{usersActionLoginAs}]]'><span class='glyphicon glyphicon-random'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].rid' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' />"
+																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><a href='#' class='a_login-as' id='a_login-as-"+ rowIndex +"' title='[[#{usersActionLoginAs}]]'><span class='glyphicon glyphicon-random'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].rid' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' />"
+																	+ "<input type='hidden' id='hiddenGroupRids-"+ rowIndex +"' name='users["+ rowIndex +"].groupRids'/>"
+																	+ "<input type='hidden' id='hiddenEmail-"+ rowIndex +"' name='users["+ rowIndex +"].email' />"
+																	+ "<input type='hidden' id='hiddenDefaultClient-"+ rowIndex +"' name='users["+ rowIndex +"].defaultClient' />"
+																	+ "<input type='hidden' id='hiddenChangePasswordOnNextLogin-"+ rowIndex +"' name='users["+ rowIndex +"].changePasswordOnNextLogin' />"
+																	+ "<input type='hidden' id='hiddenPassword-"+ rowIndex +"' name='users["+ rowIndex +"].password' />"
 																	+ "</td>"
 																	+ "</tr>");
 
@@ -177,7 +182,7 @@
 
 						$("#clientGroupSelect").change(function() {
 							var clientId = $(this).val();
-							retrieveClientGroups(clientId); 
+							retrieveClientGroups(clientId);
 						});
 
 						$("#clientGroupSelect").ready(
@@ -265,25 +270,20 @@
 												$("tr.groupItem")
 														.each(
 																function() {
-																	
-																	alert("alter zustand:" + assignedGroupRids);
 																	var groupRid = $(
 																			this)
 																			.find(
 																					"input.hiddenGroupRid")
 																			.val();
 
-																	var isAssigned = $(
+																	var switchOn = $(
 																			this)
 																			.find(
 																					"input.groupSwitch")
 																			.bootstrapSwitch(
 																					'state');
-																	
-																	alert("gruppe:" + groupRid);
-																	
-																	if (isAssigned) {
-																		alert("einschalten");
+
+																	if (switchOn) {
 																		if (assignedGroupRids.length == 0) {
 																			assignedGroupRids = assignedGroupRids
 																					+ groupRid;
@@ -297,7 +297,6 @@
 																			}
 																		}
 																	} else {
-																		alert("ausschalten");
 																		if (isGroupAssigned(
 																				groupRid,
 																				assignedGroupRids)) {
@@ -307,8 +306,6 @@
 																		}
 																	}
 																});
-												
-												alert("neuer zustand:" + assignedGroupRids);
 
 												$(
 														"#hiddenGroupRids-"
@@ -436,6 +433,8 @@
 					result = result + "," + groupRidsArray[i];
 				}
 			}
+
+			return result;
 
 		} else {
 			return groupRids;

@@ -12,6 +12,8 @@ import org.springframework.util.AutoPopulatingList;
 import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
+import com.orientechnologies.orient.core.command.OCommandRequest;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
@@ -107,13 +109,22 @@ public class OdbUserRepository implements IUserRepository
 
                 if (persistentUser != null)
                 {
-                    persistentUser.update(user);
+                    persistentUser.bind(user);
                     db.save(persistentUser);
                 }
                 else
                 {
-                    db.save(user);
+                    User newUser = db.save(user);
+                    user.setRid(newUser.getRid());
                 }
+
+                OCommandRequest command = new OCommandSQL("update " + user.getRid() + " set groups = "
+                        + user.getGroupRids());
+                db.command(command).execute();
+
+                command = new OCommandSQL("update " + user.getRid() + " set defaultClient = "
+                        + user.getDefaultClientRid());
+                db.command(command).execute();
             }
         }
         catch (final RuntimeException e)

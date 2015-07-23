@@ -1,10 +1,12 @@
 package com.ecg.webclient.feature.administration.viewmodell.mapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.util.AutoPopulatingList;
 
+import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
@@ -20,6 +22,30 @@ public class UserMapper
         dto.setEnabled(user.isEnabled());
         dto.setDelete(false);
         dto.setRid(user.getRid());
+        dto.setEmail(user.getEmail());
+        dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
+
+        if (user.getDefaultClient() != null)
+        {
+            dto.setDefaultClient(user.getDefaultClient().getRid().toString());
+        }
+
+        if (user.getGroups() != null)
+        {
+            String groups = "";
+            for (Group group : user.getGroups())
+            {
+                if (groups.length() == 0)
+                {
+                    groups = group.getRid().toString();
+                }
+                else
+                {
+                    groups = groups + "," + group.getRid().toString();
+                }
+            }
+            dto.setGroupRids(groups);
+        }
 
         return dto;
     }
@@ -38,6 +64,30 @@ public class UserMapper
             dto.setEnabled(user.isEnabled());
             dto.setDelete(false);
             dto.setRid(user.getRid());
+            dto.setEmail(user.getEmail());
+            dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
+
+            if (user.getDefaultClient() != null)
+            {
+                dto.setDefaultClient(user.getDefaultClient().getRid().toString());
+            }
+
+            if (user.getGroups() != null)
+            {
+                String groups = "";
+                for (Group group : user.getGroups())
+                {
+                    if (groups.length() == 0)
+                    {
+                        groups = group.getRid().toString();
+                    }
+                    else
+                    {
+                        groups = groups + "," + group.getRid().toString();
+                    }
+                }
+                dto.setGroupRids(groups);
+            }
 
             result.add(dto);
         }
@@ -58,6 +108,11 @@ public class UserMapper
             entity.setFirstname(dto.getFirstname());
             entity.setEnabled(dto.isEnabled());
             entity.setRid(dto.getRid());
+            entity.setEmail(dto.getEmail());
+            entity.setPassword(dto.getPassword());
+            entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
+            entity.setDefaultClientRid(dto.getDefaultClient());
+            entity.setGroupRids(getGroupRids(dto.getGroupRids()));
 
             result.add(entity);
         }
@@ -74,7 +129,26 @@ public class UserMapper
         entity.setFirstname(dto.getFirstname());
         entity.setEnabled(dto.isEnabled());
         entity.setRid(dto.getRid());
+        entity.setEmail(dto.getEmail());
+        entity.setPassword(dto.getPassword());
+        entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
+        entity.setDefaultClientRid(dto.getDefaultClient());
+        entity.setGroupRids(getGroupRids(dto.getGroupRids()));
 
         return entity;
+    }
+
+    private static List<Object> getGroupRids(String groupRids)
+    {
+        List<Object> result = new ArrayList<Object>();
+
+        List<String> rids = Arrays.asList(groupRids.split(","));
+
+        for (String rid : rids)
+        {
+            result.add(rid);
+        }
+
+        return result.size() != 0 ? result : null;
     }
 }

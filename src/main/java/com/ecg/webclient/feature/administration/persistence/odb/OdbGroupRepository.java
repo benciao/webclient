@@ -144,7 +144,8 @@ public class OdbGroupRepository implements IGroupRepository
                 }
                 else
                 {
-                    db.save(group);
+                    Group newGroup = db.save(group);
+                    group.setRid(newGroup.getRid());
                 }
 
                 OCommandRequest command = new OCommandSQL("update " + group.getRid() + " set roles = "
