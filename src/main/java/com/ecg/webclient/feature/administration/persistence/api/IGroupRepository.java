@@ -33,6 +33,15 @@ public interface IGroupRepository
     List<Group> getAllGroupsForClient(Object clientId);
 
     /**
+     * Speichert eine Benutzergruppe
+     * 
+     * @param group
+     *            zu speichernde Gruppe
+     * @return Gespeicherte Gruppe
+     */
+    Group saveGroup(Group group);
+
+    /**
      * Speichert alle Benutzergruppen der Liste
      * 
      * @param groups

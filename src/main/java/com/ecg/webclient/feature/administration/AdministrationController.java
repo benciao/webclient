@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ecg.webclient.common.Util;
+import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.common.feature.FeatureRegistry;
 import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
@@ -23,6 +26,7 @@ import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
+import com.ecg.webclient.feature.administration.persistence.dbmodell.Role;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
 import com.ecg.webclient.feature.administration.viewmodell.ClientConfig;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
@@ -49,6 +53,7 @@ import com.ecg.webclient.feature.administration.viewmodell.mapper.UserMapper;
 @RequestMapping(value = "/admin")
 public class AdministrationController
 {
+    static final Logger       logger = LogManager.getLogger(AdministrationController.class.getName());
     @Autowired
     private FeatureRegistry   featureRegistry;
 
@@ -281,6 +286,81 @@ public class AdministrationController
         userRepository.saveUsers(users);
 
         return "redirect:";
+    }
+
+    /**
+     * Behandelt POST-Requests vom Typ "/admin/setup/system". Initialisiert das System mit Standardmandant,
+     * Standardbenutzer usw.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/setup/system", method = RequestMethod.GET)
+    public String setupSystem()
+    {
+        Client setupClient = new Client();
+        setupClient.setEnabled(true);
+        setupClient.setName("Setup Client");
+        setupClient.setDescription("Client to setup the system");
+        setupClient.setColor("#ff0000");
+
+        Client savedClient = clientRepository.saveClient(setupClient);
+
+        logger.info("Setup-Client created");
+
+        List<Role> roles = roleRepository.getAllRoles();
+
+        Role setupRole = null;
+        Role savedRole = null;
+        if (roles.isEmpty())
+        {
+            setupRole = new Role();
+            setupRole.setName("Setup Role");
+            setupRole.setDescription("Role to setup the system");
+            setupRole.setEnabled(true);
+
+            savedRole = roleRepository.saveRole(setupRole);
+            logger.info("Setup-Role created");
+        }
+
+        Group setupGroup = new Group();
+        setupGroup.setClient(savedClient);
+        setupGroup.setName("Setup Group");
+        setupGroup.setDescription("Group to setup system");
+        setupGroup.setEnabled(true);
+
+        List<Object> roleRids = new ArrayList<Object>();
+        for (Role role : roles)
+        {
+            roleRids.add(role.getRid());
+        }
+        if (savedRole != null)
+        {
+            roleRids.add(savedRole.getRid());
+        }
+        setupGroup.setRoleRids(roleRids);
+
+        Group savedGroup = groupRepository.saveGroup(setupGroup);
+        logger.info("Setup-Group created");
+
+        List<Object> groupRids = new ArrayList<Object>();
+        groupRids.add(savedGroup.getRid());
+
+        User setupUser = new User();
+        setupUser.setLogin("setupuser");
+        setupUser.setPassword(PasswordEncoder.encodeSimple("SetupSystem!"));
+        setupUser.setFirstname("Setup");
+        setupUser.setLastname("User");
+        setupUser.setEnabled(true);
+        setupUser.setChangePasswordOnNextLogin(false);
+        setupUser.setDefaultClientRid(savedClient.getRid());
+        setupUser.setEmail("setupuser@ecg-leipzig.de");
+        setupUser.setType(true);
+        setupUser.setGroupRids(groupRids);
+
+        userRepository.saveUser(setupUser);;
+        logger.info("Setup-User created");
+
+        return "login";
     }
 
     /**

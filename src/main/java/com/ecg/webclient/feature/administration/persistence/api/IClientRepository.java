@@ -60,8 +60,9 @@ public interface IClientRepository
      * 
      * @param client
      *            Mandant
+     * @return gespeicherter Mandant
      */
-    void saveClient(Client client);
+    Client saveClient(Client client);
 
     /**
      * Speichert die in der Liste enthaltenen Mandanten

@@ -226,7 +226,7 @@ public class OdbClientRepository implements IClientRepository
     }
 
     @Override
-    public void saveClient(Client client)
+    public Client saveClient(Client client)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();
 
@@ -237,11 +237,11 @@ public class OdbClientRepository implements IClientRepository
             if (persistentClient != null)
             {
                 persistentClient.update(client);
-                db.save(persistentClient);
+                return db.save(persistentClient);
             }
             else
             {
-                db.save(client);
+                return db.save(client);
             }
         }
         catch (final RuntimeException e)
@@ -256,6 +256,8 @@ public class OdbClientRepository implements IClientRepository
                 db.close();
             }
         }
+        
+        return null;
     }
 
     @Override

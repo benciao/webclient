@@ -14,20 +14,27 @@ public class ClientMapper
 {
     public static ClientDto mapToDto(Client client)
     {
-        ClientDto dto = new ClientDto();
-        dto.setColor(client.getColor());
-        dto.setDescription(client.getDescription());
-        dto.setName(client.getName());
-        dto.setEnabled(client.isEnabled());
-        dto.setDelete(false);
-        dto.setRid(client.getRid());
-
-        for (Property property : client.getProperties())
+        if (client != null)
         {
-            dto.getProperties().add(PropertyMapper.mapToDto(property));
-        }
+            ClientDto dto = new ClientDto();
+            dto.setColor(client.getColor());
+            dto.setDescription(client.getDescription());
+            dto.setName(client.getName());
+            dto.setEnabled(client.isEnabled());
+            dto.setDelete(false);
+            dto.setRid(client.getRid());
 
-        return dto;
+            for (Property property : client.getProperties())
+            {
+                dto.getProperties().add(PropertyMapper.mapToDto(property));
+            }
+
+            return dto;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public static List<ClientDto> mapToDtos(List<Client> clients)

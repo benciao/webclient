@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
+import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
@@ -127,6 +128,52 @@ public class OdbUserRepository implements IUserRepository
     }
 
     @Override
+    public void saveUser(User user)
+    {
+        final OObjectDatabaseTx db = connectionFactory.getTx();
+
+        try
+        {
+            User persistentUser = getUserByRid(user.getRid());
+
+            if (persistentUser != null)
+            {
+                persistentUser.bind(user);
+                db.save(persistentUser);
+            }
+            else
+            {
+                persistentUser = db.save(user);
+                user.setRid(persistentUser.getRid());
+
+                OCommandRequest command = new OCommandSQL("update " + user.getRid() + " set password = "
+                        + PasswordEncoder.encodeComplex(user.getPassword(), user.getRid().toString()));
+                db.command(command).execute();
+            }
+
+            OCommandRequest command = new OCommandSQL("update " + user.getRid() + " set groups = "
+                    + user.getGroupRids());
+            db.command(command).execute();
+
+            command = new OCommandSQL("update " + user.getRid() + " set defaultClient = "
+                    + user.getDefaultClientRid());
+            db.command(command).execute();
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.commit();
+                db.close();
+            }
+        }
+    }
+
+    @Override
     public void saveUsers(List<User> users)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();
@@ -135,26 +182,7 @@ public class OdbUserRepository implements IUserRepository
         {
             for (User user : users)
             {
-                User persistentUser = getUserByRid(user.getRid());
-
-                if (persistentUser != null)
-                {
-                    persistentUser.bind(user);
-                    db.save(persistentUser);
-                }
-                else
-                {
-                    User newUser = db.save(user);
-                    user.setRid(newUser.getRid());
-                }
-
-                OCommandRequest command = new OCommandSQL("update " + user.getRid() + " set groups = "
-                        + user.getGroupRids());
-                db.command(command).execute();
-
-                command = new OCommandSQL("update " + user.getRid() + " set defaultClient = "
-                        + user.getDefaultClientRid());
-                db.command(command).execute();
+                saveUser(user);
             }
         }
         catch (final RuntimeException e)

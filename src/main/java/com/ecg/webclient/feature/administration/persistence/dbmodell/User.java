@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.persistence.Transient;
 
+import com.ecg.webclient.common.authentication.PasswordEncoder;
+
 public class User extends BaseObject
 {
     private String       login;
@@ -33,7 +35,7 @@ public class User extends BaseObject
         // wichtig, damit es nicht genullt wird in der DB bei Nichtänderung
         if (user.getPassword() != null && !user.getPassword().isEmpty())
         {
-            setPassword(user.getPassword());
+            setPassword(PasswordEncoder.encodeComplex(user.getPassword(), getRid().toString()));
         }
         setEnabled(user.isEnabled());
         setEmail(user.getEmail());

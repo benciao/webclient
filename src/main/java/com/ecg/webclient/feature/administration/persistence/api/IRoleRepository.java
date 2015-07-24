@@ -26,6 +26,15 @@ public interface IRoleRepository
     List<Role> getAllRoles();
 
     /**
+     * Speichert eine Rolle in der DB
+     * 
+     * @param setupRole
+     *            zu Speichernde Rolle
+     * @return Gespeicherte Rolle
+     */
+    Role saveRole(Role setupRole);
+
+    /**
      * Speichert alle in der Liste enthaltenen Benutzerrollen
      * 
      * @param roles

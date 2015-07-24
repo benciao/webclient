@@ -103,10 +103,6 @@ $(document).ready(function() {
 	}
 });
 
-function encode(value, salt) {
-	var encodedValue = $.md5(value);
-	var encodedSalt = $.md5(salt);
-	var encodingResult = $.md5(encodedValue + encodedSalt);
-	
-	return encodingResult;
+function encode(value) {
+	return $.md5(value);
 }

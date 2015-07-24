@@ -127,6 +127,48 @@ public class OdbGroupRepository implements IGroupRepository
     }
 
     @Override
+    public Group saveGroup(Group group)
+    {
+        final OObjectDatabaseTx db = connectionFactory.getTx();
+
+        try
+        {
+            Group persistentGroup = getGroupByRid(group.getRid());
+
+            if (persistentGroup != null)
+            {
+                persistentGroup.bind(group);
+                db.save(persistentGroup);
+            }
+            else
+            {
+                persistentGroup = db.save(group);
+                group.setRid(persistentGroup.getRid());
+            }
+
+            OCommandRequest command = new OCommandSQL("update " + group.getRid() + " set roles = "
+                    + group.getRoleRids());
+            db.command(command).execute();
+
+            return persistentGroup;
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.commit();
+                db.close();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public void saveGroups(List<Group> groups)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();

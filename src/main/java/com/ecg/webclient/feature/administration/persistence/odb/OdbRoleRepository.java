@@ -95,6 +95,41 @@ public class OdbRoleRepository implements IRoleRepository
     }
 
     @Override
+    public Role saveRole(Role role)
+    {
+        final OObjectDatabaseTx db = connectionFactory.getTx();
+
+        try
+        {
+            Role persistentRole = getRoleByRid(role.getRid());
+
+            if (persistentRole != null)
+            {
+                persistentRole.update(role);
+                return db.save(persistentRole);
+            }
+            else
+            {
+                return db.save(role);
+            }
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.commit();
+                db.close();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public void saveRoles(List<Role> roles)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();

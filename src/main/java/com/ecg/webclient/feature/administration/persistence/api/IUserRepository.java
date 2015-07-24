@@ -33,6 +33,14 @@ public interface IUserRepository
     User getUserById(Object id);
 
     /**
+     * Speichert einen Benutzer
+     * 
+     * @param setupUser
+     *            Zu speichernder Benutzer
+     */
+    void saveUser(User setupUser);
+
+    /**
      * Speichert alle in der Liste enthaltenen Benutzer
      * 
      * @param users
