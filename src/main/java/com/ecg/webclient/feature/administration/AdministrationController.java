@@ -1,6 +1,7 @@
 package com.ecg.webclient.feature.administration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -20,6 +21,7 @@ import com.ecg.webclient.feature.administration.persistence.api.IClientRepositor
 import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
+import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
 import com.ecg.webclient.feature.administration.viewmodell.ClientConfig;
@@ -282,6 +284,26 @@ public class AdministrationController
     }
 
     /**
+     * Behandelt einen Ajax Request zum Anzeigen von außschließlich Mandanten, welchen die zugeordneten
+     * Gruppen angehören.
+     * 
+     * @return
+     */
+    @RequestMapping(value = "/user/availableClients/{groupRids}/{userRid}", method = RequestMethod.GET)
+    public String showAvailableClients(Model model, @PathVariable("groupRids") String groupRids,
+            @PathVariable("userRid") String userRid)
+    {
+        List<Object> realGroupRids = getGroupRids(groupRids);
+        List<Client> clients = clientRepository.getAssignedClientsForGroups(realGroupRids);
+        User user = userRepository.getUserById("#" + userRid);
+
+        model.addAttribute("availableClients", ClientMapper.mapToDtos(clients));
+        model.addAttribute("currentUser", UserMapper.mapToDto(user));
+
+        return "administration/user :: availableClients";
+    }
+
+    /**
      * Behandelt GET-Requests vom Typ "/admin/client". Lädt alle Mandanten.
      * 
      * @return Template
@@ -298,8 +320,6 @@ public class AdministrationController
     /**
      * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten gehörende Gruppen.
      * 
-     * @param model
-     * @param surname
      * @return
      */
     @RequestMapping(value = "/user/clientgroups/{clientId}", method = RequestMethod.GET)
@@ -391,5 +411,19 @@ public class AdministrationController
                 break;
             }
         }
+    }
+
+    private static List<Object> getGroupRids(String groupRids)
+    {
+        List<Object> result = new ArrayList<Object>();
+
+        List<String> rids = Arrays.asList(groupRids.split(","));
+
+        for (String rid : rids)
+        {
+            result.add("#" + rid);
+        }
+
+        return result.size() != 0 ? result : null;
     }
 }

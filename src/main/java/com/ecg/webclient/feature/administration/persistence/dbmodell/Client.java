@@ -14,6 +14,12 @@ public class Client extends BaseObject
     public Client()
     {}
 
+    @Override
+    public boolean equals(Object otherClient)
+    {
+        return this.getRid().toString().equalsIgnoreCase(((Client) otherClient).getRid().toString());
+    }
+
     public String getColor()
     {
         return color;
@@ -66,6 +72,12 @@ public class Client extends BaseObject
     public void setProperties(List<Property> properties)
     {
         this.properties = properties;
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.getRid().toString();
     }
 
     public void update(Client newClient)

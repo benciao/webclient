@@ -23,6 +23,7 @@
 <script th:src="@{/js/bootstrap-switch.js}"></script>
 <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
 <script th:src="@{/js/webclient.js}"></script>
+<script th:src="@{/js/jquery.md5.js}"></script>
 
 <script type="text/javascript" th:inline="text">
 	/*<![CDATA[*/
@@ -132,20 +133,6 @@
 									}
 								});
 
-						$("#defaultClientGroupSelect")
-								.change(
-										function(event, state) {
-											var userIndex = $(
-													"#hiddenUserIndex").val();
-											var selected = $(
-													"#defaultClientGroupSelect")
-													.val();
-											$(
-													"#hiddenDefaultClient-"
-															+ userIndex).val(
-													selected);
-										});
-
 						$("#email").change(function(event, state) {
 							var userIndex = $("#hiddenUserIndex").val();
 							var value = $("#email").val();
@@ -203,13 +190,19 @@
 												if ($("#pw-change-switch")
 														.bootstrapSwitch(
 																'state')) {
+													var userRid = $(
+															"#hiddenRid-"
+																	+ userIndex)
+															.val();
+
 													$(
 															"#hiddenPassword-"
 																	+ userIndex)
 															.val(
-																	$(
+																	encode($(
 																			"#password-confirm")
-																			.val());
+																			.val()),
+																	userRid);
 													$("#password-confirm")
 															.removeClass(
 																	'invalidPassword');
@@ -231,6 +224,47 @@
 											}
 										});
 					});
+
+	function determinAvailableClients() {
+		var url = '/admin/user/availableClients';
+		var userIndex = $("#hiddenUserIndex").val();
+		var assignedGroupRids = $("#hiddenGroupRids-" + userIndex).val();
+		var uRid = $("#hiddenRid-" + userIndex).val();
+
+		var collectionIndex = uRid.split("#");
+		var userRid = collectionIndex[1];
+		var groupRids = removeHashTag(assignedGroupRids);
+
+		url = url + '/' + groupRids + "/" + userRid;
+
+		$("#availableClientsResult").load(url, function() {
+			$("#defaultClientGroupSelect").change(function(event, state) {
+				var userIndex = $("#hiddenUserIndex").val();
+				var selected = $("#defaultClientGroupSelect").val();
+				$("#hiddenDefaultClient-" + userIndex).val(selected);
+			});
+		});
+
+	}
+
+	// notwendig, da Steuerzeichen
+	function removeHashTag(assignedGroupRids) {
+
+		var ridsArray = assignedGroupRids.split(",");
+		var result = "";
+
+		for (var i = 0; i < ridsArray.length; i++) {
+			var collectionIndex = ridsArray[i].split("#");
+
+			if (i == 0) {
+				result = result + collectionIndex[1];
+			} else {
+				result = result + "," + collectionIndex[1];
+			}
+		}
+
+		return result;
+	}
 
 	function retrieveClientGroups(clientId) {
 		var url = '/admin/user/clientgroups';
@@ -314,6 +348,9 @@
 
 												$("#usersSave").removeClass(
 														"disabled");
+
+												// Auswahl für Standardmandant aktualisieren
+												determinAvailableClients();
 											});
 
 							var userIndex = $("#hiddenUserIndex").val();
@@ -366,6 +403,10 @@
 			$("#password").val(pw);
 			$("#password-confirm").val(pw);
 			$("#pw-change-switch").bootstrapSwitch('state', true);
+		} else {
+			$("#password").val(null);
+			$("#password-confirm").val(null);
+			$("#pw-change-switch").bootstrapSwitch('state', false);
 		}
 
 		// bereits zugeordnete Gruppen initialisieren
@@ -641,15 +682,8 @@ body {
 
 									<div class="col-md-6">
 										<ul class="list-group">
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{clientDefault}"></span></label> <select
-														id="defaultClientGroupSelect" class="form-control">
-														<option th:each="client : ${beans.util.getClients()}"
-															th:value="${client.rid}" th:text="${client.name}">
-														</option>
-													</select>
-												</div></li>
+											<li class="list-group-item"><div
+													id="availableClientsResult"></div></li>
 											<li class="list-group-item"><div>
 													<label class="control-label"><span
 														th:text="#{userEmailLabel}"></span></label>
@@ -766,6 +800,17 @@ body {
 				</tr>
 			</tbody>
 		</table>
+	</div>
+
+	<div th:fragment="availableClients"
+		th:unless="${#lists.isEmpty(availableClients)}"
+		class="userAvailableClients">
+		<label class="control-label"><span th:text="#{clientDefault}"></span></label>
+		<select id="defaultClientGroupSelect" class="form-control">
+			<option th:each="client : ${availableClients}"
+				th:value="${client.rid}" th:text="${client.name}"
+				th:selected="${client.rid.toString() == currentUser.defaultClient}"></option>
+		</select>
 	</div>
 </body>
 </html>

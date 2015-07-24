@@ -1,7 +1,9 @@
 package com.ecg.webclient.feature.administration.persistence.odb;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +13,7 @@ import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
+import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
 import com.ecg.webclient.feature.administration.persistence.dbmodell.Property;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
@@ -123,6 +126,45 @@ public class OdbClientRepository implements IClientRepository
         bla.addAll(clients);
 
         return bla;
+    }
+
+    @Override
+    public List<Client> getAssignedClientsForGroups(List<Object> groupRids)
+    {
+        List<Client> result = new ArrayList<Client>();
+        OObjectDatabaseTx db = null;
+
+        try
+        {
+            db = connectionFactory.getTx();
+
+            List<Group> groups = db.query(new OSQLSynchQuery<Client>("select from Group"));
+
+            Map<String, Client> clientMap = new HashMap<String, Client>();
+
+            for (Group group : groups)
+            {
+                if (containsGroupRid(groupRids, group.getRid()))
+                {
+                    clientMap.put(group.getClient().toString(), group.getClient());
+                }
+            }
+
+            result.addAll(clientMap.values());
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.close();
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -291,5 +333,18 @@ public class OdbClientRepository implements IClientRepository
                 db.close();
             }
         }
+    }
+
+    private boolean containsGroupRid(List<Object> groupRids, Object currentGroupRid)
+    {
+        for (Object assignedGroup : groupRids)
+        {
+            if (assignedGroup.toString().equalsIgnoreCase(currentGroupRid.toString()))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

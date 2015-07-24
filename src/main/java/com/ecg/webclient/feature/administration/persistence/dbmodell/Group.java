@@ -11,6 +11,7 @@ public class Group extends BaseObject
     private boolean      enabled;
     private List<Role>   roles;
     private Client       client;
+    @Transient
     private List<Object> roleRids;
 
     public Group()
@@ -22,6 +23,12 @@ public class Group extends BaseObject
         setDescription(newGroup.getDescription());
         setEnabled(newGroup.isEnabled());
         setClient(newGroup.getClient());
+    }
+
+    @Override
+    public boolean equals(Object otherGroup)
+    {
+        return this.getRid().toString().equalsIgnoreCase(((Group) otherGroup).getRid().toString());
     }
 
     public Client getClient()
@@ -39,7 +46,6 @@ public class Group extends BaseObject
         return name;
     }
 
-    @Transient
     public List<Object> getRoleRids()
     {
         return roleRids;

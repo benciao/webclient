@@ -35,6 +35,13 @@ public interface IClientRepository
     List<Client> getAllClients();
 
     /**
+     * @param groupRids
+     *            liste von Rids
+     * @return Alle Client-Objekte, welche den Rids zugehörigen Gruppen angehören.
+     */
+    List<Client> getAssignedClientsForGroups(List<Object> groupRids);
+
+    /**
      * @param id
      *            technische Id
      * @return den Mandandanten zu welchem die id passt

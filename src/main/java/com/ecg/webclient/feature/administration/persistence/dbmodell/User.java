@@ -15,8 +15,10 @@ public class User extends BaseObject
     private boolean      type;
     private String       email;
     private Client       defaultClient;
+    @Transient
     private Object       defaultClientRid;
     private List<Group>  groups;
+    @Transient
     private List<Object> groupRids;
 
     public User()
@@ -28,7 +30,11 @@ public class User extends BaseObject
         setType(user.isType());
         setFirstname(user.getFirstname());
         setLastname(user.getLastname());
-        setPassword(user.getPassword());
+        // wichtig, damit es nicht genullt wird in der DB bei Nichtänderung
+        if (user.getPassword() != null && !user.getPassword().isEmpty())
+        {
+            setPassword(user.getPassword());
+        }
         setEnabled(user.isEnabled());
         setEmail(user.getEmail());
         setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
@@ -39,7 +45,6 @@ public class User extends BaseObject
         return defaultClient;
     }
 
-    @Transient
     public Object getDefaultClientRid()
     {
         return defaultClientRid;
@@ -55,7 +60,6 @@ public class User extends BaseObject
         return firstname;
     }
 
-    @Transient
     public List<Object> getGroupRids()
     {
         return groupRids;

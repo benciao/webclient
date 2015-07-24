@@ -76,7 +76,7 @@ public class OdbUserRepository implements IUserRepository
         {
             db = connectionFactory.getTx();
 
-            users = db.query(new OSQLSynchQuery<Client>("select from User"));
+            users = db.query(new OSQLSynchQuery<User>("select from User"));
         }
         catch (final RuntimeException e)
         {
@@ -94,6 +94,36 @@ public class OdbUserRepository implements IUserRepository
         result.addAll(users);
 
         return result;
+    }
+
+    @Override
+    public User getUserById(Object id)
+    {
+        User user = null;
+        OObjectDatabaseTx db = null;
+
+        try
+        {
+            db = connectionFactory.getTx();
+
+            List<User> users = db.query(new OSQLSynchQuery<User>("select from User where @rid = " + id));
+
+            return (users.size() != 0) ? users.get(0) : null;
+
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.close();
+            }
+        }
+
+        return user;
     }
 
     @Override

@@ -26,6 +26,13 @@ public interface IUserRepository
     List<User> getAllUsers();
 
     /**
+     * @param id
+     *            technische Id des Benutzers
+     * @return Den zur Id gehörigen Benutzer.
+     */
+    User getUserById(Object id);
+
+    /**
      * Speichert alle in der Liste enthaltenen Benutzer
      * 
      * @param users
