@@ -27,7 +27,7 @@ public class PasswordEncoder
             MessageDigest messageDigestFinal = MessageDigest.getInstance("MD5");
             messageDigestFinal.reset();
             messageDigestFinal.update(finalString.getBytes(Charset.forName("UTF8")));
-            final byte[] finalResultByte = messageDigestRid.digest();
+            final byte[] finalResultByte = messageDigestFinal.digest();
             final String finalResult = new String(Hex.encode(finalResultByte));
 
             return finalResult;

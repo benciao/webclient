@@ -23,7 +23,7 @@
 <script th:src="@{/js/bootstrap-switch.js}"></script>
 <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
 <script th:src="@{/js/webclient.js}"></script>
-<script th:src="@{/js/jquery.md5.js}"></script> 
+<script th:src="@{/js/jquery.md5.js}"></script>
 
 <script type="text/javascript" th:inline="text">
 	/*<![CDATA[*/
@@ -243,6 +243,15 @@
 				var selected = $("#defaultClientGroupSelect").val();
 				$("#hiddenDefaultClient-" + userIndex).val(selected);
 			});
+			
+			var userIndex = $("#hiddenUserIndex").val();
+			
+			var hiddenSelectedClient = $("#hiddenDefaultClient-" + userIndex).val();
+
+			if (!hiddenSelectedClient) {
+				$("#hiddenDefaultClient-" + userIndex).val(
+						$("#defaultClientGroupSelect").val());
+			}
 		});
 
 	}
@@ -411,7 +420,7 @@
 
 		// bereits zugeordnete Gruppen initialisieren
 		setAssignedGroups(collectionIndex[1]);
-		
+
 		// Auswahl für Standardmandant aktualisieren
 		determinAvailableClients();
 	}

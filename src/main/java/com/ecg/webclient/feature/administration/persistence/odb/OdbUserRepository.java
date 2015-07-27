@@ -177,8 +177,15 @@ public class OdbUserRepository implements IUserRepository
                 persistentUser = db.save(user);
                 user.setRid(persistentUser.getRid());
 
-                OCommandRequest command = new OCommandSQL("update " + user.getRid() + " set password = "
-                        + PasswordEncoder.encodeComplex(user.getPassword(), user.getRid().toString()));
+                String pw = user.getPassword();
+
+                if (pw == null || pw.isEmpty())
+                {
+                    pw = PasswordEncoder.encodeSimple("NewUser123?");
+                }
+
+                OCommandRequest command = new OCommandSQL("update " + user.getRid() + " set password = '"
+                        + PasswordEncoder.encodeComplex(pw, user.getRid().toString()) + "'");
                 db.command(command).execute();
             }
 
