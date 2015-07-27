@@ -33,6 +33,15 @@ public interface IUserRepository
     User getUserById(Object id);
 
     /**
+     * Lädt einen Benutzer anhand seines Benutzernamen
+     * 
+     * @param string
+     *            Benutzername
+     * @return Benutzer wenn existent, sonst null
+     */
+    User getUserByLogin(String string);
+
+    /**
      * Speichert einen Benutzer
      * 
      * @param setupUser

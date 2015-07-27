@@ -22,12 +22,7 @@ public class Util
     public Util(IClientRepository clientRepository)
     {
         this.clientRepository = clientRepository;
-
-        List<ClientDto> clients = ClientMapper.mapToDtos(clientRepository.getAllClients());
-        if (!clients.isEmpty())
-        {
-            this.selectedClient = clients.get(0);
-        }
+        initSelectedClient();
     }
 
     public String getClientChangePath()
@@ -45,6 +40,11 @@ public class Util
             {
                 clients.add(client);
             }
+        }
+
+        if (selectedClient == null)
+        {
+            initSelectedClient();
         }
 
         boolean selectedClientNotIncluded = true;
@@ -87,5 +87,14 @@ public class Util
     public void setSelectedClient(ClientDto selectedClient)
     {
         this.selectedClient = selectedClient;
+    }
+
+    private void initSelectedClient()
+    {
+        List<ClientDto> clients = ClientMapper.mapToDtos(clientRepository.getAllClients());
+        if (!clients.isEmpty())
+        {
+            this.selectedClient = clients.get(0);
+        }
     }
 }

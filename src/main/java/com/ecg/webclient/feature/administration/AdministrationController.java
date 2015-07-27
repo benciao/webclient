@@ -53,24 +53,24 @@ import com.ecg.webclient.feature.administration.viewmodell.mapper.UserMapper;
 @RequestMapping(value = "/admin")
 public class AdministrationController
 {
-    static final Logger       logger = LogManager.getLogger(AdministrationController.class.getName());
+    static final Logger        logger = LogManager.getLogger(AdministrationController.class.getName());
     @Autowired
-    private FeatureRegistry   featureRegistry;
+    private FeatureRegistry    featureRegistry;
 
     @Autowired
-    private IClientRepository clientRepository;
+    private IClientRepository  clientRepository;
 
     @Autowired
-    private IRoleRepository   roleRepository;
+    private IRoleRepository    roleRepository;
 
     @Autowired
-    private IGroupRepository  groupRepository;
+    private IGroupRepository   groupRepository;
 
     @Autowired
-    private IUserRepository   userRepository;
+    private IUserRepository    userRepository;
 
     @Autowired
-    private Util              util;
+    private Util               util;
 
     /**
      * Behandelt GET-Requests vom Typ "/admin".
@@ -303,9 +303,13 @@ public class AdministrationController
         setupClient.setDescription("Client to setup the system");
         setupClient.setColor("#ff0000");
 
-        Client savedClient = clientRepository.saveClient(setupClient);
+        Client savedClient = clientRepository.getClientByName("Setup Client");
 
-        logger.info("Setup-Client created");
+        if (savedClient == null)
+        {
+            savedClient = clientRepository.saveClient(setupClient);
+            logger.info("Setup-Client created");
+        }
 
         List<Role> roles = roleRepository.getAllRoles();
 
@@ -322,11 +326,18 @@ public class AdministrationController
             logger.info("Setup-Role created");
         }
 
-        Group setupGroup = new Group();
-        setupGroup.setClient(savedClient);
-        setupGroup.setName("Setup Group");
-        setupGroup.setDescription("Group to setup system");
-        setupGroup.setEnabled(true);
+        Group savedGroup = groupRepository.getGroupByName("Setup Group");
+
+        if (savedGroup == null)
+        {
+            Group setupGroup = new Group();
+            setupGroup.setClient(savedClient);
+            setupGroup.setName("Setup Group");
+            setupGroup.setDescription("Group to setup system");
+            setupGroup.setEnabled(true);
+            savedGroup = setupGroup;
+            logger.info("Setup-Group created");
+        }
 
         List<Object> roleRids = new ArrayList<Object>();
         for (Role role : roles)
@@ -337,28 +348,32 @@ public class AdministrationController
         {
             roleRids.add(savedRole.getRid());
         }
-        setupGroup.setRoleRids(roleRids);
+        savedGroup.setRoleRids(roleRids);
 
-        Group savedGroup = groupRepository.saveGroup(setupGroup);
-        logger.info("Setup-Group created");
+        savedGroup = groupRepository.saveGroup(savedGroup);
 
         List<Object> groupRids = new ArrayList<Object>();
         groupRids.add(savedGroup.getRid());
 
-        User setupUser = new User();
-        setupUser.setLogin("setupuser");
-        setupUser.setPassword(PasswordEncoder.encodeSimple("SetupSystem!"));
-        setupUser.setFirstname("Setup");
-        setupUser.setLastname("User");
-        setupUser.setEnabled(true);
-        setupUser.setChangePasswordOnNextLogin(false);
-        setupUser.setDefaultClientRid(savedClient.getRid());
-        setupUser.setEmail("setupuser@ecg-leipzig.de");
-        setupUser.setType(true);
-        setupUser.setGroupRids(groupRids);
+        User setupUser = userRepository.getUserByLogin("setupuser");
 
-        userRepository.saveUser(setupUser);;
-        logger.info("Setup-User created");
+        if (setupUser == null)
+        {
+            setupUser = new User();
+            setupUser.setLogin("setupuser");
+            setupUser.setPassword(PasswordEncoder.encodeSimple("SetupSystem!"));
+            setupUser.setFirstname("Setup");
+            setupUser.setLastname("User");
+            setupUser.setEnabled(true);
+            setupUser.setChangePasswordOnNextLogin(false);
+            setupUser.setDefaultClientRid(savedClient.getRid());
+            setupUser.setEmail("setupuser@ecg-leipzig.de");
+            setupUser.setType(true);
+            setupUser.setGroupRids(groupRids);
+
+            userRepository.saveUser(setupUser);
+            logger.info("Setup-User created");
+        }
 
         return "login";
     }
@@ -378,7 +393,15 @@ public class AdministrationController
         User user = userRepository.getUserById("#" + userRid);
 
         model.addAttribute("availableClients", ClientMapper.mapToDtos(clients));
-        model.addAttribute("currentUser", UserMapper.mapToDto(user));
+
+        if (user != null)
+        {
+            model.addAttribute("defaultClient", UserMapper.mapToDto(user).getDefaultClient());
+        }
+        else
+        {
+            model.addAttribute("defaultClient", "");
+        }
 
         return "administration/user :: availableClients";
     }

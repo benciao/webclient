@@ -127,6 +127,35 @@ public class OdbGroupRepository implements IGroupRepository
     }
 
     @Override
+    public Group getGroupByName(String name)
+    {
+        Group group = null;
+        OObjectDatabaseTx db = null;
+
+        try
+        {
+            db = connectionFactory.getTx();
+
+            List<Group> resultSet = db.query(new OSQLSynchQuery<Client>("select from Group where name = '"
+                    + name + "'"));
+            return (resultSet.size() != 0) ? resultSet.get(0) : null;
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.close();
+            }
+        }
+
+        return group;
+    }
+
+    @Override
     public Group saveGroup(Group group)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();

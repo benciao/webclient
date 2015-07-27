@@ -49,6 +49,14 @@ public interface IClientRepository
     Client getClientById(Object id);
 
     /**
+     * Lädt einen Mandanten anhand seines Namens
+     * 
+     * @param string Name
+     * @return Mandanten wenn vorhanden, sonst null
+     */
+    Client getClientByName(String string);
+
+    /**
      * @param id
      *            technische id
      * @return die Mandanteneigenschaft yu welcher die Id passt

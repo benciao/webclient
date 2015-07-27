@@ -411,6 +411,9 @@
 
 		// bereits zugeordnete Gruppen initialisieren
 		setAssignedGroups(collectionIndex[1]);
+		
+		// Auswahl für Standardmandant aktualisieren
+		determinAvailableClients();
 	}
 
 	function onDeleteClick(event) {
@@ -809,7 +812,7 @@ body {
 		<select id="defaultClientGroupSelect" class="form-control">
 			<option th:each="client : ${availableClients}"
 				th:value="${client.rid}" th:text="${client.name}"
-				th:selected="${client.rid.toString() == currentUser.defaultClient}"></option>
+				th:selected="${client.rid.toString() == defaultClient}"></option>
 		</select>
 	</div>
 </body>

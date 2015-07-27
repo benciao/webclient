@@ -33,6 +33,15 @@ public interface IGroupRepository
     List<Group> getAllGroupsForClient(Object clientId);
 
     /**
+     * Lädt eine Gruppe anhand ihres Namens
+     * 
+     * @param string
+     *            Gruppenname
+     * @return Gruppe wenn existent, sonst null
+     */
+    Group getGroupByName(String string);
+
+    /**
      * Speichert eine Benutzergruppe
      * 
      * @param group

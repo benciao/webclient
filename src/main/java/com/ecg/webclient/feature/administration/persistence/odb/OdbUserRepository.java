@@ -128,6 +128,37 @@ public class OdbUserRepository implements IUserRepository
     }
 
     @Override
+    public User getUserByLogin(String login)
+    {
+        User user = null;
+        OObjectDatabaseTx db = null;
+
+        try
+        {
+            db = connectionFactory.getTx();
+
+            List<User> users = db.query(new OSQLSynchQuery<User>("select from User where login = '" + login
+                    + "'"));
+
+            return (users.size() != 0) ? users.get(0) : null;
+
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.close();
+            }
+        }
+
+        return user;
+    }
+
+    @Override
     public void saveUser(User user)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();

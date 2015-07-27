@@ -197,6 +197,35 @@ public class OdbClientRepository implements IClientRepository
     }
 
     @Override
+    public Client getClientByName(String name)
+    {
+        Client client = null;
+        OObjectDatabaseTx db = null;
+
+        try
+        {
+            db = connectionFactory.getTx();
+
+            List<Client> resultSet = db.query(new OSQLSynchQuery<Client>("select from Client where name = '"
+                    + name + "'"));
+            return (resultSet.size() != 0) ? resultSet.get(0) : null;
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.close();
+            }
+        }
+
+        return client;
+    }
+
+    @Override
     public Property getPropertyById(Object id)
     {
         Property property = null;
@@ -256,7 +285,7 @@ public class OdbClientRepository implements IClientRepository
                 db.close();
             }
         }
-        
+
         return null;
     }
 
