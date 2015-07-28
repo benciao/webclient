@@ -159,6 +159,36 @@ public class OdbUserRepository implements IUserRepository
     }
 
     @Override
+    public boolean isUserAuthorized(String login, String password)
+    {
+        User user = getUserByLogin(login);
+
+        if (user == null)
+        {
+            return false;
+        }
+        else
+        {
+            String finalPw = PasswordEncoder.encodeComplex(password, user.getRid().toString());
+            if (finalPw.equalsIgnoreCase(user.getPassword()))
+            {
+                if (user.isEnabled() && !user.getGroups().isEmpty() && user.getDefaultClient().isEnabled())
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    @Override
     public void saveUser(User user)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();

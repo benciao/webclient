@@ -366,14 +366,16 @@ public class AdministrationController
             setupUser.setLastname("User");
             setupUser.setEnabled(true);
             setupUser.setChangePasswordOnNextLogin(false);
-            setupUser.setDefaultClientRid(savedClient.getRid());
+
             setupUser.setEmail("setupuser@ecg-leipzig.de");
             setupUser.setType(true);
             setupUser.setGroupRids(groupRids);
 
-            userRepository.saveUser(setupUser);
             logger.info("Setup-User created");
         }
+
+        setupUser.setDefaultClientRid(savedClient.getRid());
+        userRepository.saveUser(setupUser);
 
         return "login";
     }

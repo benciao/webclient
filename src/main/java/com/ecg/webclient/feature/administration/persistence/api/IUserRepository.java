@@ -42,6 +42,14 @@ public interface IUserRepository
     User getUserByLogin(String string);
 
     /**
+     * Prüft, ob es einen Benutzer mit übereinstimmenden Logindaten gibt
+     * @param user Benutzerlogin
+     * @param password Benutzerpasswort
+     * @return true, wenn existent, sonst false
+     */
+    boolean isUserAuthorized(String user, String password);
+
+    /**
      * Speichert einen Benutzer
      * 
      * @param setupUser

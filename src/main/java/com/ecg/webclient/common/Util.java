@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
+import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
+import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
+import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.mapper.ClientMapper;
 
@@ -17,11 +22,13 @@ public class Util
     private boolean           isMenuMinimized;
     private ClientDto         selectedClient;
     private IClientRepository clientRepository;
+    private IUserRepository   userRepository;
 
     @Autowired
-    public Util(IClientRepository clientRepository)
+    public Util(IClientRepository clientRepository, IUserRepository userRepository)
     {
         this.clientRepository = clientRepository;
+        this.userRepository = userRepository;
         initSelectedClient();
     }
 
@@ -32,9 +39,22 @@ public class Util
 
     public List<ClientDto> getClients()
     {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String login = auth.getName();
+
+        User user = userRepository.getUserByLogin(login);
+
         clients = new ArrayList<ClientDto>();
 
-        for (ClientDto client : ClientMapper.mapToDtos(clientRepository.getAllClients()))
+        List<Object> groupRids = new ArrayList<Object>();
+        List<Group> assignedGroups = user.getGroups();
+        for (Group group : assignedGroups)
+        {
+            groupRids.add(group.getRid());
+        }
+
+        for (ClientDto client : ClientMapper.mapToDtos(clientRepository
+                .getAssignedClientsForGroups(groupRids)))
         {
             if (client.isEnabled())
             {
