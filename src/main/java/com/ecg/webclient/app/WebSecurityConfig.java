@@ -32,6 +32,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/resources/**", "/css/**", "/icons/**", "/js/**", "/fonts/**",
                         "/img/bootstrap-colorpicker/**", "/admin/setup/system").permitAll().anyRequest()
                 .authenticated().and().formLogin().loginPage("/login").permitAll().and().logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login");
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login");;
     }
 }
