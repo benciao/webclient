@@ -80,7 +80,7 @@ public class AdministrationController
     @RequestMapping(method = RequestMethod.GET)
     public String load()
     {
-        return getLoadingRedirectTemplate();
+        return getLoadingRedirectTemplate() + "administration";
     }
 
     /**
@@ -93,7 +93,7 @@ public class AdministrationController
             @ModelAttribute("currentFeature") FeatureAdministration feature)
     {
         featureRegistry.updateActiveFeature(feature, isMinimized);
-        return getLoadingRedirectTemplate();
+        return getLoadingRedirectTemplate() + "administration";
     }
 
     /**
@@ -126,7 +126,7 @@ public class AdministrationController
 
         if (bindingResult.hasErrors())
         {
-            return "administration/clientConfig";
+            return getLoadingRedirectTemplate() + "clientConfig";
         }
 
         clientRepository.saveClients(ClientMapper.mapToEntities(updateDtos));
@@ -164,7 +164,7 @@ public class AdministrationController
 
         if (bindingResult.hasErrors())
         {
-            return "administration/clientProperties";
+            return getLoadingRedirectTemplate() + "clientProperties";
         }
 
         clientRepository.saveClient(ClientMapper.mapToEntity(updatedClient));
@@ -202,7 +202,7 @@ public class AdministrationController
 
         if (bindingResult.hasErrors())
         {
-            return "administration/userGroup";
+            return getLoadingRedirectTemplate() + "userGroup";
         }
 
         List<Group> groups = GroupMapper.mapToEntities(updateDtos);
@@ -242,7 +242,7 @@ public class AdministrationController
 
         if (bindingResult.hasErrors())
         {
-            return "administration/userRole";
+            return getLoadingRedirectTemplate() + "userRole";
         }
 
         roleRepository.saveRoles(RoleMapper.mapToEntities(updateDtos));
@@ -279,7 +279,7 @@ public class AdministrationController
 
         if (bindingResult.hasErrors())
         {
-            return "administration/user";
+            return getLoadingRedirectTemplate() + "user";
         }
 
         List<User> users = UserMapper.mapToEntities(updateDtos);
@@ -326,7 +326,7 @@ public class AdministrationController
             logger.info("SETUP_ROLE created");
         }
 
-        Group savedGroup = groupRepository.getGroupByName("Setup Group");
+        Group savedGroup = groupRepository.getGroupByName("SETUP_GROUP");
 
         if (savedGroup == null)
         {
@@ -405,7 +405,7 @@ public class AdministrationController
             model.addAttribute("defaultClient", "");
         }
 
-        return "administration/user :: availableClients";
+        return getLoadingRedirectTemplate() + "user :: availableClients";
     }
 
     /**
@@ -419,7 +419,7 @@ public class AdministrationController
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.setClients(ClientMapper.mapToDtos(clientRepository.getAllClients(false)));
         model.addAttribute("clientConfig", clientConfig);
-        return "administration/clientConfig";
+        return getLoadingRedirectTemplate() + "clientConfig";
     }
 
     /**
@@ -435,7 +435,7 @@ public class AdministrationController
 
         model.addAttribute("groups", GroupMapper.mapToDtos(groups));
 
-        return "administration/user :: clientGroups";
+        return getLoadingRedirectTemplate() + "user :: clientGroups";
     }
 
     /**
@@ -450,7 +450,7 @@ public class AdministrationController
         ClientProperties clientProperties = new ClientProperties();
         clientProperties.setProperties(util.getSelectedClient().getProperties());
         model.addAttribute("clientProperties", clientProperties);
-        return "administration/clientProperties";
+        return getLoadingRedirectTemplate() + "clientProperties";
     }
 
     /**
@@ -468,7 +468,7 @@ public class AdministrationController
         groupConfig.setRoles(RoleMapper.mapToDtos(roleRepository.getAllRoles()));
         model.addAttribute("groupConfig", groupConfig);
 
-        return "administration/usergroup";
+        return getLoadingRedirectTemplate() + "usergroup";
     }
 
     /**
@@ -483,7 +483,7 @@ public class AdministrationController
         roleConfig.setRoles(RoleMapper.mapToDtos(roleRepository.getAllRoles()));
         model.addAttribute("roleConfig", roleConfig);
 
-        return "administration/userrole";
+        return getLoadingRedirectTemplate() + "userrole";
     }
 
     /**
@@ -498,12 +498,12 @@ public class AdministrationController
         userConfig.setUsers(UserMapper.mapToDtos(userRepository.getAllUsers()));
         model.addAttribute("userConfig", userConfig);
 
-        return "administration/user";
+        return getLoadingRedirectTemplate() + "user";
     }
 
     protected String getLoadingRedirectTemplate()
     {
-        return "administration/administration";
+        return "feature/administration/";
     }
 
     private void updateSelectedClient(List<ClientDto> clientDtos)

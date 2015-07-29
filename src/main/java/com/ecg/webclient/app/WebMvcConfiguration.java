@@ -32,8 +32,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter
         registry.addResourceHandler("/icons/**").addResourceLocations("classpath:/icons/");
         registry.addResourceHandler("/fonts/**").addResourceLocations("classpath:/fonts/");
         registry.addResourceHandler("/img/**").addResourceLocations("classpath:/img/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations(
-                "classpath:/META-INF/resources/webjars/");
     }
 
     @Override
@@ -42,7 +40,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter
         registry.addViewController("/login").setViewName("login");
         registry.addViewController("/main").setViewName("main");
         registry.addViewController("/process_monitor").setViewName("process_monitor");
-        registry.addViewController("/administration").setViewName("administration");
+        registry.addViewController("/adminministration").setViewName("administration");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 
