@@ -5,13 +5,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ecg.webclient.common.Util;
-
 @Controller
 public class SiteController
 {
     @Autowired
-    private Util util;
+    private AuthenticationUtil util;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login()

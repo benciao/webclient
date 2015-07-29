@@ -30,9 +30,10 @@ public interface IClientRepository
     void deleteProperties(List<Property> properties);
 
     /**
-     * @return alle Mandanten
+     * @param true, wenn nur die aktiven; false, wenn alle
+     * @return alle Mandanten bei false, sonst nur die aktiven
      */
-    List<Client> getAllClients();
+    List<Client> getAllClients(boolean onlyEnabled);
 
     /**
      * @param groupRids

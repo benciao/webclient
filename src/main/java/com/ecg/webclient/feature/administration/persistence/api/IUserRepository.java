@@ -43,8 +43,11 @@ public interface IUserRepository
 
     /**
      * Prüft, ob es einen Benutzer mit übereinstimmenden Logindaten gibt
-     * @param user Benutzerlogin
-     * @param password Benutzerpasswort
+     * 
+     * @param user
+     *            Benutzerlogin
+     * @param password
+     *            Benutzerpasswort
      * @return true, wenn existent, sonst false
      */
     boolean isUserAuthorized(String user, String password);

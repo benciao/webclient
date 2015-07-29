@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ecg.webclient.common.Util;
+import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.common.feature.FeatureRegistry;
 import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
@@ -70,7 +70,7 @@ public class AdministrationController
     private IUserRepository    userRepository;
 
     @Autowired
-    private Util               util;
+    private AuthenticationUtil util;
 
     /**
      * Behandelt GET-Requests vom Typ "/admin".
@@ -168,7 +168,7 @@ public class AdministrationController
         }
 
         clientRepository.saveClient(ClientMapper.mapToEntity(updatedClient));
-        util.setSelectedClient(updatedClient);
+        util.setSelectedClientWithNewAuthority(updatedClient);
 
         return "redirect:";
     }
@@ -299,7 +299,7 @@ public class AdministrationController
     {
         Client setupClient = new Client();
         setupClient.setEnabled(true);
-        setupClient.setName("Setup Client");
+        setupClient.setName("SETUP_CLIENT");
         setupClient.setDescription("Client to setup the system");
         setupClient.setColor("#ff0000");
 
@@ -308,7 +308,7 @@ public class AdministrationController
         if (savedClient == null)
         {
             savedClient = clientRepository.saveClient(setupClient);
-            logger.info("Setup-Client created");
+            logger.info("SETUP_CLIENT created");
         }
 
         List<Role> roles = roleRepository.getAllRoles();
@@ -318,12 +318,12 @@ public class AdministrationController
         if (roles.isEmpty())
         {
             setupRole = new Role();
-            setupRole.setName("Setup Role");
+            setupRole.setName("SETUP_ROLE");
             setupRole.setDescription("Role to setup the system");
             setupRole.setEnabled(true);
 
             savedRole = roleRepository.saveRole(setupRole);
-            logger.info("Setup-Role created");
+            logger.info("SETUP_ROLE created");
         }
 
         Group savedGroup = groupRepository.getGroupByName("Setup Group");
@@ -332,11 +332,11 @@ public class AdministrationController
         {
             Group setupGroup = new Group();
             setupGroup.setClient(savedClient);
-            setupGroup.setName("Setup Group");
+            setupGroup.setName("SETUP_GROUP");
             setupGroup.setDescription("Group to setup system");
             setupGroup.setEnabled(true);
             savedGroup = setupGroup;
-            logger.info("Setup-Group created");
+            logger.info("SETUP_GROUP created");
         }
 
         List<Object> roleRids = new ArrayList<Object>();
@@ -417,7 +417,7 @@ public class AdministrationController
     public String showClientConfig(Model model)
     {
         ClientConfig clientConfig = new ClientConfig();
-        clientConfig.setClients(ClientMapper.mapToDtos(clientRepository.getAllClients()));
+        clientConfig.setClients(ClientMapper.mapToDtos(clientRepository.getAllClients(false)));
         model.addAttribute("clientConfig", clientConfig);
         return "administration/clientConfig";
     }
@@ -512,7 +512,7 @@ public class AdministrationController
         {
             if (util.getSelectedClient().getRid().toString().equalsIgnoreCase(clientDto.getRid().toString()))
             {
-                util.setSelectedClient(clientDto);
+                util.setSelectedClientWithNewAuthority(clientDto);
                 break;
             }
         }

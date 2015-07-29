@@ -326,7 +326,7 @@ body {
 						<div id="collapseOne" class="panel-collapse collapse">
 							<div class="panel-body">
 								<table class="table">
-									<tr>
+									<tr sec:authorize="hasAnyRole('SETUP_ROLE', 'SECURITY_ADMIN_ROLE')">
 										<td><a href="/admin/client"><span
 												th:text="#{menuTreeClientConfig}"></span></a></td>
 									</tr>
@@ -338,7 +338,7 @@ body {
 							</div>
 						</div>
 					</div>
-					<div class="panel panel-default">
+					<div class="panel panel-default" sec:authorize="hasAnyRole('SETUP_ROLE', 'SECURITY_ADMIN_ROLE')">
 						<div class="panel-heading">
 							<h4 class="panel-title">
 								<a data-toggle="collapse" data-parent="#accordion"

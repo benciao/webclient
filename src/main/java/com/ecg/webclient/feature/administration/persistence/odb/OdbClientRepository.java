@@ -99,7 +99,7 @@ public class OdbClientRepository implements IClientRepository
     }
 
     @Override
-    public List<Client> getAllClients()
+    public List<Client> getAllClients(boolean onlyEnabled)
     {
         List<Client> clients = new ArrayList<Client>();
         OObjectDatabaseTx db = null;
@@ -108,7 +108,14 @@ public class OdbClientRepository implements IClientRepository
         {
             db = connectionFactory.getTx();
 
-            clients = db.query(new OSQLSynchQuery<Client>("select from Client"));
+            if (!onlyEnabled)
+            {
+                clients = db.query(new OSQLSynchQuery<Client>("select from Client"));
+            }
+            else
+            {
+                clients = db.query(new OSQLSynchQuery<Client>("select from Client where enabled = true"));
+            }
         }
         catch (final RuntimeException e)
         {

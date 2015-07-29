@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ecg.webclient.common.Util;
+import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.common.feature.FeatureRegistry;
 import com.ecg.webclient.feature.administration.persistence.odb.OdbClientRepository;
 import com.ecg.webclient.feature.administration.viewmodell.mapper.ClientMapper;
@@ -21,12 +21,13 @@ public class MainController
     private OdbClientRepository clientRepository;
 
     @Autowired
-    private Util             util;
+    private AuthenticationUtil             util;
 
     @RequestMapping(value = "/changeClient", method = RequestMethod.POST)
     public String changeClient(@ModelAttribute("selectedClient") Object selectedClient)
     {
-        util.setSelectedClient(ClientMapper.mapToDto(clientRepository.getClientById(selectedClient)));
+        util.setSelectedClientWithNewAuthority(ClientMapper.mapToDto(clientRepository
+                .getClientById(selectedClient)));
         featureRegistry.resetActiveFeature();
         return "/main";
     }
