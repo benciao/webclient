@@ -1,16 +1,16 @@
-package com.ecg.webclient.feature.administration.persistence.odb;
+package com.ecg.webclient.feature.administration.persistence.odbrepo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.feature.administration.persistence.dbmodell.BaseObject;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Property;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Role;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbBaseObject;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbClient;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbGroup;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbProperty;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbRole;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbUser;
 import com.orientechnologies.orient.core.entity.OEntityManager;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
@@ -28,12 +28,12 @@ public class OdbModellInitializer
     public OdbModellInitializer()
     {
         objectTypes = new ArrayList<>();
-        objectTypes.add(BaseObject.class);
-        objectTypes.add(Client.class);
-        objectTypes.add(Property.class);
-        objectTypes.add(User.class);
-        objectTypes.add(Group.class);
-        objectTypes.add(Role.class);
+        objectTypes.add(OdbBaseObject.class);
+        objectTypes.add(OdbClient.class);
+        objectTypes.add(OdbProperty.class);
+        objectTypes.add(OdbUser.class);
+        objectTypes.add(OdbGroup.class);
+        objectTypes.add(OdbRole.class);
     }
 
     void addObjectType(final Class<?> clazz)

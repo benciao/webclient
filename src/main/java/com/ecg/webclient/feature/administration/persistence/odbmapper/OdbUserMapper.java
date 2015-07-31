@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.viewmodell.mapper;
+package com.ecg.webclient.feature.administration.persistence.odbmapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,15 +6,29 @@ import java.util.List;
 
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
+import com.ecg.webclient.feature.administration.persistence.api.IGroup;
+import com.ecg.webclient.feature.administration.persistence.api.IUser;
+import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbUser;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
-public class UserMapper
+/**
+ * Mapped die Eigenschaften einer in OrientDb bekannten Entität auf einen detachten Benutzer oder umgekehrt.
+ * 
+ * @author arndtmar
+ */
+public class OdbUserMapper
 {
-    public static UserDto mapToDto(User user)
+    /**
+     * Wandelt einen persistenten Benutzer in einen detachten um
+     * 
+     * @param user
+     *            persistenter Benutzer
+     * @return Detacheter Benutzer
+     */
+    public static IUserDto mapToDto(IUser user)
     {
-        UserDto dto = new UserDto();
+        IUserDto dto = new UserDto();
         dto.setLogin(user.getLogin());
         dto.setType(user.isType());
         dto.setLastname(user.getLastname());
@@ -33,7 +47,7 @@ public class UserMapper
         if (user.getGroups() != null)
         {
             String groups = "";
-            for (Group group : user.getGroups())
+            for (IGroup group : user.getGroups())
             {
                 if (groups.length() == 0)
                 {
@@ -50,13 +64,20 @@ public class UserMapper
         return dto;
     }
 
-    public static List<UserDto> mapToDtos(List<User> users)
+    /**
+     * Wandelt eine Liste von persistenten Benutzern in eine Liste von detachten Benutzern um
+     * 
+     * @param users
+     *            Liste von persistenten Benutzern
+     * @return Liste von detachten Benutzern
+     */
+    public static List<IUserDto> mapToDtos(List<IUser> users)
     {
-        List<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
+        List<IUserDto> result = new AutoPopulatingList<IUserDto>(IUserDto.class);
 
-        for (User user : users)
+        for (IUser user : users)
         {
-            UserDto dto = new UserDto();
+            IUserDto dto = new UserDto();
             dto.setLogin(user.getLogin());
             dto.setType(user.isType());
             dto.setLastname(user.getLastname());
@@ -75,7 +96,7 @@ public class UserMapper
             if (user.getGroups() != null)
             {
                 String groups = "";
-                for (Group group : user.getGroups())
+                for (IGroup group : user.getGroups())
                 {
                     if (groups.length() == 0)
                     {
@@ -95,15 +116,22 @@ public class UserMapper
         return result;
     }
 
-    public static List<User> mapToEntities(List<UserDto> dtos)
+    /**
+     * Wandelt eine Liste von detachten Benutzern in eine Liste von persistenten Benutzern um
+     * 
+     * @param dtos
+     *            Liste von detachten Benutzern
+     * @return Liste von persistenten Benutzern
+     */
+    public static List<IUser> mapToEntities(List<IUserDto> dtos)
     {
-        List<User> result = new ArrayList<User>();
+        List<IUser> result = new ArrayList<IUser>();
 
-        for (UserDto dto : dtos)
+        for (IUserDto dto : dtos)
         {
-            User entity = new User();
+            IUser entity = new OdbUser();
             entity.setLogin(dto.getLogin());
-            entity.setType(dto.getType());
+            entity.setType(dto.isType());
             entity.setLastname(dto.getLastname());
             entity.setFirstname(dto.getFirstname());
             entity.setEnabled(dto.isEnabled());
@@ -120,11 +148,18 @@ public class UserMapper
         return result;
     }
 
-    public static User mapToEntity(UserDto dto)
+    /**
+     * Wandelt einen detachten Benutzer in einen persistenten um
+     * 
+     * @param dto
+     *            Detachter Benutzer
+     * @return Persistenter Benutzer
+     */
+    public static IUser mapToEntity(IUserDto dto)
     {
-        User entity = new User();
+        IUser entity = new OdbUser();
         entity.setLogin(dto.getLogin());
-        entity.setType(dto.getType());
+        entity.setType(dto.isType());
         entity.setLastname(dto.getLastname());
         entity.setFirstname(dto.getFirstname());
         entity.setEnabled(dto.isEnabled());

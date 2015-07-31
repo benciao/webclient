@@ -1,24 +1,28 @@
-package com.ecg.webclient.feature.administration.viewmodell;
+package com.ecg.webclient.feature.administration.persistence.odbmodell;
 
-import javax.validation.constraints.NotNull;
-
-import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
+import com.ecg.webclient.feature.administration.persistence.api.IRole;
 
 /**
- * Implementierung einer von der Persistenz detachten Benutzerrolle.
+ * Implementierung einer Benutzerrolle. OrientDb spezifisch.
  * 
  * @author arndtmar
  */
-public class RoleDto extends BaseObjectDto implements IRoleDto
+public class OdbRole extends OdbBaseObject implements IRole
 {
-    @NotNull
     private String  name;
-    @NotNull
     private String  description;
     private boolean enabled;
 
-    public RoleDto()
+    public OdbRole()
     {}
+
+    @Override
+    public void bind(IRole newRole)
+    {
+        setName(newRole.getName());
+        setDescription(newRole.getDescription());
+        setEnabled(newRole.isEnabled());
+    }
 
     @Override
     public String getDescription()
@@ -55,4 +59,5 @@ public class RoleDto extends BaseObjectDto implements IRoleDto
     {
         this.name = name;
     }
+
 }

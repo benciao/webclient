@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.odb;
+package com.ecg.webclient.feature.administration.persistence.odbrepo;
 
 import java.io.IOException;
 import java.util.Optional;

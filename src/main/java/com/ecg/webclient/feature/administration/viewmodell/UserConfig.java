@@ -7,26 +7,28 @@ import javax.validation.Valid;
 
 import org.springframework.util.AutoPopulatingList;
 
+import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
+
 public class UserConfig
 {
     @Valid
-    private List<UserDto> users;
+    private List<IUserDto> users;
 
-    public List<UserDto> getUsers()
+    public List<IUserDto> getUsers()
     {
         if (users == null)
         {
-            users = new AutoPopulatingList<UserDto>(UserDto.class);
+            users = new AutoPopulatingList<IUserDto>(IUserDto.class);
         }
         return users;
     }
 
     public void removeDeleted()
     {
-        List<UserDto> usersToRemove = new ArrayList<UserDto>();
-        for (UserDto user : users)
+        List<IUserDto> usersToRemove = new ArrayList<IUserDto>();
+        for (IUserDto user : users)
         {
-            if (user.getDelete())
+            if (user.isDelete())
             {
                 usersToRemove.add(user);
             }
@@ -34,7 +36,7 @@ public class UserConfig
         users.removeAll(usersToRemove);
     }
 
-    public void setUsers(List<UserDto> users)
+    public void setUsers(List<IUserDto> users)
     {
         this.users = users;
     }

@@ -7,36 +7,39 @@ import javax.validation.Valid;
 
 import org.springframework.util.AutoPopulatingList;
 
+import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
+import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
+
 public class GroupConfig
 {
     @Valid
-    private List<GroupDto> groups;
-    private List<RoleDto>  roles;
+    private List<IGroupDto> groups;
+    private List<IRoleDto>  roles;
 
-    public List<GroupDto> getGroups()
+    public List<IGroupDto> getGroups()
     {
         if (groups == null)
         {
-            groups = new AutoPopulatingList<GroupDto>(GroupDto.class);
+            groups = new AutoPopulatingList<IGroupDto>(IGroupDto.class);
         }
         return groups;
     }
 
-    public List<RoleDto> getRoles()
+    public List<IRoleDto> getRoles()
     {
         if (roles == null)
         {
-            roles = new ArrayList<RoleDto>();
+            roles = new ArrayList<IRoleDto>();
         }
         return roles;
     }
 
     public void removeDeleted()
     {
-        List<GroupDto> groupsToRemove = new ArrayList<GroupDto>();
-        for (GroupDto group : groups)
+        List<IGroupDto> groupsToRemove = new ArrayList<IGroupDto>();
+        for (IGroupDto group : groups)
         {
-            if (group.getDelete())
+            if (group.isDelete())
             {
                 groupsToRemove.add(group);
             }
@@ -44,12 +47,12 @@ public class GroupConfig
         groups.removeAll(groupsToRemove);
     }
 
-    public void setGroups(List<GroupDto> groups)
+    public void setGroups(List<IGroupDto> groups)
     {
         this.groups = groups;
     }
 
-    public void setRoles(List<RoleDto> roles)
+    public void setRoles(List<IRoleDto> roles)
     {
         this.roles = roles;
     }

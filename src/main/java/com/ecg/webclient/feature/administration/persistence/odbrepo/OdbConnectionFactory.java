@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.odb;
+package com.ecg.webclient.feature.administration.persistence.odbrepo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

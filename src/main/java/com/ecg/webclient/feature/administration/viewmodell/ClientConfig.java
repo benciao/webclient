@@ -7,26 +7,28 @@ import javax.validation.Valid;
 
 import org.springframework.util.AutoPopulatingList;
 
+import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
+
 public class ClientConfig
 {
     @Valid
-    private List<ClientDto> clients;
+    private List<IClientDto> clients;
 
-    public List<ClientDto> getClients()
+    public List<IClientDto> getClients()
     {
         if (clients == null)
         {
-            clients = new AutoPopulatingList<ClientDto>(ClientDto.class);
+            clients = new AutoPopulatingList<IClientDto>(IClientDto.class);
         }
         return clients;
     }
 
     public void removeDeleted()
     {
-        List<ClientDto> clientsToRemove = new ArrayList<ClientDto>();
-        for (ClientDto client : clients)
+        List<IClientDto> clientsToRemove = new ArrayList<IClientDto>();
+        for (IClientDto client : clients)
         {
-            if (client.getDelete())
+            if (client.isDelete())
             {
                 clientsToRemove.add(client);
             }
@@ -34,7 +36,7 @@ public class ClientConfig
         clients.removeAll(clientsToRemove);
     }
 
-    public void setClients(List<ClientDto> clients)
+    public void setClients(List<IClientDto> clients)
     {
         this.clients = clients;
     }

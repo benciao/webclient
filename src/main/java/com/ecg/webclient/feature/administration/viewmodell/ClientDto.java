@@ -7,7 +7,15 @@ import javax.validation.constraints.Size;
 
 import org.springframework.util.AutoPopulatingList;
 
-public class ClientDto extends BaseObjectDto
+import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
+import com.ecg.webclient.feature.administration.persistence.api.IPropertyDto;
+
+/**
+ * Implementierung eines von der Persistenz detachten Mandanten.
+ * 
+ * @author arndtmar
+ */
+public class ClientDto extends BaseObjectDto implements IClientDto
 {
     private String            color;
 
@@ -19,76 +27,83 @@ public class ClientDto extends BaseObjectDto
     @NotNull
     private String            name;
     private boolean           enabled;
-    private List<PropertyDto> properties;
+    private List<IPropertyDto> properties;
     private boolean           selected;
 
     public ClientDto()
     {}
 
-    public boolean equals(ClientDto otherDto)
-    {
-        return otherDto.getRid().toString().equalsIgnoreCase(this.getRid().toString()) ? true : false;
-    }
-
+    @Override
     public String getColor()
     {
         return color;
     }
 
+    @Override
     public String getDescription()
     {
         return description;
     }
 
+    @Override
     public String getName()
     {
         return name;
     }
 
-    public List<PropertyDto> getProperties()
+    @Override
+    public List<IPropertyDto> getProperties()
     {
         if (properties == null)
         {
-            properties = new AutoPopulatingList<PropertyDto>(PropertyDto.class);
+            properties = new AutoPopulatingList<IPropertyDto>(IPropertyDto.class);
         }
         return properties;
     }
 
+    @Override
     public boolean isEnabled()
     {
         return enabled;
     }
 
+    @Override
     public boolean isSelected()
     {
         return selected;
     }
 
+    @Override
     public void setColor(String color)
     {
         this.color = color;
     }
 
+    @Override
     public void setDescription(String description)
     {
         this.description = description;
     }
 
+    @Override
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
     }
 
+    @Override
     public void setName(String name)
     {
         this.name = name;
     }
 
-    public void setProperties(List<PropertyDto> properties)
+    @Override
+    public void setProperties(List<IPropertyDto> properties)
     {
         this.properties = properties;
     }
 
+    @Override
     public void setSelected(boolean selected)
     {
         this.selected = selected;

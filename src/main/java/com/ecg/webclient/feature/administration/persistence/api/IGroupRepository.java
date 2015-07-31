@@ -2,8 +2,6 @@ package com.ecg.webclient.feature.administration.persistence.api;
 
 import java.util.List;
 
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
-
 /**
  * Schnittstelle für Persistenzimplementierung von Benutzergruppen.
  * 
@@ -18,19 +16,28 @@ public interface IGroupRepository
      * @param groups
      *            Liste von Benutzergruppen
      */
-    void deleteGroups(List<Group> groups);
+    void deleteGroups(List<IGroupDto> groups);
 
     /**
-     * @return alle Benutzergruppen
+     * @param onlyEnabledGroups
+     *            true, wenn nur aktivierte Benutzergruppen zurückgegeben werden sollen, sonst false
+     * @return Alle aktivierten Benutzergruppen, wenn Parameter == true, sonst alle
      */
-    List<Group> getAllGroups();
+    List<IGroupDto> getAllGroups(boolean onlyEnabledGroups);
 
     /**
      * @param clientId
      *            technische Id des Mandanten
      * @return alle Benutzergruppen des zur Id gehörenden Mandanten
      */
-    List<Group> getAllGroupsForClient(Object clientId);
+    List<IGroupDto> getAllGroupsForClient(Object clientId);
+
+    /**
+     * @param rid
+     *            Gruppen ID
+     * @return Mandant
+     */
+    IClientDto getClientForGroupId(Object rid);
 
     /**
      * Lädt eine Gruppe anhand ihres Namens
@@ -39,7 +46,13 @@ public interface IGroupRepository
      *            Gruppenname
      * @return Gruppe wenn existent, sonst null
      */
-    Group getGroupByName(String string);
+    IGroupDto getGroupByName(String string);
+
+    /**
+     * @param groupRidObjects Liste von Gruppen IDs
+     * @return Alle Gruppen mit den im Parameter enhaltenen IDs
+     */
+    List<IGroupDto> getGroupsForIds(List<Object> groupRidObjects);
 
     /**
      * Speichert eine Benutzergruppe
@@ -48,7 +61,7 @@ public interface IGroupRepository
      *            zu speichernde Gruppe
      * @return Gespeicherte Gruppe
      */
-    Group saveGroup(Group group);
+    IGroupDto saveGroup(IGroupDto group);
 
     /**
      * Speichert alle Benutzergruppen der Liste
@@ -56,5 +69,5 @@ public interface IGroupRepository
      * @param groups
      *            Benutzergruppen
      */
-    void saveGroups(List<Group> groups);
+    void saveGroups(List<IGroupDto> groups);
 }

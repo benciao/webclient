@@ -1,23 +1,33 @@
-package com.ecg.webclient.feature.administration.persistence.dbmodell;
+package com.ecg.webclient.feature.administration.persistence.odbmodell;
 
 import java.util.List;
 
 import javax.persistence.Transient;
 
-public class Group extends BaseObject
+import com.ecg.webclient.feature.administration.persistence.api.IClient;
+import com.ecg.webclient.feature.administration.persistence.api.IGroup;
+import com.ecg.webclient.feature.administration.persistence.api.IRole;
+
+/**
+ * Implementierung einer BenutzerGruppe. OrientDb spezifisch.
+ * 
+ * @author arndtmar
+ */
+public class OdbGroup extends OdbBaseObject implements IGroup
 {
     private String       name;
     private String       description;
     private boolean      enabled;
-    private List<Role>   roles;
-    private Client       client;
+    private List<IRole>  roles;
+    private IClient      client;
     @Transient
     private List<Object> roleRids;
 
-    public Group()
+    public OdbGroup()
     {}
 
-    public void bind(Group newGroup)
+    @Override
+    public void bind(IGroup newGroup)
     {
         setName(newGroup.getName());
         setDescription(newGroup.getDescription());
@@ -26,67 +36,73 @@ public class Group extends BaseObject
     }
 
     @Override
-    public boolean equals(Object otherGroup)
-    {
-        return this.getRid().toString().equalsIgnoreCase(((Group) otherGroup).getRid().toString());
-    }
-
-    public Client getClient()
+    public IClient getClient()
     {
         return client;
     }
 
+    @Override
     public String getDescription()
     {
         return description;
     }
 
+    @Override
     public String getName()
     {
         return name;
     }
 
+    @Override
     public List<Object> getRoleRids()
     {
         return roleRids;
     }
 
-    public List<Role> getRoles()
+    @Override
+    public List<IRole> getRoles()
     {
         return roles;
     }
 
+    @Override
     public boolean isEnabled()
     {
         return enabled;
     }
 
-    public void setClient(Client client)
+    @Override
+    public void setClient(IClient client)
     {
         this.client = client;
     }
 
+    @Override
     public void setDescription(String description)
     {
         this.description = description;
     }
 
+    @Override
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
     }
 
+    @Override
     public void setName(String name)
     {
         this.name = name;
     }
 
+    @Override
     public void setRoleRids(List<Object> roleRids)
     {
         this.roleRids = roleRids;
     }
 
-    public void setRoles(List<Role> roles)
+    @Override
+    public void setRoles(List<IRole> roles)
     {
         this.roles = roles;
     }

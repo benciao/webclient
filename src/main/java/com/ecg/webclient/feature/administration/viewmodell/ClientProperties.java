@@ -7,26 +7,28 @@ import javax.validation.Valid;
 
 import org.springframework.util.AutoPopulatingList;
 
+import com.ecg.webclient.feature.administration.persistence.api.IPropertyDto;
+
 public class ClientProperties
 {
     @Valid
-    private List<PropertyDto> properties;
+    private List<IPropertyDto> properties;
 
-    public List<PropertyDto> getProperties()
+    public List<IPropertyDto> getProperties()
     {
         if (properties == null)
         {
-            properties = new AutoPopulatingList<PropertyDto>(PropertyDto.class);
+            properties = new AutoPopulatingList<IPropertyDto>(IPropertyDto.class);
         }
         return properties;
     }
 
     public void removeDeleted()
     {
-        List<PropertyDto> propertiesToRemove = new ArrayList<PropertyDto>();
-        for (PropertyDto property : properties)
+        List<IPropertyDto> propertiesToRemove = new ArrayList<IPropertyDto>();
+        for (IPropertyDto property : properties)
         {
-            if (property.getDelete())
+            if (property.isDelete())
             {
                 propertiesToRemove.add(property);
             }
@@ -34,7 +36,7 @@ public class ClientProperties
         properties.removeAll(propertiesToRemove);
     }
 
-    public void setProperties(List<PropertyDto> properties)
+    public void setProperties(List<IPropertyDto> properties)
     {
         this.properties = properties;
     }

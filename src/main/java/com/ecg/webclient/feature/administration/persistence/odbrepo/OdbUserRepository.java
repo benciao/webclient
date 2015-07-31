@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.odb;
+package com.ecg.webclient.feature.administration.persistence.odbrepo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +10,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.common.authentication.PasswordEncoder;
+import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
+import com.ecg.webclient.feature.administration.persistence.api.IUser;
+import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
 import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbClientMapper;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbUserMapper;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbClient;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbUser;
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -22,7 +27,6 @@ import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
  * Repository für Benutzer bei Nutzung einer OrientDB.
  * 
  * @author arndtmar
- *
  */
 @Component
 public class OdbUserRepository implements IUserRepository
@@ -37,15 +41,15 @@ public class OdbUserRepository implements IUserRepository
     }
 
     @Override
-    public void deleteUsers(List<User> users)
+    public void deleteUsers(List<IUserDto> detachedUsers)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();
 
         try
         {
-            for (User user : users)
+            for (IUserDto user : detachedUsers)
             {
-                User persistentUser = getUserByRid(user.getRid());
+                IUser persistentUser = getUserByRid(user.getRid());
 
                 if (persistentUser != null)
                 {
@@ -68,16 +72,24 @@ public class OdbUserRepository implements IUserRepository
     }
 
     @Override
-    public List<User> getAllUsers()
+    public List<IUserDto> getAllUsers(boolean onlyEnabledUsers)
     {
-        List<User> users = new ArrayList<User>();
+        List<IUser> attachedUsers = new ArrayList<IUser>();
         OObjectDatabaseTx db = null;
 
         try
         {
             db = connectionFactory.getTx();
 
-            users = db.query(new OSQLSynchQuery<User>("select from User"));
+            if (!onlyEnabledUsers)
+            {
+                attachedUsers = db.query(new OSQLSynchQuery<OdbUser>("select from User"));
+            }
+            else
+            {
+                attachedUsers = db
+                        .query(new OSQLSynchQuery<OdbUser>("select from User where enabled = true"));
+            }
         }
         catch (final RuntimeException e)
         {
@@ -91,25 +103,59 @@ public class OdbUserRepository implements IUserRepository
             }
         }
 
-        AutoPopulatingList<User> result = new AutoPopulatingList<User>(User.class);
-        result.addAll(users);
+        AutoPopulatingList<IUserDto> result = new AutoPopulatingList<IUserDto>(IUserDto.class);
+
+        for (IUser attachedUser : attachedUsers)
+        {
+            result.add(OdbUserMapper.mapToDto(attachedUser));
+        }
 
         return result;
     }
 
     @Override
-    public User getUserById(Object id)
+    public IClientDto getDefaultClientForUser(IUserDto user)
     {
-        User user = null;
+        final OObjectDatabaseTx db = connectionFactory.getTx();
+
+        try
+        {
+            IUser persistentUser = getUserByRid(user.getRid());
+
+            if (persistentUser != null)
+            {
+                return OdbClientMapper.mapToDto(persistentUser.getDefaultClient());
+            }
+        }
+        catch (final RuntimeException e)
+        {
+            logger.error(e);
+        }
+        finally
+        {
+            if (db != null)
+            {
+                db.commit();
+                db.close();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public IUserDto getUserById(Object id)
+    {
+        IUserDto user = null;
         OObjectDatabaseTx db = null;
 
         try
         {
             db = connectionFactory.getTx();
 
-            List<User> users = db.query(new OSQLSynchQuery<User>("select from User where @rid = " + id));
+            List<IUser> users = db.query(new OSQLSynchQuery<OdbUser>("select from User where @rid = " + id));
 
-            return (users.size() != 0) ? users.get(0) : null;
+            return (users.size() != 0) ? OdbUserMapper.mapToDto(users.get(0)) : null;
 
         }
         catch (final RuntimeException e)
@@ -128,19 +174,19 @@ public class OdbUserRepository implements IUserRepository
     }
 
     @Override
-    public User getUserByLogin(String login)
+    public IUserDto getUserByLogin(String login)
     {
-        User user = null;
+        IUserDto user = null;
         OObjectDatabaseTx db = null;
 
         try
         {
             db = connectionFactory.getTx();
 
-            List<User> users = db.query(new OSQLSynchQuery<User>("select from User where login = '" + login
-                    + "'"));
+            List<IUser> users = db.query(new OSQLSynchQuery<OdbUser>("select from User where login = '"
+                    + login + "'"));
 
-            return (users.size() != 0) ? users.get(0) : null;
+            return (users.size() != 0) ? OdbUserMapper.mapToDto(users.get(0)) : null;
 
         }
         catch (final RuntimeException e)
@@ -161,7 +207,7 @@ public class OdbUserRepository implements IUserRepository
     @Override
     public boolean isUserAuthorized(String login, String password)
     {
-        User user = getUserByLogin(login);
+        IUserDto user = getUserByLogin(login);
 
         if (user == null)
         {
@@ -169,10 +215,13 @@ public class OdbUserRepository implements IUserRepository
         }
         else
         {
+            IUser persistentUser = getUserByRid(user.getRid());
+
             String finalPw = PasswordEncoder.encodeComplex(password, user.getRid().toString());
             if (finalPw.equalsIgnoreCase(user.getPassword()))
             {
-                if (user.isEnabled() && !user.getGroups().isEmpty() && user.getDefaultClient().isEnabled())
+                if (persistentUser.isEnabled() && !persistentUser.getGroups().isEmpty()
+                        && persistentUser.getDefaultClient().isEnabled())
                 {
                     return true;
                 }
@@ -189,42 +238,44 @@ public class OdbUserRepository implements IUserRepository
     }
 
     @Override
-    public void saveUser(User user)
+    public void saveUser(IUserDto detachedUser)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();
 
         try
         {
-            User persistentUser = getUserByRid(user.getRid());
+            IUser attachedUser = OdbUserMapper.mapToEntity(detachedUser);
+            IUser persistentUser = getUserByRid(detachedUser.getRid());
 
             if (persistentUser != null)
             {
-                persistentUser.bind(user);
-                db.save(persistentUser);
+                persistentUser.bind(attachedUser);
+                persistentUser = db.save(persistentUser);
             }
             else
             {
-                persistentUser = db.save(user);
-                user.setRid(persistentUser.getRid());
+                persistentUser = db.save(attachedUser);
+                attachedUser.setRid(persistentUser.getRid());
 
-                String pw = user.getPassword();
+                String pw = detachedUser.getPassword();
 
                 if (pw == null || pw.isEmpty())
                 {
                     pw = PasswordEncoder.encodeSimple("NewUser123?");
                 }
 
-                OCommandRequest command = new OCommandSQL("update " + user.getRid() + " set password = '"
-                        + PasswordEncoder.encodeComplex(pw, user.getRid().toString()) + "'");
+                OCommandRequest command = new OCommandSQL("update " + persistentUser.getRid()
+                        + " set password = '"
+                        + PasswordEncoder.encodeComplex(pw, persistentUser.getRid().toString()) + "'");
                 db.command(command).execute();
             }
 
-            OCommandRequest command = new OCommandSQL("update " + user.getRid() + " set groups = "
-                    + user.getGroupRids());
+            OCommandRequest command = new OCommandSQL("update " + attachedUser.getRid() + " set groups = "
+                    + attachedUser.getGroupRids());
             db.command(command).execute();
 
-            command = new OCommandSQL("update " + user.getRid() + " set defaultClient = "
-                    + user.getDefaultClientRid());
+            command = new OCommandSQL("update " + attachedUser.getRid() + " set defaultClient = "
+                    + attachedUser.getDefaultClientRid());
             db.command(command).execute();
         }
         catch (final RuntimeException e)
@@ -242,13 +293,13 @@ public class OdbUserRepository implements IUserRepository
     }
 
     @Override
-    public void saveUsers(List<User> users)
+    public void saveUsers(List<IUserDto> detachedUsers)
     {
         final OObjectDatabaseTx db = connectionFactory.getTx();
 
         try
         {
-            for (User user : users)
+            for (IUserDto user : detachedUsers)
             {
                 saveUser(user);
             }
@@ -267,17 +318,17 @@ public class OdbUserRepository implements IUserRepository
         }
     }
 
-    private User getUserByRid(Object rid)
+    private IUser getUserByRid(Object rid)
     {
-        User user = null;
+        IUser user = null;
         OObjectDatabaseTx db = null;
 
         try
         {
             db = connectionFactory.getTx();
 
-            List<User> resultSet = db
-                    .query(new OSQLSynchQuery<Client>("select from User where @rid = " + rid));
+            List<IUser> resultSet = db.query(new OSQLSynchQuery<OdbClient>("select from User where @rid = "
+                    + rid));
             return (resultSet.size() != 0) ? resultSet.get(0) : null;
         }
         catch (final RuntimeException e)

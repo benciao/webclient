@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.viewmodell.mapper;
+package com.ecg.webclient.feature.administration.persistence.odbmapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,15 +6,29 @@ import java.util.List;
 
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Role;
+import com.ecg.webclient.feature.administration.persistence.api.IGroup;
+import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
+import com.ecg.webclient.feature.administration.persistence.api.IRole;
+import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbGroup;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 
-public class GroupMapper
+/**
+ * Mapped die Eigenschaften einer in OrientDb bekannten Entität auf eine detachted Gruppe oder umgekehrt.
+ * 
+ * @author arndtmar
+ */
+public class OdbGroupMapper
 {
-    public static GroupDto mapToDto(Group group)
+    /**
+     * Wandelt eine persistente Gruppe in eine detachte um
+     * 
+     * @param group
+     *            persistente Gruppe
+     * @return Detachete Gruppe
+     */
+    public static IGroupDto mapToDto(IGroup group)
     {
-        GroupDto dto = new GroupDto();
+        IGroupDto dto = new GroupDto();
         dto.setDescription(group.getDescription());
         dto.setName(group.getName());
         dto.setEnabled(group.isEnabled());
@@ -24,7 +38,7 @@ public class GroupMapper
         if (group.getRoles() != null)
         {
             String roles = "";
-            for (Role role : group.getRoles())
+            for (IRole role : group.getRoles())
             {
                 if (roles.length() == 0)
                 {
@@ -41,11 +55,18 @@ public class GroupMapper
         return dto;
     }
 
-    public static List<GroupDto> mapToDtos(List<Group> groups)
+    /**
+     * Wandelt eine Liste von persistenten Gruppen in eine Liste von detachten Gruppen um
+     * 
+     * @param groups
+     *            Liste von Persistenten Gruppen
+     * @return Liste von detachten Gruppen
+     */
+    public static List<IGroupDto> mapToDtos(List<IGroup> groups)
     {
-        List<GroupDto> result = new AutoPopulatingList<GroupDto>(GroupDto.class);
+        List<IGroupDto> result = new AutoPopulatingList<IGroupDto>(IGroupDto.class);
 
-        for (Group group : groups)
+        for (IGroup group : groups)
         {
             GroupDto dto = new GroupDto();
             dto.setDescription(group.getDescription());
@@ -57,7 +78,7 @@ public class GroupMapper
             if (group.getRoles() != null)
             {
                 String roles = "";
-                for (Role role : group.getRoles())
+                for (IRole role : group.getRoles())
                 {
                     if (roles.length() == 0)
                     {
@@ -77,13 +98,20 @@ public class GroupMapper
         return result;
     }
 
-    public static List<Group> mapToEntities(List<GroupDto> dtos)
+    /**
+     * Wandelt eine Liste von detachten Gruppen in eine Liste von persistenten Gruppen um
+     * 
+     * @param dtos
+     *            Liste von detachten Gruppen
+     * @return Liste von persistenten Gruppen
+     */
+    public static List<IGroup> mapToEntities(List<IGroupDto> dtos)
     {
-        List<Group> result = new ArrayList<Group>();
+        List<IGroup> result = new ArrayList<IGroup>();
 
-        for (GroupDto dto : dtos)
+        for (IGroupDto dto : dtos)
         {
-            Group entity = new Group();
+            IGroup entity = new OdbGroup();
             entity.setDescription(dto.getDescription());
             entity.setName(dto.getName());
             entity.setEnabled(dto.isEnabled());
@@ -96,9 +124,16 @@ public class GroupMapper
         return result;
     }
 
-    public static Group mapToEntity(GroupDto dto)
+    /**
+     * Wandelt eine detachte Gruppen in eine persistente um
+     * 
+     * @param dto
+     *            Detachte Gruppen
+     * @return Persistente Gruppen
+     */
+    public static IGroup mapToEntity(IGroupDto dto)
     {
-        Group entity = new Group();
+        IGroup entity = new OdbGroup();
         entity.setDescription(dto.getDescription());
         entity.setName(dto.getName());
         entity.setEnabled(dto.isEnabled());

@@ -2,9 +2,6 @@ package com.ecg.webclient.feature.administration.persistence.api;
 
 import java.util.List;
 
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Property;
-
 /**
  * Schnittstelle für Persistenzimplementierung von Mandanten und deren Eigenschaften.
  * 
@@ -19,7 +16,7 @@ public interface IClientRepository
      * @param clients
      *            Liste von Mandanten
      */
-    void deleteClients(List<Client> clients);
+    void deleteClients(List<IClientDto> clients);
 
     /**
      * Löscht alle Mandanteneigenschaften der Liste
@@ -27,42 +24,36 @@ public interface IClientRepository
      * @param properties
      *            Mandanteneigenschaften
      */
-    void deleteProperties(List<Property> properties);
+    void deleteProperties(List<IPropertyDto> properties);
 
     /**
      * @param true, wenn nur die aktiven; false, wenn alle
      * @return alle Mandanten bei false, sonst nur die aktiven
      */
-    List<Client> getAllClients(boolean onlyEnabled);
+    List<IClientDto> getAllClients(boolean onlyEnabled);
 
     /**
      * @param groupRids
      *            liste von Rids
      * @return Alle Client-Objekte, welche den Rids zugehörigen Gruppen angehören.
      */
-    List<Client> getAssignedClientsForGroups(List<Object> groupRids);
+    List<IClientDto> getAssignedClientsForGroups(List<Object> groupRids);
 
     /**
      * @param id
-     *            technische Id
-     * @return den Mandandanten zu welchem die id passt
+     *            Id des Mandanten
+     * @return Mandant
      */
-    Client getClientById(Object id);
+    IClientDto getClient(Object id);
 
     /**
      * Lädt einen Mandanten anhand seines Namens
      * 
-     * @param string Name
+     * @param string
+     *            Name
      * @return Mandanten wenn vorhanden, sonst null
      */
-    Client getClientByName(String string);
-
-    /**
-     * @param id
-     *            technische id
-     * @return die Mandanteneigenschaft yu welcher die Id passt
-     */
-    Property getPropertyById(Object id);
+    IClientDto getClientByName(String string);
 
     /**
      * Speichert den Mandanten
@@ -71,7 +62,7 @@ public interface IClientRepository
      *            Mandant
      * @return gespeicherter Mandant
      */
-    Client saveClient(Client client);
+    IClientDto saveClient(IClientDto client);
 
     /**
      * Speichert die in der Liste enthaltenen Mandanten
@@ -79,7 +70,7 @@ public interface IClientRepository
      * @param clients
      *            Liste von Mandanten
      */
-    void saveClients(List<Client> clients);
+    void saveClients(List<IClientDto> clients);
 
     /**
      * Speichert die in der Liste enthaltenen Mandanteneigenschaften
@@ -87,5 +78,5 @@ public interface IClientRepository
      * @param properties
      *            Liste von Mandanteneigenschaften
      */
-    void saveProperties(List<Property> properties);
+    void saveProperties(List<IPropertyDto> properties);
 }

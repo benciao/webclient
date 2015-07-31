@@ -2,8 +2,6 @@ package com.ecg.webclient.feature.administration.persistence.api;
 
 import java.util.List;
 
-import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
-
 /**
  * Schnittstelle für Persistenzimplementierung von Benutzern.
  * 
@@ -18,19 +16,26 @@ public interface IUserRepository
      * @param users
      *            Liste von Benutzern
      */
-    void deleteUsers(List<User> users);
+    void deleteUsers(List<IUserDto> users);
 
     /**
-     * @return alle Benutzer
+     * @return alle Benutzer aktiven benutzer, wenn true, sonst alle
      */
-    List<User> getAllUsers();
+    List<IUserDto> getAllUsers(boolean onlyEnabledUsers);
+
+    /**
+     * @param user
+     *            Benutzer
+     * @return Standardmandant
+     */
+    IClientDto getDefaultClientForUser(IUserDto user);
 
     /**
      * @param id
      *            technische Id des Benutzers
      * @return Den zur Id gehörigen Benutzer.
      */
-    User getUserById(Object id);
+    IUserDto getUserById(Object id);
 
     /**
      * Lädt einen Benutzer anhand seines Benutzernamen
@@ -39,7 +44,7 @@ public interface IUserRepository
      *            Benutzername
      * @return Benutzer wenn existent, sonst null
      */
-    User getUserByLogin(String string);
+    IUserDto getUserByLogin(String string);
 
     /**
      * Prüft, ob es einen Benutzer mit übereinstimmenden Logindaten gibt
@@ -58,7 +63,7 @@ public interface IUserRepository
      * @param setupUser
      *            Zu speichernder Benutzer
      */
-    void saveUser(User setupUser);
+    void saveUser(IUserDto setupUser);
 
     /**
      * Speichert alle in der Liste enthaltenen Benutzer
@@ -66,5 +71,5 @@ public interface IUserRepository
      * @param users
      *            Liste von Benutzern
      */
-    void saveUsers(List<User> users);
+    void saveUsers(List<IUserDto> users);
 }

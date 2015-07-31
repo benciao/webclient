@@ -11,17 +11,23 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
+import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
+import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
+import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
+import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
+import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
 import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Role;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
-import com.ecg.webclient.feature.administration.viewmodell.mapper.ClientMapper;
 
 @Component("odbAuthenticationProvider")
 public class OdbAuthenticationProvider implements AuthenticationProvider
 {
     @Autowired
     IUserRepository    userRepository;
+    @Autowired
+    IGroupRepository   groupRepository;
+    @Autowired
+    IRoleRepository    roleRepository;
     @Autowired
     AuthenticationUtil util;
 
@@ -33,16 +39,18 @@ public class OdbAuthenticationProvider implements AuthenticationProvider
 
         if (userRepository.isUserAuthorized(login, password))
         {
-            User user = userRepository.getUserByLogin(login);
-            util.setSelectedClient(ClientMapper.mapToDto(user.getDefaultClient()));
+            IUserDto user = userRepository.getUserByLogin(login);
+            IClientDto defaultClient = userRepository.getDefaultClientForUser(user);
+            util.setSelectedClient(defaultClient);
 
             List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
             // zugeordnete Rollen für den Client setzen
-            for (Group group : user.getGroups())
+            for (IGroupDto group : groupRepository.getGroupsForIds(user.getGroupRidObjects()))
             {
-                if (group.getClient().equals(user.getDefaultClient()))
+                if (groupRepository.getClientForGroupId(group.getRid()).getRid().toString()
+                        .equals(defaultClient.getRid().toString()))
                 {
-                    for (Role role : group.getRoles())
+                    for (IRoleDto role : roleRepository.getRolesForIds(group.getRoleRidObjects()))
                     {
                         OdbGrantedAuthoritiy newAuth = new OdbGrantedAuthoritiy(role.getName());
                         grantedAuths.add(newAuth);

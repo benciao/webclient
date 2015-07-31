@@ -20,28 +20,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.common.feature.FeatureRegistry;
+import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
 import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
+import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
+import com.ecg.webclient.feature.administration.persistence.api.IPropertyDto;
+import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
+import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
 import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Client;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Group;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.Role;
-import com.ecg.webclient.feature.administration.persistence.dbmodell.User;
 import com.ecg.webclient.feature.administration.viewmodell.ClientConfig;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.ClientProperties;
 import com.ecg.webclient.feature.administration.viewmodell.GroupConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
-import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleConfig;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserConfig;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
-import com.ecg.webclient.feature.administration.viewmodell.mapper.ClientMapper;
-import com.ecg.webclient.feature.administration.viewmodell.mapper.GroupMapper;
-import com.ecg.webclient.feature.administration.viewmodell.mapper.RoleMapper;
-import com.ecg.webclient.feature.administration.viewmodell.mapper.UserMapper;
 
 /**
  * Controller zur Bearbeitung von Requests aus Administrationsdialogen.
@@ -104,12 +100,12 @@ public class AdministrationController
     @RequestMapping(value = "/client/save", method = RequestMethod.POST)
     public String save(@Valid ClientConfig clientConfig, BindingResult bindingResult)
     {
-        List<ClientDto> updateDtos = new ArrayList<ClientDto>();
-        List<ClientDto> deleteDtos = new ArrayList<ClientDto>();
+        List<IClientDto> updateDtos = new ArrayList<IClientDto>();
+        List<IClientDto> deleteDtos = new ArrayList<IClientDto>();
 
-        for (ClientDto dto : clientConfig.getClients())
+        for (IClientDto dto : clientConfig.getClients())
         {
-            if (dto.getDelete())
+            if (dto.isDelete())
             {
                 deleteDtos.add(dto);
             }
@@ -119,7 +115,7 @@ public class AdministrationController
             }
         }
 
-        clientRepository.deleteClients(ClientMapper.mapToEntities(deleteDtos));
+        clientRepository.deleteClients(deleteDtos);
         updateSelectedClient(deleteDtos);
 
         clientConfig.removeDeleted();
@@ -129,7 +125,7 @@ public class AdministrationController
             return getLoadingRedirectTemplate() + "clientConfig";
         }
 
-        clientRepository.saveClients(ClientMapper.mapToEntities(updateDtos));
+        clientRepository.saveClients(updateDtos);
         updateSelectedClient(updateDtos);
 
         return "redirect:";
@@ -143,12 +139,12 @@ public class AdministrationController
     @RequestMapping(value = "/clientp/save", method = RequestMethod.POST)
     public String save(@Valid ClientProperties clientProperties, BindingResult bindingResult)
     {
-        List<PropertyDto> updateDtos = new ArrayList<PropertyDto>();
-        List<PropertyDto> deleteDtos = new ArrayList<PropertyDto>();
+        List<IPropertyDto> updateDtos = new ArrayList<IPropertyDto>();
+        List<IPropertyDto> deleteDtos = new ArrayList<IPropertyDto>();
 
-        for (PropertyDto dto : clientProperties.getProperties())
+        for (IPropertyDto dto : clientProperties.getProperties())
         {
-            if (dto.getDelete())
+            if (dto.isDelete())
             {
                 deleteDtos.add(dto);
             }
@@ -158,7 +154,7 @@ public class AdministrationController
             }
         }
 
-        ClientDto updatedClient = util.getSelectedClient();
+        IClientDto updatedClient = util.getSelectedClient();
         updatedClient.setProperties(updateDtos);
         clientProperties.removeDeleted();
 
@@ -167,7 +163,7 @@ public class AdministrationController
             return getLoadingRedirectTemplate() + "clientProperties";
         }
 
-        clientRepository.saveClient(ClientMapper.mapToEntity(updatedClient));
+        clientRepository.saveClient(updatedClient);
         util.setSelectedClientWithNewAuthority(updatedClient);
 
         return "redirect:";
@@ -181,12 +177,12 @@ public class AdministrationController
     @RequestMapping(value = "/usergroup/save", method = RequestMethod.POST)
     public String save(@Valid GroupConfig groupConfig, BindingResult bindingResult)
     {
-        List<GroupDto> updateDtos = new ArrayList<GroupDto>();
-        List<GroupDto> deleteDtos = new ArrayList<GroupDto>();
+        List<IGroupDto> updateDtos = new ArrayList<IGroupDto>();
+        List<IGroupDto> deleteDtos = new ArrayList<IGroupDto>();
 
-        for (GroupDto dto : groupConfig.getGroups())
+        for (IGroupDto dto : groupConfig.getGroups())
         {
-            if (dto.getDelete())
+            if (dto.isDelete())
             {
                 deleteDtos.add(dto);
             }
@@ -196,7 +192,7 @@ public class AdministrationController
             }
         }
 
-        groupRepository.deleteGroups(GroupMapper.mapToEntities(deleteDtos));
+        groupRepository.deleteGroups(deleteDtos);
 
         groupConfig.removeDeleted();
 
@@ -205,10 +201,7 @@ public class AdministrationController
             return getLoadingRedirectTemplate() + "userGroup";
         }
 
-        List<Group> groups = GroupMapper.mapToEntities(updateDtos);
-        groups.forEach(element -> element.setClient(ClientMapper.mapToEntity(util.getSelectedClient())));
-
-        groupRepository.saveGroups(groups);
+        groupRepository.saveGroups(updateDtos);
 
         return "redirect:";
     }
@@ -221,12 +214,12 @@ public class AdministrationController
     @RequestMapping(value = "/userrole/save", method = RequestMethod.POST)
     public String save(@Valid RoleConfig roleConfig, BindingResult bindingResult)
     {
-        List<RoleDto> updateDtos = new ArrayList<RoleDto>();
-        List<RoleDto> deleteDtos = new ArrayList<RoleDto>();
+        List<IRoleDto> updateDtos = new ArrayList<IRoleDto>();
+        List<IRoleDto> deleteDtos = new ArrayList<IRoleDto>();
 
-        for (RoleDto dto : roleConfig.getRoles())
+        for (IRoleDto dto : roleConfig.getRoles())
         {
-            if (dto.getDelete())
+            if (dto.isDelete())
             {
                 deleteDtos.add(dto);
             }
@@ -236,7 +229,7 @@ public class AdministrationController
             }
         }
 
-        roleRepository.deleteRoles(RoleMapper.mapToEntities(deleteDtos));
+        roleRepository.deleteRoles(deleteDtos);
 
         roleConfig.removeDeleted();
 
@@ -245,7 +238,7 @@ public class AdministrationController
             return getLoadingRedirectTemplate() + "userRole";
         }
 
-        roleRepository.saveRoles(RoleMapper.mapToEntities(updateDtos));
+        roleRepository.saveRoles(updateDtos);
 
         return "redirect:";
     }
@@ -258,12 +251,12 @@ public class AdministrationController
     @RequestMapping(value = "/user/save", method = RequestMethod.POST)
     public String save(@Valid UserConfig userConfig, BindingResult bindingResult)
     {
-        List<UserDto> updateDtos = new ArrayList<UserDto>();
-        List<UserDto> deleteDtos = new ArrayList<UserDto>();
+        List<IUserDto> updateDtos = new ArrayList<IUserDto>();
+        List<IUserDto> deleteDtos = new ArrayList<IUserDto>();
 
-        for (UserDto dto : userConfig.getUsers())
+        for (IUserDto dto : userConfig.getUsers())
         {
-            if (dto.getDelete())
+            if (dto.isDelete())
             {
                 deleteDtos.add(dto);
             }
@@ -273,7 +266,7 @@ public class AdministrationController
             }
         }
 
-        userRepository.deleteUsers(UserMapper.mapToEntities(deleteDtos));
+        userRepository.deleteUsers(deleteDtos);
 
         userConfig.removeDeleted();
 
@@ -282,8 +275,7 @@ public class AdministrationController
             return getLoadingRedirectTemplate() + "user";
         }
 
-        List<User> users = UserMapper.mapToEntities(updateDtos);
-        userRepository.saveUsers(users);
+        userRepository.saveUsers(updateDtos);
 
         return "redirect:";
     }
@@ -297,13 +289,13 @@ public class AdministrationController
     @RequestMapping(value = "/setup/system", method = RequestMethod.GET)
     public String setupSystem()
     {
-        Client setupClient = new Client();
+        IClientDto setupClient = new ClientDto();
         setupClient.setEnabled(true);
         setupClient.setName("SETUP_CLIENT");
         setupClient.setDescription("Client to setup the system");
         setupClient.setColor("#ff0000");
 
-        Client savedClient = clientRepository.getClientByName("Setup Client");
+        IClientDto savedClient = clientRepository.getClientByName("Setup Client");
 
         if (savedClient == null)
         {
@@ -311,13 +303,13 @@ public class AdministrationController
             logger.info("SETUP_CLIENT created");
         }
 
-        List<Role> roles = roleRepository.getAllRoles();
+        List<IRoleDto> roles = roleRepository.getAllRoles(false);
 
-        Role setupRole = null;
-        Role savedRole = null;
+        IRoleDto setupRole = null;
+        IRoleDto savedRole = null;
         if (roles.isEmpty())
         {
-            setupRole = new Role();
+            setupRole = new RoleDto();
             setupRole.setName("SETUP_ROLE");
             setupRole.setDescription("Role to setup the system");
             setupRole.setEnabled(true);
@@ -326,11 +318,11 @@ public class AdministrationController
             logger.info("SETUP_ROLE created");
         }
 
-        Group savedGroup = groupRepository.getGroupByName("SETUP_GROUP");
+        IGroupDto savedGroup = groupRepository.getGroupByName("SETUP_GROUP");
 
         if (savedGroup == null)
         {
-            Group setupGroup = new Group();
+            IGroupDto setupGroup = new GroupDto();
             setupGroup.setClient(savedClient);
             setupGroup.setName("SETUP_GROUP");
             setupGroup.setDescription("Group to setup system");
@@ -340,7 +332,7 @@ public class AdministrationController
         }
 
         List<Object> roleRids = new ArrayList<Object>();
-        for (Role role : roles)
+        for (IRoleDto role : roles)
         {
             roleRids.add(role.getRid());
         }
@@ -355,11 +347,11 @@ public class AdministrationController
         List<Object> groupRids = new ArrayList<Object>();
         groupRids.add(savedGroup.getRid());
 
-        User setupUser = userRepository.getUserByLogin("setupuser");
+        IUserDto setupUser = userRepository.getUserByLogin("setupuser");
 
         if (setupUser == null)
         {
-            setupUser = new User();
+            setupUser = new UserDto();
             setupUser.setLogin("setupuser");
             setupUser.setPassword(PasswordEncoder.encodeSimple("SetupSystem!"));
             setupUser.setFirstname("Setup");
@@ -391,14 +383,14 @@ public class AdministrationController
             @PathVariable("userRid") String userRid)
     {
         List<Object> realGroupRids = getGroupRids(groupRids);
-        List<Client> clients = clientRepository.getAssignedClientsForGroups(realGroupRids);
-        User user = userRepository.getUserById("#" + userRid);
+        List<IClientDto> clients = clientRepository.getAssignedClientsForGroups(realGroupRids);
+        IUserDto user = userRepository.getUserById("#" + userRid);
 
-        model.addAttribute("availableClients", ClientMapper.mapToDtos(clients));
+        model.addAttribute("availableClients", clients);
 
         if (user != null)
         {
-            model.addAttribute("defaultClient", UserMapper.mapToDto(user).getDefaultClient());
+            model.addAttribute("defaultClient", user.getDefaultClient());
         }
         else
         {
@@ -417,7 +409,7 @@ public class AdministrationController
     public String showClientConfig(Model model)
     {
         ClientConfig clientConfig = new ClientConfig();
-        clientConfig.setClients(ClientMapper.mapToDtos(clientRepository.getAllClients(false)));
+        clientConfig.setClients(clientRepository.getAllClients(false));
         model.addAttribute("clientConfig", clientConfig);
         return getLoadingRedirectTemplate() + "clientConfig";
     }
@@ -431,9 +423,9 @@ public class AdministrationController
     public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
     {
         clientId = "#" + clientId;
-        List<Group> groups = groupRepository.getAllGroupsForClient(clientId);
+        List<IGroupDto> groups = groupRepository.getAllGroupsForClient(clientId);
 
-        model.addAttribute("groups", GroupMapper.mapToDtos(groups));
+        model.addAttribute("groups", groups);
 
         return getLoadingRedirectTemplate() + "user :: clientGroups";
     }
@@ -463,9 +455,8 @@ public class AdministrationController
     public String showGroupConfig(Model model)
     {
         GroupConfig groupConfig = new GroupConfig();
-        groupConfig.setGroups(GroupMapper.mapToDtos(groupRepository.getAllGroupsForClient(util
-                .getSelectedClient().getRid())));
-        groupConfig.setRoles(RoleMapper.mapToDtos(roleRepository.getAllRoles()));
+        groupConfig.setGroups(groupRepository.getAllGroupsForClient(util.getSelectedClient().getRid()));
+        groupConfig.setRoles(roleRepository.getAllRoles(false));
         model.addAttribute("groupConfig", groupConfig);
 
         return getLoadingRedirectTemplate() + "usergroup";
@@ -480,7 +471,7 @@ public class AdministrationController
     public String showRoleConfig(Model model)
     {
         RoleConfig roleConfig = new RoleConfig();
-        roleConfig.setRoles(RoleMapper.mapToDtos(roleRepository.getAllRoles()));
+        roleConfig.setRoles(roleRepository.getAllRoles(false));
         model.addAttribute("roleConfig", roleConfig);
 
         return getLoadingRedirectTemplate() + "userrole";
@@ -495,7 +486,7 @@ public class AdministrationController
     public String showUserConfig(Model model)
     {
         UserConfig userConfig = new UserConfig();
-        userConfig.setUsers(UserMapper.mapToDtos(userRepository.getAllUsers()));
+        userConfig.setUsers(userRepository.getAllUsers(false));
         model.addAttribute("userConfig", userConfig);
 
         return getLoadingRedirectTemplate() + "user";
@@ -506,9 +497,9 @@ public class AdministrationController
         return "feature/administration/";
     }
 
-    private void updateSelectedClient(List<ClientDto> clientDtos)
+    private void updateSelectedClient(List<IClientDto> clientDtos)
     {
-        for (ClientDto clientDto : clientDtos)
+        for (IClientDto clientDto : clientDtos)
         {
             if (util.getSelectedClient().getRid().toString().equalsIgnoreCase(clientDto.getRid().toString()))
             {
