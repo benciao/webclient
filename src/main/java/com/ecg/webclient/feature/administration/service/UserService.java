@@ -10,339 +10,255 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.common.authentication.PasswordEncoder;
-import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
-import com.ecg.webclient.feature.administration.persistence.api.IUser;
-import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
-import com.ecg.webclient.feature.administration.persistence.api.UserRepository;
 import com.ecg.webclient.feature.administration.persistence.mapper.ClientMapper;
 import com.ecg.webclient.feature.administration.persistence.mapper.UserMapper;
-import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.User;
-import com.orientechnologies.orient.core.command.OCommandRequest;
-import com.orientechnologies.orient.core.sql.OCommandSQL;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
+import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
+import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
+import com.ecg.webclient.feature.administration.persistence.repo.UserRepository;
+import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
 /**
- * Repository für Benutzer bei Nutzung einer OrientDB.
+ * Service zum Bearbeiten von Benutzern.
  * 
  * @author arndtmar
  */
 @Component
-public class UserService implements UserRepository
+public class UserService
 {
-    static final Logger          logger = LogManager.getLogger(UserService.class.getName());
-    private OdbConnectionFactory connectionFactory;
+	static final Logger logger = LogManager.getLogger(UserService.class.getName());
 
-    @Autowired
-    public UserService(OdbConnectionFactory connectionFactory)
-    {
-        this.connectionFactory = connectionFactory;
-    }
+	UserRepository		userRepo;
+	GroupRepository		groupRepo;
+	ClientRepository	clientRepo;
 
-    @Override
-    public void deleteUsers(List<IUserDto> detachedUsers)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
+	@Autowired
+	public UserService(UserRepository userRepo, GroupRepository groupRepo, ClientRepository clientRepo)
+	{
+		this.userRepo = userRepo;
+		this.groupRepo = groupRepo;
+		this.clientRepo = clientRepo;
+	}
 
-        try
-        {
-            for (IUserDto user : detachedUsers)
-            {
-                IUser persistentUser = getUserByRid(user.getRid());
+	/**
+	 * Löscht die in der Liste enthaltenen Benutzer.
+	 * 
+	 * @param detachedUsers
+	 *            Liste von zu löschenden Benutzern
+	 */
+	public void deleteUsers(List<UserDto> detachedUsers)
+	{
+		try
+		{
+			for (UserDto user : detachedUsers)
+			{
+				User persistentUser = userRepo.findOne(user.getId());
 
-                if (persistentUser != null)
-                {
-                    db.delete(persistentUser);
-                }
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-    }
+				if (persistentUser != null)
+				{
+					userRepo.delete(persistentUser);
+				}
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+	}
 
-    @Override
-    public List<IUserDto> getAllUsers(boolean onlyEnabledUsers)
-    {
-        List<IUser> attachedUsers = new ArrayList<IUser>();
-        OObjectDatabaseTx db = null;
+	/**
+	 * @param onlyEnabledUsers
+	 *            true, wenn nur die aktiven Benutzer geladen werden sollen,
+	 *            sonst false
+	 * @return Alle Benutzer, wenn false, sonst nur die aktivierten Benutzer
+	 */
+	public List<UserDto> getAllUsers(boolean onlyEnabledUsers)
+	{
+		List<User> attachedUsers = new ArrayList<User>();
 
-        try
-        {
-            db = connectionFactory.getTx();
+		try
+		{
+			if (!onlyEnabledUsers)
+			{
+				userRepo.findAll().forEach(e -> attachedUsers.add(e));
+			}
+			else
+			{
+				userRepo.findAllEnabledUsers(true).forEach(e -> attachedUsers.add(e));
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-            if (!onlyEnabledUsers)
-            {
-                attachedUsers = db.query(new OSQLSynchQuery<User>("select from User"));
-            }
-            else
-            {
-                attachedUsers = db
-                        .query(new OSQLSynchQuery<User>("select from User where enabled = true"));
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+		AutoPopulatingList<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
 
-        AutoPopulatingList<IUserDto> result = new AutoPopulatingList<IUserDto>(IUserDto.class);
+		for (User attachedUser : attachedUsers)
+		{
+			result.add(UserMapper.mapToDto(attachedUser));
+		}
 
-        for (IUser attachedUser : attachedUsers)
-        {
-            result.add(UserMapper.mapToDto(attachedUser));
-        }
+		return result;
+	}
 
-        return result;
-    }
+	/**
+	 * @param user
+	 *            Benutzer
+	 * @return Den dem Benutzer zugeordneten Standardmandanten
+	 */
+	public ClientDto getDefaultClientForUser(UserDto user)
+	{
+		try
+		{
+			User persistentUser = userRepo.findOne(user.getId());
 
-    @Override
-    public IClientDto getDefaultClientForUser(IUserDto user)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
+			if (persistentUser != null)
+			{
+				return ClientMapper.mapToDto(persistentUser.getDefaultClient());
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        try
-        {
-            IUser persistentUser = getUserByRid(user.getRid());
+		return null;
+	}
 
-            if (persistentUser != null)
-            {
-                return ClientMapper.mapToDto(persistentUser.getDefaultClient());
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
+	/**
+	 * @param id
+	 *            Benutzer-ID
+	 * @return Den zur ID gehördenen Benutzer
+	 */
+	public UserDto getUserById(Long id)
+	{
+		try
+		{
+			User user = userRepo.findOne(id);
 
-        return null;
-    }
+			return (user != null) ? UserMapper.mapToDto(user) : null;
 
-    @Override
-    public IUserDto getUserById(Object id)
-    {
-        IUserDto user = null;
-        OObjectDatabaseTx db = null;
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        try
-        {
-            db = connectionFactory.getTx();
+		return null;
+	}
 
-            List<IUser> users = db.query(new OSQLSynchQuery<User>("select from User where @rid = " + id));
+	/**
+	 * @param login
+	 *            Login des Benutzers
+	 * @return Den zum Login gehörenden Benutzer
+	 */
+	public UserDto getUserByLogin(String login)
+	{
+		try
+		{
+			User user = userRepo.findUserByLogin(login);
 
-            return (users.size() != 0) ? UserMapper.mapToDto(users.get(0)) : null;
+			return (user != null) ? UserMapper.mapToDto(user) : null;
 
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        return user;
-    }
+		return null;
+	}
 
-    @Override
-    public IUserDto getUserByLogin(String login)
-    {
-        IUserDto user = null;
-        OObjectDatabaseTx db = null;
+	/**
+	 * @param login
+	 *            Benutzer-Login
+	 * @param password
+	 *            Durch Javascript einfach codiertes Passwort
+	 * @return true, wenn Benutzer bekannt, Passwort stimmt, Benutzer aktiviert
+	 *         ist, Benutzer mindestens einer Gruppe zugeordnet ist, der
+	 *         Standardmandant des Benutzers aktiviert ist... sonst false
+	 */
+	public boolean isUserAuthorized(String login, String password)
+	{
+		User persistentUser = userRepo.findUserByLogin(login);
 
-        try
-        {
-            db = connectionFactory.getTx();
+		if (persistentUser == null)
+		{
+			return false;
+		}
+		else
+		{
+			String finalPw = PasswordEncoder.encodeComplex(password, Long.toString(persistentUser.getId()));
+			if (finalPw.equalsIgnoreCase(persistentUser.getPassword()))
+			{
+				if (persistentUser.isEnabled() && !persistentUser.getGroups().isEmpty()
+						&& persistentUser.getDefaultClient().isEnabled())
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
 
-            List<IUser> users = db.query(new OSQLSynchQuery<User>("select from User where login = '"
-                    + login + "'"));
+	/**
+	 * Speichert einen Benutzer.
+	 * 
+	 * @param detachedUser
+	 *            Zu speichernder Benutzer
+	 */
+	public void saveUser(UserDto detachedUser)
+	{
+		try
+		{
+			User persistentUser = userRepo.findOne(detachedUser.getId());
 
-            return (users.size() != 0) ? UserMapper.mapToDto(users.get(0)) : null;
+			if (persistentUser != null)
+			{
+				User attachedUser = UserMapper.mapToEntity(detachedUser, false, clientRepo, groupRepo);
+				persistentUser.bind(attachedUser);
+				persistentUser = userRepo.save(persistentUser);
+			}
+			else
+			{
+				User attachedUser = UserMapper.mapToEntity(detachedUser, true, clientRepo, groupRepo);
+				persistentUser = userRepo.save(attachedUser);
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+	}
 
-        return user;
-    }
-
-    @Override
-    public boolean isUserAuthorized(String login, String password)
-    {
-        IUserDto user = getUserByLogin(login);
-
-        if (user == null)
-        {
-            return false;
-        }
-        else
-        {
-            IUser persistentUser = getUserByRid(user.getRid());
-
-            String finalPw = PasswordEncoder.encodeComplex(password, user.getRid().toString());
-            if (finalPw.equalsIgnoreCase(user.getPassword()))
-            {
-                if (persistentUser.isEnabled() && !persistentUser.getGroups().isEmpty()
-                        && persistentUser.getDefaultClient().isEnabled())
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-
-    @Override
-    public void saveUser(IUserDto detachedUser)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
-
-        try
-        {
-            IUser attachedUser = UserMapper.mapToEntity(detachedUser);
-            IUser persistentUser = getUserByRid(detachedUser.getRid());
-
-            if (persistentUser != null)
-            {
-                persistentUser.bind(attachedUser);
-                persistentUser = db.save(persistentUser);
-            }
-            else
-            {
-                persistentUser = db.save(attachedUser);
-                attachedUser.setRid(persistentUser.getRid());
-
-                String pw = detachedUser.getPassword();
-
-                if (pw == null || pw.isEmpty())
-                {
-                    pw = PasswordEncoder.encodeSimple("NewUser123?");
-                }
-
-                OCommandRequest command = new OCommandSQL("update " + persistentUser.getRid()
-                        + " set password = '"
-                        + PasswordEncoder.encodeComplex(pw, persistentUser.getRid().toString()) + "'");
-                db.command(command).execute();
-            }
-
-            OCommandRequest command = new OCommandSQL("update " + attachedUser.getRid() + " set groups = "
-                    + attachedUser.getGroupRids());
-            db.command(command).execute();
-
-            command = new OCommandSQL("update " + attachedUser.getRid() + " set defaultClient = "
-                    + attachedUser.getDefaultClientRid());
-            db.command(command).execute();
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-    }
-
-    @Override
-    public void saveUsers(List<IUserDto> detachedUsers)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
-
-        try
-        {
-            for (IUserDto user : detachedUsers)
-            {
-                saveUser(user);
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-    }
-
-    private IUser getUserByRid(Object rid)
-    {
-        IUser user = null;
-        OObjectDatabaseTx db = null;
-
-        try
-        {
-            db = connectionFactory.getTx();
-
-            List<IUser> resultSet = db.query(new OSQLSynchQuery<Client>("select from User where @rid = "
-                    + rid));
-            return (resultSet.size() != 0) ? resultSet.get(0) : null;
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
-
-        return user;
-    }
+	/**
+	 * Speichert eine Liste von Benutzern.
+	 * 
+	 * @param detachedUsers
+	 *            Zu speichernde Benutzer
+	 */
+	public void saveUsers(List<UserDto> detachedUsers)
+	{
+		try
+		{
+			for (UserDto user : detachedUsers)
+			{
+				saveUser(user);
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+	}
 }

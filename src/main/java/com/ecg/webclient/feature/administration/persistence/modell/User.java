@@ -36,8 +36,6 @@ public class User
     private Client      defaultClient;
     @OneToMany(targetEntity = Group.class)
     private List<Group> groups;
-    private long        defaultClientId;
-    private List<Long>  groupIds;
 
     public User()
     {}
@@ -54,6 +52,8 @@ public class User
         {
             setPassword(PasswordEncoder.encodeComplex(newUser.getPassword(), Long.toString(getId())));
         }
+        setDefaultClient(newUser.getDefaultClient());
+        setGroups(newUser.getGroups());
         setEnabled(newUser.isEnabled());
         setEmail(newUser.getEmail());
         setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
@@ -204,12 +204,6 @@ public class User
         this.defaultClient = defaultClient;
     }
 
-    @Transient
-    public void setDefaultClientId(long defaultClientId)
-    {
-        this.defaultClientId = defaultClientId;
-    }
-
     public void setEmail(String email)
     {
         this.email = email;
@@ -223,12 +217,6 @@ public class User
     public void setFirstname(String firstname)
     {
         this.firstname = firstname;
-    }
-
-    @Transient
-    public void setGroupIds(List<Long> groupIdObjects)
-    {
-        this.groupIds = groupIdObjects;
     }
 
     public void setGroups(List<Group> groups)

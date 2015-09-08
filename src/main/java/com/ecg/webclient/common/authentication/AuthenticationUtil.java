@@ -22,9 +22,8 @@ import com.ecg.webclient.feature.administration.persistence.api.UserRepository;
 @Component
 public class AuthenticationUtil
 {
-    private List<IClientDto>  clients;
-    private boolean           isMenuMinimized;
-    private IClientDto        selectedClient;
+    private List<ClientDto>  clients;
+    private ClientDto        selectedClient;
     private ClientService clientRepository;
     private UserRepository   userRepository;
     private GroupRepository  groupRepository;
@@ -107,16 +106,6 @@ public class AuthenticationUtil
             selectedClient = clientRepository.getClient(selectedClient.getRid());
         }
         return selectedClient;
-    }
-
-    public boolean isMenuMinimized()
-    {
-        return isMenuMinimized;
-    }
-
-    public void setMenuMinimized(boolean isMenuMinimized)
-    {
-        this.isMenuMinimized = isMenuMinimized;
     }
 
     public void setSelectedClient(IClientDto selectedClient)

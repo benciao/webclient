@@ -29,7 +29,6 @@ public class Group
     private List<Role> roles;
     @OneToOne
     private Client     client;
-    private List<Long> roleIds;
 
     public Group()
     {}
@@ -155,13 +154,6 @@ public class Group
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    @Transient
-    public void setRoleIds(List<Long> roleIdObjects)
-    {
-        this.roleIds = roleIdObjects;
-
     }
 
     public void setRoles(List<Role> roles)

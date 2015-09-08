@@ -55,7 +55,7 @@
 				</div>
 				<div class="container-fluid custom-menu">
 					<div
-						th:attr="class='container-fluid ' + (${beans.authenticationUtil.isMenuMinimized()} ? 'hide-menu' : '')"
+						th:attr="class='container-fluid ' + (${beans.applicationUtil.isMenuMinimized()} ? 'hide-menu' : '')"
 						id="maximizedMenu">
 						<div class="toggle-menu">
 							<a href="javascript:toggle_menu_visibility('maximizedMenu');"><img
@@ -70,7 +70,7 @@
 									<form th:attr="id=${feature.getId()}"
 										th:action="@{${feature.getLink()}}" method="POST">
 										<input class="sizing" type="hidden" th:name="isMinimized"
-											th:value="${beans.authenticationUtil.isMenuMinimized()}" /> <input
+											th:value="${beans.applicationUtil.isMenuMinimized()}" /> <input
 											type="hidden" th:name="currentFeature" th:value="${feature}" />
 									</form> <a
 									th:href="'javascript:document.getElementById(' + '\'' + ${feature.getId()} + '\'' + ').submit();'"><img
@@ -81,7 +81,7 @@
 						</div>
 					</div>
 					<div
-						th:attr="class='container-fluid ' + (${beans.authenticationUtil.isMenuMinimized()} ? '' : 'hide-menu')"
+						th:attr="class='container-fluid ' + (${beans.applicationUtil.isMenuMinimized()} ? '' : 'hide-menu')"
 						id="minimizedMenu">
 						<div class="toggle-menu">
 							<a href="javascript:toggle_menu_visibility('minimizedMenu');"><img
@@ -95,7 +95,7 @@
 									role="presentation"><form th:attr="id=${feature.getId()}"
 										th:action="@{${feature.getLink()}}" method="POST">
 										<input class="sizing" type="hidden" th:name="isMinimized"
-											th:value="${beans.authenticationUtil.isMenuMinimized()}" /> <input
+											th:value="${beans.applicationUtil.isMenuMinimized()}" /> <input
 											type="hidden" th:name="currentFeature" th:value="${feature}" />
 									</form> <a
 									th:href="'javascript:document.getElementById(' + '\'' + ${feature.getId()} + '\'' + ').submit();'"><div

@@ -5,14 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.authentication.AuthenticationUtil;
+import com.ecg.webclient.common.ApplicationUtil;
 
 @Component
 public class FeatureRegistry
 {
     private List<Feature> registeredFeatures;
     @Autowired
-    private AuthenticationUtil           util;
+    private ApplicationUtil           util;
 
     @Autowired
     FeatureRegistry(List<Feature> features)

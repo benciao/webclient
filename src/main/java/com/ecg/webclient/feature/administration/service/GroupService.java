@@ -10,344 +10,263 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.common.authentication.AuthenticationUtil;
-import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
-import com.ecg.webclient.feature.administration.persistence.api.IGroup;
-import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
 import com.ecg.webclient.feature.administration.persistence.mapper.ClientMapper;
 import com.ecg.webclient.feature.administration.persistence.mapper.GroupMapper;
-import com.ecg.webclient.feature.administration.persistence.api.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
+import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
+import com.ecg.webclient.feature.administration.persistence.repo.RoleRepository;
+import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 /**
- * Repository für Benutzergruppen bei Nutzung einer OrientDB.
+ * Service zum Bearbeiten von Gruppen.
  * 
  * @author arndtmar
- *
  */
 @Component
-public class GroupService implements GroupRepository
+public class GroupService
 {
-    static final Logger          logger = LogManager.getLogger(GroupService.class.getName());
-    private OdbConnectionFactory connectionFactory;
-    private AuthenticationUtil   authenticationUtil;
+	static final Logger logger = LogManager.getLogger(GroupService.class.getName());
 
-    @Autowired
-    public GroupService(OdbConnectionFactory connectionFactory, AuthenticationUtil authenticationUtil)
-    {
-        this.connectionFactory = connectionFactory;
-        this.authenticationUtil = authenticationUtil;
-    }
+	AuthenticationUtil	authenticationUtil;
+	GroupRepository		groupRepo;
+	RoleRepository		roleRepo;
 
-    @Override
-    public void deleteGroups(List<IGroupDto> detachedGroups)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
+	@Autowired
+	public GroupService(AuthenticationUtil authenticationUtil, GroupRepository groupRepo, RoleRepository roleRepo)
+	{
+		this.authenticationUtil = authenticationUtil;
+		this.groupRepo = groupRepo;
+		this.roleRepo = roleRepo;
+	}
 
-        try
-        {
-            for (IGroupDto group : detachedGroups)
-            {
-                IGroup persistentGroup = getGroupByRid(group.getRid());
+	/**
+	 * Löscht die in der Liste enthaltenen Gruppen.
+	 * 
+	 * @param detachedGroups
+	 *            Liste von zu löschenden Gruppen
+	 */
+	public void deleteGroups(List<GroupDto> detachedGroups)
+	{
+		try
+		{
+			for (GroupDto group : detachedGroups)
+			{
+				Group persistentGroup = groupRepo.findOne(group.getId());
 
-                if (persistentGroup != null)
-                {
-                    db.delete(persistentGroup);
-                }
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-    }
+				if (persistentGroup != null)
+				{
+					groupRepo.delete(persistentGroup);
+				}
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+	}
 
-    @Override
-    public List<IGroupDto> getAllGroups(boolean onlyEnabledGroups)
-    {
-        List<IGroup> attachedGroups = new ArrayList<IGroup>();
-        OObjectDatabaseTx db = null;
+	/**
+	 * @param onlyEnabled
+	 *            true, wenn nur die aktiven Gruppen geladen werden sollen,
+	 *            sonst false
+	 * @return Alle Gruppen, wenn false, sonst nur die aktivierten Gruppen
+	 */
+	public List<GroupDto> getAllGroups(boolean onlyEnabledGroups)
+	{
+		List<Group> attachedGroups = new ArrayList<Group>();
 
-        try
-        {
-            db = connectionFactory.getTx();
+		try
+		{
+			if (!onlyEnabledGroups)
+			{
+				groupRepo.findAll().forEach(e -> attachedGroups.add(e));
+			}
+			else
+			{
+				groupRepo.findAllEnabledGroups(true).forEach(e -> attachedGroups.add(e));
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-            if (!onlyEnabledGroups)
-            {
-                attachedGroups = db.query(new OSQLSynchQuery<Client>("select from Group"));
-            }
-            else
-            {
-                attachedGroups = db.query(new OSQLSynchQuery<Client>(
-                        "select from Group where enabled = true"));
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+		AutoPopulatingList<GroupDto> result = new AutoPopulatingList<GroupDto>(GroupDto.class);
+		for (Group attachedGroup : attachedGroups)
+		{
+			result.add(GroupMapper.mapToDto(attachedGroup));
+		}
 
-        AutoPopulatingList<IGroupDto> result = new AutoPopulatingList<IGroupDto>(IGroupDto.class);
-        for (IGroup attachedGroup : attachedGroups)
-        {
-            result.add(GroupMapper.mapToDto(attachedGroup));
-        }
+		return result;
+	}
 
-        return result;
-    }
+	/**
+	 * @param clientId
+	 *            Mandanten-ID
+	 * @return Alle zum Mandanten gehörende Gruppen
+	 */
+	public List<GroupDto> getAllGroupsForClient(Long clientId)
+	{
+		List<Group> attachedGroups = new ArrayList<Group>();
 
-    @Override
-    public List<IGroupDto> getAllGroupsForClient(Object clientId)
-    {
-        List<IGroup> attachedGroups = new ArrayList<IGroup>();
-        OObjectDatabaseTx db = null;
+		try
+		{
+			groupRepo.findAllGroupsAssignedToClientId(clientId).forEach(e -> attachedGroups.add(e));
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        try
-        {
-            db = connectionFactory.getTx();
+		AutoPopulatingList<GroupDto> result = new AutoPopulatingList<GroupDto>(GroupDto.class);
+		for (Group attachedGroup : attachedGroups)
+		{
+			result.add(GroupMapper.mapToDto(attachedGroup));
+		}
 
-            attachedGroups = db.query(new OSQLSynchQuery<Client>("select from Group where client = "
-                    + clientId));
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+		return result;
+	}
 
-        AutoPopulatingList<IGroupDto> result = new AutoPopulatingList<IGroupDto>(IGroupDto.class);
-        for (IGroup attachedGroup : attachedGroups)
-        {
-            result.add(GroupMapper.mapToDto(attachedGroup));
-        }
+	/**
+	 * @param groupId
+	 *            Gruppen-ID
+	 * @return Der der Gruppe zugeordnete Mandant
+	 */
+	public ClientDto getClientForGroupId(Long groupId)
+	{
+		try
+		{
+			Group persistentGroup = groupRepo.findOne(groupId);
+			if (persistentGroup != null)
+			{
+				return ClientMapper.mapToDto(persistentGroup.getClient());
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        return result;
-    }
+		return null;
+	}
 
-    @Override
-    public IClientDto getClientForGroupId(Object rid)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
+	/**
+	 * @param name
+	 *            Gruppenname
+	 * @return Die zum Namen gehörende Gruppe
+	 */
+	public GroupDto getGroupByName(String name)
+	{
+		try
+		{
+			Group persistentGroup = groupRepo.findGroupByName(name);
+			return (persistentGroup != null) ? GroupMapper.mapToDto(persistentGroup) : null;
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        try
-        {
-            IGroup persistentGroup = getGroupByRid(rid);
-            if (persistentGroup != null)
-            {
-                return ClientMapper.mapToDto(persistentGroup.getClient());
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
+		return null;
+	}
 
-        return null;
-    }
+	/**
+	 * @param groupIds
+	 *            Liste von Gruppen-IDs
+	 * @return Liste von Gruppen
+	 */
+	public List<GroupDto> getGroupsForIds(List<Long> groupIds)
+	{
+		List<GroupDto> result = new ArrayList<GroupDto>();
 
-    @Override
-    public IGroupDto getGroupByName(String name)
-    {
-        IGroupDto group = null;
-        OObjectDatabaseTx db = null;
+		try
+		{
+			Iterable<Group> persistentGroups = groupRepo.findAll(groupIds);
+			for (Group persistentGroup : persistentGroups)
+			{
+				result.add(GroupMapper.mapToDto(persistentGroup));
+			}
 
-        try
-        {
-            db = connectionFactory.getTx();
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-            List<IGroup> resultSet = db.query(new OSQLSynchQuery<Client>(
-                    "select from Group where name = '" + name + "'"));
-            return (resultSet.size() != 0) ? GroupMapper.mapToDto(resultSet.get(0)) : null;
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+		return result;
+	}
 
-        return group;
-    }
+	/**
+	 * Speichert eine Gruppe.
+	 * 
+	 * @param detachedGroup
+	 *            Zu speichernde Gruppe
+	 * @return Gespeicherte Gruppe
+	 */
+	public GroupDto saveGroup(GroupDto detachedGroup)
+	{
+		try
+		{
+			Group attachedGroup = GroupMapper.mapToEntity(detachedGroup, roleRepo,
+					ClientMapper.mapToEntity(authenticationUtil.getSelectedClient()));
+			Group persistentGroup = groupRepo.findOne(attachedGroup.getId());
 
-    @Override
-    public List<IGroupDto> getGroupsForIds(List<Object> groupRidObjects)
-    {
-        List<IGroupDto> result = new ArrayList<IGroupDto>();
-        OObjectDatabaseTx db = null;
+			if (persistentGroup != null)
+			{
+				persistentGroup.bind(attachedGroup);
+				persistentGroup = groupRepo.save(persistentGroup);
+			}
+			else
+			{
+				persistentGroup = groupRepo.save(attachedGroup);
+			}
 
-        try
-        {
-            db = connectionFactory.getTx();
+			return GroupMapper.mapToDto(persistentGroup);
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-            for (Object rid : groupRidObjects)
-            {
-                IGroup persistentGroup = getGroupByRid(rid);
-                result.add(GroupMapper.mapToDto(persistentGroup));
-            }
+		return null;
+	}
 
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+	/**
+	 * Speichert eine Liste von Gruppen.
+	 * 
+	 * @param detachedGroups
+	 *            Liste von zu speichernden Gruppen
+	 */
+	public void saveGroups(List<GroupDto> detachedGroups)
+	{
+		try
+		{
+			for (GroupDto detachedGroup : detachedGroups)
+			{
+				Group attachedGroup = GroupMapper.mapToEntity(detachedGroup, roleRepo,
+						ClientMapper.mapToEntity(authenticationUtil.getSelectedClient()));
+				Group persistentGroup = groupRepo.findOne(detachedGroup.getId());
 
-        return result;
-    }
-
-    @Override
-    public IGroupDto saveGroup(IGroupDto detachedGroup)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
-
-        try
-        {
-            IGroup attachedGroup = GroupMapper.mapToEntity(detachedGroup);
-            IGroup persistentGroup = getGroupByRid(attachedGroup.getRid());
-
-            if (persistentGroup != null)
-            {
-                persistentGroup.bind(attachedGroup);
-                persistentGroup = db.save(persistentGroup);
-            }
-            else
-            {
-                persistentGroup = db.save(attachedGroup);
-            }
-
-            OCommandRequest command = new OCommandSQL("update " + persistentGroup.getRid() + " set roles = "
-                    + persistentGroup.getRoleRids());
-            db.command(command).execute();
-
-            return GroupMapper.mapToDto(persistentGroup);
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public void saveGroups(List<IGroupDto> detachedGroups)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
-
-        try
-        {
-            List<IGroup> attachedGroups = GroupMapper.mapToEntities(detachedGroups);
-            for (IGroup group : attachedGroups)
-            {
-                IGroup persistentGroup = getGroupByRid(group.getRid());
-                group.setClient(ClientMapper.mapToEntity(authenticationUtil.getSelectedClient()));
-
-                if (persistentGroup != null)
-                {
-                    persistentGroup.bind(group);
-                    persistentGroup = db.save(persistentGroup);
-                }
-                else
-                {
-                    persistentGroup = db.save(group);
-                }
-
-                OCommandRequest command = new OCommandSQL("update " + persistentGroup.getRid()
-                        + " set roles = " + persistentGroup.getRoleRids());
-                db.command(command).execute();
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-    }
-
-    private IGroup getGroupByRid(Object rid)
-    {
-        IGroup group = null;
-        OObjectDatabaseTx db = null;
-
-        try
-        {
-            db = connectionFactory.getTx();
-
-            List<Group> resultSet = db.query(new OSQLSynchQuery<Client>(
-                    "select from Group where @rid = " + rid));
-            return (resultSet.size() != 0) ? resultSet.get(0) : null;
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
-
-        return group;
-    }
+				if (persistentGroup != null)
+				{
+					persistentGroup.bind(attachedGroup);
+					persistentGroup = groupRepo.save(persistentGroup);
+				}
+				else
+				{
+					persistentGroup = groupRepo.save(attachedGroup);
+				}
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+	}
 }

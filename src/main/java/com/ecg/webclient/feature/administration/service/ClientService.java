@@ -32,12 +32,17 @@ public class ClientService
 {
 	static final Logger logger = LogManager.getLogger(ClientService.class.getName());
 
+	ClientRepository	clientRepo;
+	PropertyRepository	propertyRepo;
+	GroupRepository		groupRepo;
+
 	@Autowired
-	ClientRepository clientRepo;
-	@Autowired
-	PropertyRepository propertyRepo;
-	@Autowired
-	GroupRepository groupRepo;
+	public ClientService(PropertyRepository propertyRepo, GroupRepository groupRepo, ClientRepository clientRepo)
+	{
+		this.propertyRepo = propertyRepo;
+		this.groupRepo = groupRepo;
+		this.clientRepo = clientRepo;
+	}
 
 	/**
 	 * Löscht alle in der Liste enthaltenen Mandanten.

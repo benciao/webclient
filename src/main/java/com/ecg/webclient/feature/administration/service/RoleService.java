@@ -24,8 +24,13 @@ public class RoleService
 {
 	static final Logger logger = LogManager.getLogger(RoleService.class.getName());
 
-	@Autowired
 	RoleRepository roleRepo;
+
+	@Autowired
+	public RoleService(RoleRepository roleRepo)
+	{
+		this.roleRepo = roleRepo;
+	}
 
 	/**
 	 * Löscht die in der Liste enthaltenen Rollen.
