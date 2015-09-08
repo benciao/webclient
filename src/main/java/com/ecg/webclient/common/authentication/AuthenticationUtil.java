@@ -10,157 +10,151 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
-import com.ecg.webclient.feature.administration.persistence.api.ClientRepository;
-import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
-import com.ecg.webclient.feature.administration.persistence.api.GroupRepository;
-import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
-import com.ecg.webclient.feature.administration.persistence.api.RoleRepository;
-import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
-import com.ecg.webclient.feature.administration.persistence.api.UserRepository;
+import com.ecg.webclient.feature.administration.service.ClientService;
+import com.ecg.webclient.feature.administration.service.GroupService;
+import com.ecg.webclient.feature.administration.service.RoleService;
+import com.ecg.webclient.feature.administration.service.UserService;
+import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
+import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
+import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
 @Component
 public class AuthenticationUtil
 {
-    private List<ClientDto>  clients;
-    private ClientDto        selectedClient;
-    private ClientService clientRepository;
-    private UserRepository   userRepository;
-    private GroupRepository  groupRepository;
-    private RoleRepository   roleRepository;
+	private List<ClientDto>	clients;
+	private ClientDto		selectedClient;
+	private ClientService	clientService;
+	private UserService		userService;
+	private GroupService	groupService;
+	private RoleService		roleService;
 
-    @Autowired
-    public AuthenticationUtil(ClientService clientRepository, UserRepository userRepository,
-            GroupRepository groupRepository, RoleRepository roleRepository)
-    {
-        this.clientRepository = clientRepository;
-        this.userRepository = userRepository;
-        this.groupRepository = groupRepository;
-        this.roleRepository = roleRepository;
-        initSelectedClient();
-    }
+	@Autowired
+	public AuthenticationUtil(ClientService clientService, UserService userService, GroupService groupService,
+			RoleService roleService)
+	{
+		this.clientService = clientService;
+		this.userService = userService;
+		this.groupService = groupService;
+		this.roleService = roleService;
+		initSelectedClient();
+	}
 
-    public String getClientChangePath()
-    {
-        return "/changeClient";
-    }
+	public String getClientChangePath()
+	{
+		return "/changeClient";
+	}
 
-    public List<IClientDto> getClients()
-    {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String login = auth.getName();
+	public List<ClientDto> getClients()
+	{
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String login = auth.getName();
 
-        IUserDto user = userRepository.getUserByLogin(login);
+		UserDto user = userService.getUserByLogin(login);
 
-        clients = new ArrayList<IClientDto>();
+		clients = new ArrayList<ClientDto>();
 
-        if (auth.getAuthorities().contains(new OdbGrantedAuthoritiy("SETUP_ROLE")))
-        {
-            clients = clientRepository.getAllClients(true);
-        }
-        else
-        {
-            List<Object> groupRids = new ArrayList<Object>();
-            List<Object> assignedGroupIds = user.getGroupRidObjects();
-            for (Object id : assignedGroupIds)
-            {
-                groupRids.add(id);
-            }
+		if (auth.getAuthorities().contains(new DbGrantedAuthoritiy("SETUP_ROLE")))
+		{
+			clients = clientService.getAllClients(true);
+		}
+		else
+		{
+			for (ClientDto client : clientService.getAssignedClientsForGroups(user.getGroupIdObjects()))
+			{
+				if (client.isEnabled())
+				{
+					clients.add(client);
+				}
+			}
+		}
 
-            for (IClientDto client : clientRepository.getAssignedClientsForGroups(groupRids))
-            {
-                if (client.isEnabled())
-                {
-                    clients.add(client);
-                }
-            }
-        }
+		if (selectedClient == null)
+		{
+			initSelectedClient();
+		}
 
-        if (selectedClient == null)
-        {
-            initSelectedClient();
-        }
+		boolean selectedClientNotIncluded = true;
+		for (ClientDto clientDto : clients)
+		{
+			if (clientDto.equals(selectedClient))
+			{
+				selectedClientNotIncluded = false;
+				break;
+			}
+		}
 
-        boolean selectedClientNotIncluded = true;
-        for (IClientDto clientDto : clients)
-        {
-            if (clientDto.equals(selectedClient))
-            {
-                selectedClientNotIncluded = false;
-                break;
-            }
-        }
+		if (selectedClientNotIncluded)
+		{
+			setSelectedClient(clients.get(0));
+		}
 
-        if (selectedClientNotIncluded)
-        {
-            setSelectedClient(clients.get(0));
-        }
+		return clients;
+	}
 
-        return clients;
-    }
+	public ClientDto getSelectedClient()
+	{
+		if (selectedClient.getId() != 0)
+		{
+			selectedClient = clientService.getClient(selectedClient.getId());
+		}
+		return selectedClient;
+	}
 
-    public IClientDto getSelectedClient()
-    {
-        if (!selectedClient.getRid().toString().equalsIgnoreCase("0"))
-        {
-            selectedClient = clientRepository.getClient(selectedClient.getRid());
-        }
-        return selectedClient;
-    }
+	public void setSelectedClient(ClientDto selectedClient)
+	{
+		this.selectedClient = selectedClient;
+	}
 
-    public void setSelectedClient(IClientDto selectedClient)
-    {
-        this.selectedClient = selectedClient;
-    }
+	public void setSelectedClientWithNewAuthority(ClientDto selectedClient)
+	{
+		this.selectedClient = selectedClient;
 
-    public void setSelectedClientWithNewAuthority(IClientDto selectedClient)
-    {
-        this.selectedClient = selectedClient;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String login = auth.getName();
+		String password = auth.getCredentials().toString();
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String login = auth.getName();
-        String password = auth.getCredentials().toString();
+		UserDto user = userService.getUserByLogin(login);
 
-        IUserDto user = userRepository.getUserByLogin(login);
+		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+		// zugeordnete Rollen für den Client setzen
+		for (GroupDto group : groupService.getGroupsForIds(user.getGroupIdObjects()))
+		{
+			// Nutzer mit dieser Rolle erhält alle ihm zugeordneten Rollen über
+			// alle Mandanten
+			if (auth.getAuthorities().contains(new DbGrantedAuthoritiy("SETUP_ROLE")))
+			{
+				for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
+				{
+					DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getName());
+					grantedAuths.add(newAuth);
+				}
+			}
+			// jeder andere Nutzer erhält nur die ihm zugeordneten Rollen des
+			// gerade ausgewählten Mandanten
+			else
+			{
+				if (groupService.getClientForGroupId(group.getId()).getId() ==  selectedClient.getId())
+				{
+					for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
+					{
+						DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getName());
+						grantedAuths.add(newAuth);
+					}
+				}
+			}
+		}
 
-        List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-        // zugeordnete Rollen für den Client setzen
-        for (IGroupDto group : groupRepository.getGroupsForIds(user.getGroupRidObjects()))
-        {
-            // Nutzer mit dieser Rolle erhält alle ihm zugeordneten Rollen über alle Mandanten
-            if (auth.getAuthorities().contains(new OdbGrantedAuthoritiy("SETUP_ROLE")))
-            {
-                for (IRoleDto role : roleRepository.getRolesForIds(group.getRoleRidObjects()))
-                {
-                    OdbGrantedAuthoritiy newAuth = new OdbGrantedAuthoritiy(role.getName());
-                    grantedAuths.add(newAuth);
-                }
-            }
-            // jeder andere Nutzer erhält nur die ihm zugeordneten Rollen des gerade ausgewählten Mandanten
-            else
-            {
-                if (groupRepository.getClientForGroupId(group.getRid()).getRid().toString()
-                        .equals(selectedClient.getRid().toString()))
-                {
-                    for (IRoleDto role : roleRepository.getRolesForIds(group.getRoleRidObjects()))
-                    {
-                        OdbGrantedAuthoritiy newAuth = new OdbGrantedAuthoritiy(role.getName());
-                        grantedAuths.add(newAuth);
-                    }
-                }
-            }
-        }
+		SecurityContextHolder.getContext()
+				.setAuthentication(new UsernamePasswordAuthenticationToken(login, password, grantedAuths));
+	}
 
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(login, password, grantedAuths));
-    }
-
-    private void initSelectedClient()
-    {
-        List<IClientDto> clients = clientRepository.getAllClients(true);
-        if (!clients.isEmpty())
-        {
-            this.selectedClient = clients.get(0);
-        }
-    }
+	private void initSelectedClient()
+	{
+		List<ClientDto> clients = clientService.getAllClients(true);
+		if (!clients.isEmpty())
+		{
+			this.selectedClient = clients.get(0);
+		}
+	}
 }

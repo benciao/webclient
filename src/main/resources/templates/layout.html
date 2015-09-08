@@ -31,7 +31,7 @@
 										th:name="selectedClient">
 										<option th:each="client : ${beans.authenticationUtil.getClients()}"
 											th:value="${client.rid}" th:text="${client.name}"
-											th:selected="${client.rid == beans.authenticationUtil.getSelectedClient().getRid()}"><p
+											th:selected="${client.id == beans.authenticationUtil.getSelectedClient().getId()}"><p
 												th:text="${client.name}" />
 										</option>
 									</select>

@@ -2,12 +2,12 @@ package com.ecg.webclient.common.authentication;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public class OdbGrantedAuthoritiy implements GrantedAuthority
+public class DbGrantedAuthoritiy implements GrantedAuthority
 {
     private static final long serialVersionUID = -3442491340287701183L;
     private final String      role;
 
-    public OdbGrantedAuthoritiy(String role)
+    public DbGrantedAuthoritiy(String role)
     {
         this.role = role;
     }
@@ -20,9 +20,9 @@ public class OdbGrantedAuthoritiy implements GrantedAuthority
             return true;
         }
 
-        if (obj instanceof OdbGrantedAuthoritiy)
+        if (obj instanceof DbGrantedAuthoritiy)
         {
-            return this.role.equals(((OdbGrantedAuthoritiy) obj).role);
+            return this.role.equals(((DbGrantedAuthoritiy) obj).role);
         }
 
         return false;

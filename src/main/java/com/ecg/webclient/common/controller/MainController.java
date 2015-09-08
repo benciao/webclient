@@ -13,27 +13,27 @@ import com.ecg.webclient.feature.administration.service.ClientService;
 @Controller
 public class MainController
 {
-    @Autowired
-    private FeatureRegistry     featureRegistry;
+	@Autowired
+	private FeatureRegistry featureRegistry;
 
-    @Autowired
-    private ClientService clientRepository;
+	@Autowired
+	private ClientService clientService;
 
-    @Autowired
-    private AuthenticationUtil  util;
+	@Autowired
+	private AuthenticationUtil util;
 
-    @RequestMapping(value = "/changeClient", method = RequestMethod.POST)
-    public String changeClient(@ModelAttribute("selectedClient") Object selectedClient)
-    {
-        util.setSelectedClientWithNewAuthority(clientRepository.getClient(selectedClient));
-        featureRegistry.resetActiveFeature();
-        return "/main";
-    }
+	@RequestMapping(value = "/changeClient", method = RequestMethod.POST)
+	public String changeClient(@ModelAttribute("selectedClient") Long selectedClient)
+	{
+		util.setSelectedClientWithNewAuthority(clientService.getClient(selectedClient));
+		featureRegistry.resetActiveFeature();
+		return "/main";
+	}
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String loginOk()
-    {
-        featureRegistry.resetActiveFeature();
-        return "/main";
-    }
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String loginOk()
+	{
+		featureRegistry.resetActiveFeature();
+		return "/main";
+	}
 }

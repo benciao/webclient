@@ -15,7 +15,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 {
     @Autowired
-    @Qualifier("odbAuthenticationProvider")
+    @Qualifier("dbAuthenticationProvider")
     AuthenticationProvider authenticationProvider;
 
     @Autowired

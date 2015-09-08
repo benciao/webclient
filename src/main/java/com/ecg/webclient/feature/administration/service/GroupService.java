@@ -12,16 +12,11 @@ import org.springframework.util.AutoPopulatingList;
 import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.persistence.mapper.ClientMapper;
 import com.ecg.webclient.feature.administration.persistence.mapper.GroupMapper;
-import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
 import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.RoleRepository;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
-import com.orientechnologies.orient.core.command.OCommandRequest;
-import com.orientechnologies.orient.core.sql.OCommandSQL;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 /**
  * Service zum Bearbeiten von Gruppen.
