@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.repo;
+package com.ecg.webclient.feature.administration.persistence.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
 import com.ecg.webclient.feature.administration.persistence.api.IGroup;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
-import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
+import com.ecg.webclient.feature.administration.persistence.api.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
 import com.ecg.webclient.feature.administration.persistence.odbmapper.ClientMapper;
@@ -30,14 +30,14 @@ import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
  *
  */
 @Component
-public class OdbGroupRepository implements IGroupRepository
+public class GroupService implements GroupRepository
 {
-    static final Logger          logger = LogManager.getLogger(OdbGroupRepository.class.getName());
+    static final Logger          logger = LogManager.getLogger(GroupService.class.getName());
     private OdbConnectionFactory connectionFactory;
     private AuthenticationUtil   authenticationUtil;
 
     @Autowired
-    public OdbGroupRepository(OdbConnectionFactory connectionFactory, AuthenticationUtil authenticationUtil)
+    public GroupService(OdbConnectionFactory connectionFactory, AuthenticationUtil authenticationUtil)
     {
         this.connectionFactory = connectionFactory;
         this.authenticationUtil = authenticationUtil;

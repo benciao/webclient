@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.repo;
+package com.ecg.webclient.feature.administration.persistence.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.api.IRole;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
-import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
+import com.ecg.webclient.feature.administration.persistence.api.RoleRepository;
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Role;
 import com.ecg.webclient.feature.administration.persistence.odbmapper.RoleMapper;
@@ -24,13 +24,13 @@ import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
  * @author arndtmar
  */
 @Component
-public class OdbRoleRepository implements IRoleRepository
+public class RoleService implements RoleRepository
 {
-    static final Logger          logger = LogManager.getLogger(OdbRoleRepository.class.getName());
+    static final Logger          logger = LogManager.getLogger(RoleService.class.getName());
     private OdbConnectionFactory connectionFactory;
 
     @Autowired
-    public OdbRoleRepository(OdbConnectionFactory connectionFactory)
+    public RoleService(OdbConnectionFactory connectionFactory)
     {
         this.connectionFactory = connectionFactory;
     }

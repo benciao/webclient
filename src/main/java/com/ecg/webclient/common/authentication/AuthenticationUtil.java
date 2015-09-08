@@ -11,13 +11,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
-import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
+import com.ecg.webclient.feature.administration.persistence.api.ClientRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
-import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
+import com.ecg.webclient.feature.administration.persistence.api.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
-import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
+import com.ecg.webclient.feature.administration.persistence.api.RoleRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
-import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
+import com.ecg.webclient.feature.administration.persistence.api.UserRepository;
 
 @Component
 public class AuthenticationUtil
@@ -25,14 +25,14 @@ public class AuthenticationUtil
     private List<IClientDto>  clients;
     private boolean           isMenuMinimized;
     private IClientDto        selectedClient;
-    private IClientRepository clientRepository;
-    private IUserRepository   userRepository;
-    private IGroupRepository  groupRepository;
-    private IRoleRepository   roleRepository;
+    private ClientService clientRepository;
+    private UserRepository   userRepository;
+    private GroupRepository  groupRepository;
+    private RoleRepository   roleRepository;
 
     @Autowired
-    public AuthenticationUtil(IClientRepository clientRepository, IUserRepository userRepository,
-            IGroupRepository groupRepository, IRoleRepository roleRepository)
+    public AuthenticationUtil(ClientService clientRepository, UserRepository userRepository,
+            GroupRepository groupRepository, RoleRepository roleRepository)
     {
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;

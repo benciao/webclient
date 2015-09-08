@@ -13,21 +13,21 @@ import org.springframework.stereotype.Component;
 
 import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
-import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
+import com.ecg.webclient.feature.administration.persistence.api.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
-import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
+import com.ecg.webclient.feature.administration.persistence.api.RoleRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
-import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
+import com.ecg.webclient.feature.administration.persistence.api.UserRepository;
 
 @Component("odbAuthenticationProvider")
 public class OdbAuthenticationProvider implements AuthenticationProvider
 {
     @Autowired
-    IUserRepository    userRepository;
+    UserRepository    userRepository;
     @Autowired
-    IGroupRepository   groupRepository;
+    GroupRepository   groupRepository;
     @Autowired
-    IRoleRepository    roleRepository;
+    RoleRepository    roleRepository;
     @Autowired
     AuthenticationUtil util;
 

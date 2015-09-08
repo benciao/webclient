@@ -21,14 +21,14 @@ import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.common.feature.FeatureRegistry;
 import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
-import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
+import com.ecg.webclient.feature.administration.persistence.api.ClientRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
-import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
+import com.ecg.webclient.feature.administration.persistence.api.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IPropertyDto;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
-import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
+import com.ecg.webclient.feature.administration.persistence.api.RoleRepository;
 import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
-import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
+import com.ecg.webclient.feature.administration.persistence.api.UserRepository;
 import com.ecg.webclient.feature.administration.viewmodell.ClientConfig;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.ClientProperties;
@@ -54,16 +54,16 @@ public class AdministrationController
     private FeatureRegistry    featureRegistry;
 
     @Autowired
-    private IClientRepository  clientRepository;
+    private ClientService  clientRepository;
 
     @Autowired
-    private IRoleRepository    roleRepository;
+    private RoleRepository    roleRepository;
 
     @Autowired
-    private IGroupRepository   groupRepository;
+    private GroupRepository   groupRepository;
 
     @Autowired
-    private IUserRepository    userRepository;
+    private UserRepository    userRepository;
 
     @Autowired
     private AuthenticationUtil util;

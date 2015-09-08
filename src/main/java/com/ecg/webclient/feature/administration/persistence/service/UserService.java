@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.repo;
+package com.ecg.webclient.feature.administration.persistence.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
 import com.ecg.webclient.feature.administration.persistence.api.IUser;
 import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
-import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
+import com.ecg.webclient.feature.administration.persistence.api.UserRepository;
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.User;
 import com.ecg.webclient.feature.administration.persistence.odbmapper.ClientMapper;
@@ -29,13 +29,13 @@ import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
  * @author arndtmar
  */
 @Component
-public class OdbUserRepository implements IUserRepository
+public class UserService implements UserRepository
 {
-    static final Logger          logger = LogManager.getLogger(OdbUserRepository.class.getName());
+    static final Logger          logger = LogManager.getLogger(UserService.class.getName());
     private OdbConnectionFactory connectionFactory;
 
     @Autowired
-    public OdbUserRepository(OdbConnectionFactory connectionFactory)
+    public UserService(OdbConnectionFactory connectionFactory)
     {
         this.connectionFactory = connectionFactory;
     }
