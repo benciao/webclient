@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.api.IRole;
-import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbRole;
+import com.ecg.webclient.feature.administration.persistence.modell.Role;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 
 /**
@@ -15,7 +13,7 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
  * 
  * @author arndtmar
  */
-public class OdbRoleMapper
+public class RoleMapper
 {
     /**
      * Wandelt eine persistente Rolle in eine detachte um
@@ -24,14 +22,14 @@ public class OdbRoleMapper
      *            persistente Rolle
      * @return Detachete Rolle
      */
-    public static IRoleDto mapToDto(IRole attachedRole)
+    public static RoleDto mapToDto(Role attachedRole)
     {
         RoleDto detachedRole = new RoleDto();
         detachedRole.setDescription(attachedRole.getDescription());
         detachedRole.setName(attachedRole.getName());
         detachedRole.setEnabled(attachedRole.isEnabled());
         detachedRole.setDelete(false);
-        detachedRole.setRid(attachedRole.getRid());
+        detachedRole.setId(attachedRole.getId());
 
         return detachedRole;
     }
@@ -43,18 +41,18 @@ public class OdbRoleMapper
      *            Liste von Persistenten Rollen
      * @return Liste von detachten Rollen
      */
-    public static List<IRoleDto> mapToDtos(List<IRole> attachedRoles)
+    public static List<RoleDto> mapToDtos(List<Role> attachedRoles)
     {
-        List<IRoleDto> result = new AutoPopulatingList<IRoleDto>(IRoleDto.class);
+        List<RoleDto> result = new AutoPopulatingList<RoleDto>(RoleDto.class);
 
-        for (IRole attachedRole : attachedRoles)
+        for (Role attachedRole : attachedRoles)
         {
             RoleDto detachedRole = new RoleDto();
             detachedRole.setDescription(attachedRole.getDescription());
             detachedRole.setName(attachedRole.getName());
             detachedRole.setEnabled(attachedRole.isEnabled());
             detachedRole.setDelete(false);
-            detachedRole.setRid(attachedRole.getRid());
+            detachedRole.setId(attachedRole.getId());
 
             result.add(detachedRole);
         }
@@ -69,17 +67,16 @@ public class OdbRoleMapper
      *            Liste von detachten Rollen
      * @return Liste von persistenten Rollen
      */
-    public static List<IRole> mapToEntities(List<IRoleDto> detachedRoles)
+    public static List<Role> mapToEntities(List<RoleDto> detachedRoles)
     {
-        List<IRole> result = new ArrayList<IRole>();
+        List<Role> result = new ArrayList<Role>();
 
-        for (IRoleDto detachedRole : detachedRoles)
+        for (RoleDto detachedRole : detachedRoles)
         {
-            OdbRole entity = new OdbRole();
+            Role entity = new Role();
             entity.setDescription(detachedRole.getDescription());
             entity.setName(detachedRole.getName());
             entity.setEnabled(detachedRole.isEnabled());
-            entity.setRid(detachedRole.getRid());
 
             result.add(entity);
         }
@@ -94,13 +91,12 @@ public class OdbRoleMapper
      *            Detachte Rolle
      * @return Persistente Rolle
      */
-    public static IRole mapToEntity(IRoleDto detachedRole)
+    public static Role mapToEntity(RoleDto detachedRole)
     {
-        OdbRole entity = new OdbRole();
+        Role entity = new Role();
         entity.setDescription(detachedRole.getDescription());
         entity.setName(detachedRole.getName());
         entity.setEnabled(detachedRole.isEnabled());
-        entity.setRid(detachedRole.getRid());
 
         return entity;
     }

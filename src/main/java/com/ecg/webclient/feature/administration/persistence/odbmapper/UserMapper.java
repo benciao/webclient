@@ -1,15 +1,12 @@
 package com.ecg.webclient.feature.administration.persistence.odbmapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.api.IGroup;
-import com.ecg.webclient.feature.administration.persistence.api.IUser;
-import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbUser;
+import com.ecg.webclient.feature.administration.persistence.modell.Group;
+import com.ecg.webclient.feature.administration.persistence.modell.User;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
 /**
@@ -17,7 +14,7 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
  * 
  * @author arndtmar
  */
-public class OdbUserMapper
+public class UserMapper
 {
     /**
      * Wandelt einen persistenten Benutzer in einen detachten um
@@ -26,39 +23,39 @@ public class OdbUserMapper
      *            persistenter Benutzer
      * @return Detacheter Benutzer
      */
-    public static IUserDto mapToDto(IUser user)
+    public static UserDto mapToDto(User user)
     {
-        IUserDto dto = new UserDto();
+        UserDto dto = new UserDto();
         dto.setLogin(user.getLogin());
-        dto.setType(user.isType());
+        dto.setInternal(user.isInternal());
         dto.setLastname(user.getLastname());
         dto.setFirstname(user.getFirstname());
         dto.setEnabled(user.isEnabled());
         dto.setDelete(false);
-        dto.setRid(user.getRid());
+        dto.setId(user.getId());
         dto.setEmail(user.getEmail());
         dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
 
         if (user.getDefaultClient() != null)
         {
-            dto.setDefaultClient(user.getDefaultClient().getRid().toString());
+            dto.setDefaultClient(Long.toString(user.getDefaultClient().getId()));
         }
 
         if (user.getGroups() != null)
         {
             String groups = "";
-            for (IGroup group : user.getGroups())
+            for (Group group : user.getGroups())
             {
                 if (groups.length() == 0)
                 {
-                    groups = group.getRid().toString();
+                    groups = Long.toString(group.getId());
                 }
                 else
                 {
-                    groups = groups + "," + group.getRid().toString();
+                    groups = groups + "," + group.getId();
                 }
             }
-            dto.setGroupRids(groups);
+            dto.setGroupIds(groups);
         }
 
         return dto;
@@ -71,43 +68,43 @@ public class OdbUserMapper
      *            Liste von persistenten Benutzern
      * @return Liste von detachten Benutzern
      */
-    public static List<IUserDto> mapToDtos(List<IUser> users)
+    public static List<UserDto> mapToDtos(List<User> users)
     {
-        List<IUserDto> result = new AutoPopulatingList<IUserDto>(IUserDto.class);
+        List<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
 
-        for (IUser user : users)
+        for (User user : users)
         {
-            IUserDto dto = new UserDto();
+            UserDto dto = new UserDto();
             dto.setLogin(user.getLogin());
-            dto.setType(user.isType());
+            dto.setInternal(user.isInternal());
             dto.setLastname(user.getLastname());
             dto.setFirstname(user.getFirstname());
             dto.setEnabled(user.isEnabled());
             dto.setDelete(false);
-            dto.setRid(user.getRid());
+            dto.setId(user.getId());
             dto.setEmail(user.getEmail());
             dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
 
             if (user.getDefaultClient() != null)
             {
-                dto.setDefaultClient(user.getDefaultClient().getRid().toString());
+                dto.setDefaultClient(Long.toString(user.getDefaultClient().getId()));
             }
 
             if (user.getGroups() != null)
             {
                 String groups = "";
-                for (IGroup group : user.getGroups())
+                for (Group group : user.getGroups())
                 {
                     if (groups.length() == 0)
                     {
-                        groups = group.getRid().toString();
+                        groups = Long.toString(group.getId());
                     }
                     else
                     {
-                        groups = groups + "," + group.getRid().toString();
+                        groups = groups + "," + group.getId();
                     }
                 }
-                dto.setGroupRids(groups);
+                dto.setGroupIds(groups);
             }
 
             result.add(dto);
@@ -123,24 +120,23 @@ public class OdbUserMapper
      *            Liste von detachten Benutzern
      * @return Liste von persistenten Benutzern
      */
-    public static List<IUser> mapToEntities(List<IUserDto> dtos)
+    public static List<User> mapToEntities(List<UserDto> dtos)
     {
-        List<IUser> result = new ArrayList<IUser>();
+        List<User> result = new ArrayList<User>();
 
-        for (IUserDto dto : dtos)
+        for (UserDto dto : dtos)
         {
-            IUser entity = new OdbUser();
+            User entity = new User();
             entity.setLogin(dto.getLogin());
-            entity.setType(dto.isType());
+            entity.setInternal(dto.isInternal());
             entity.setLastname(dto.getLastname());
             entity.setFirstname(dto.getFirstname());
             entity.setEnabled(dto.isEnabled());
-            entity.setRid(dto.getRid());
             entity.setEmail(dto.getEmail());
             entity.setPassword(dto.getPassword());
             entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
-            entity.setDefaultClientRid(dto.getDefaultClient());
-            entity.setGroupRids(getGroupRids(dto.getGroupRids()));
+            entity.setDefaultClientId(Long.parseLong(dto.getDefaultClient()));
+            entity.setGroupIds(dto.getGroupIdObjects());
 
             result.add(entity);
         }
@@ -155,35 +151,20 @@ public class OdbUserMapper
      *            Detachter Benutzer
      * @return Persistenter Benutzer
      */
-    public static IUser mapToEntity(IUserDto dto)
+    public static User mapToEntity(UserDto dto)
     {
-        IUser entity = new OdbUser();
+        User entity = new User();
         entity.setLogin(dto.getLogin());
-        entity.setType(dto.isType());
+        entity.setInternal(dto.isInternal());
         entity.setLastname(dto.getLastname());
         entity.setFirstname(dto.getFirstname());
         entity.setEnabled(dto.isEnabled());
-        entity.setRid(dto.getRid());
         entity.setEmail(dto.getEmail());
         entity.setPassword(dto.getPassword());
         entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
-        entity.setDefaultClientRid(dto.getDefaultClient());
-        entity.setGroupRids(getGroupRids(dto.getGroupRids()));
+        entity.setDefaultClientId(Long.parseLong(dto.getDefaultClient()));
+        entity.setGroupIds(dto.getGroupIdObjects());
 
         return entity;
-    }
-
-    private static List<Object> getGroupRids(String groupRids)
-    {
-        List<Object> result = new ArrayList<Object>();
-
-        List<String> rids = Arrays.asList(groupRids.split(","));
-
-        for (String rid : rids)
-        {
-            result.add(rid);
-        }
-
-        return result.size() != 0 ? result : null;
     }
 }

@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.api.IProperty;
-import com.ecg.webclient.feature.administration.persistence.api.IPropertyDto;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbProperty;
+import com.ecg.webclient.feature.administration.persistence.modell.Property;
 import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
 
 /**
@@ -15,7 +13,7 @@ import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
  * 
  * @author arndtmar
  */
-public class OdbPropertyMapper
+public class PropertyMapper
 {
     /**
      * Wandelt eine persistente Eigenschaft in eine detachte um
@@ -24,12 +22,12 @@ public class OdbPropertyMapper
      *            persistente Eigenschaft
      * @return Detachete Eigenschaft
      */
-    public static IPropertyDto mapToDto(IProperty property)
+    public static PropertyDto mapToDto(Property property)
     {
-        IPropertyDto dto = new PropertyDto();
+        PropertyDto dto = new PropertyDto();
         dto.setKey(property.getKey());
         dto.setValue(property.getValue());
-        dto.setRid(property.getRid());
+        dto.setId(property.getId());
         dto.setDelete(false);
 
         return dto;
@@ -42,16 +40,16 @@ public class OdbPropertyMapper
      *            Liste von persistenten Eigenschaften
      * @return Liste von detachten Eigenschaften
      */
-    public static List<IPropertyDto> mapToDtos(List<IProperty> properties)
+    public static List<PropertyDto> mapToDtos(List<Property> properties)
     {
-        List<IPropertyDto> result = new AutoPopulatingList<IPropertyDto>(IPropertyDto.class);
+        List<PropertyDto> result = new AutoPopulatingList<PropertyDto>(PropertyDto.class);
 
-        for (IProperty property : properties)
+        for (Property property : properties)
         {
-            IPropertyDto dto = new PropertyDto();
+            PropertyDto dto = new PropertyDto();
             dto.setKey(property.getKey());
             dto.setValue(property.getValue());
-            dto.setRid(property.getRid());
+            dto.setId(property.getId());
 
             result.add(dto);
         }
@@ -66,16 +64,15 @@ public class OdbPropertyMapper
      *            Liste von detachten Eigenschaften
      * @return Liste von persistenten Eigenschaften
      */
-    public static List<IProperty> mapToEntities(List<IPropertyDto> dtos)
+    public static List<Property> mapToEntities(List<PropertyDto> dtos)
     {
-        List<IProperty> result = new ArrayList<IProperty>();
+        List<Property> result = new ArrayList<Property>();
 
-        for (IPropertyDto dto : dtos)
+        for (PropertyDto dto : dtos)
         {
-            IProperty property = new OdbProperty();
+            Property property = new Property();
             property.setKey(dto.getKey());
             property.setValue(dto.getValue());
-            property.setRid(dto.getRid());
 
             result.add(property);
         }
@@ -90,12 +87,11 @@ public class OdbPropertyMapper
      *            Detachte Eigenschaft
      * @return Persistente Eigenschaft
      */
-    public static IProperty mapToEntity(IPropertyDto dto)
+    public static Property mapToEntity(PropertyDto dto)
     {
-        IProperty property = new OdbProperty();
+        Property property = new Property();
         property.setKey(dto.getKey());
         property.setValue(dto.getValue());
-        property.setRid(dto.getRid());
 
         return property;
     }

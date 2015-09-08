@@ -2,6 +2,9 @@ package com.ecg.webclient.feature.administration.persistence.api;
 
 import java.util.List;
 
+import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
+
 /**
  * Schnittstelle für Persistenzimplementierung von Benutzergruppen.
  * 
@@ -16,28 +19,28 @@ public interface IGroupRepository
      * @param groups
      *            Liste von Benutzergruppen
      */
-    void deleteGroups(List<IGroupDto> groups);
+    void deleteGroups(List<GroupDto> groups);
 
     /**
      * @param onlyEnabledGroups
      *            true, wenn nur aktivierte Benutzergruppen zurückgegeben werden sollen, sonst false
      * @return Alle aktivierten Benutzergruppen, wenn Parameter == true, sonst alle
      */
-    List<IGroupDto> getAllGroups(boolean onlyEnabledGroups);
+    List<GroupDto> getAllGroups(boolean onlyEnabledGroups);
 
     /**
      * @param clientId
      *            technische Id des Mandanten
      * @return alle Benutzergruppen des zur Id gehörenden Mandanten
      */
-    List<IGroupDto> getAllGroupsForClient(Object clientId);
+    List<GroupDto> getAllGroupsForClient(Object clientId);
 
     /**
      * @param rid
      *            Gruppen ID
      * @return Mandant
      */
-    IClientDto getClientForGroupId(Object rid);
+    ClientDto getClientForGroupId(Object rid);
 
     /**
      * Lädt eine Gruppe anhand ihres Namens
@@ -46,13 +49,13 @@ public interface IGroupRepository
      *            Gruppenname
      * @return Gruppe wenn existent, sonst null
      */
-    IGroupDto getGroupByName(String string);
+    GroupDto getGroupByName(String string);
 
     /**
      * @param groupRidObjects Liste von Gruppen IDs
      * @return Alle Gruppen mit den im Parameter enhaltenen IDs
      */
-    List<IGroupDto> getGroupsForIds(List<Object> groupRidObjects);
+    List<GroupDto> getGroupsForIds(List<Object> groupRidObjects);
 
     /**
      * Speichert eine Benutzergruppe
@@ -61,7 +64,7 @@ public interface IGroupRepository
      *            zu speichernde Gruppe
      * @return Gespeicherte Gruppe
      */
-    IGroupDto saveGroup(IGroupDto group);
+    GroupDto saveGroup(GroupDto group);
 
     /**
      * Speichert alle Benutzergruppen der Liste
@@ -69,5 +72,5 @@ public interface IGroupRepository
      * @param groups
      *            Benutzergruppen
      */
-    void saveGroups(List<IGroupDto> groups);
+    void saveGroups(List<GroupDto> groups);
 }

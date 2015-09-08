@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.odbrepo;
+package com.ecg.webclient.feature.administration.persistence.repo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import org.springframework.util.AutoPopulatingList;
 import com.ecg.webclient.feature.administration.persistence.api.IRole;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleRepository;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbRoleMapper;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbClient;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbRole;
+import com.ecg.webclient.feature.administration.persistence.modell.Client;
+import com.ecg.webclient.feature.administration.persistence.modell.Role;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.RoleMapper;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
@@ -78,11 +78,11 @@ public class OdbRoleRepository implements IRoleRepository
 
             if (!onlyEnabledRoles)
             {
-                attachedRoles = db.query(new OSQLSynchQuery<OdbClient>("select from Role"));
+                attachedRoles = db.query(new OSQLSynchQuery<Client>("select from Role"));
             }
             else
             {
-                attachedRoles = db.query(new OSQLSynchQuery<OdbClient>(
+                attachedRoles = db.query(new OSQLSynchQuery<Client>(
                         "select from Role where enabled = true"));
             }
         }
@@ -102,7 +102,7 @@ public class OdbRoleRepository implements IRoleRepository
 
         for (IRole attachedRole : attachedRoles)
         {
-            result.add(OdbRoleMapper.mapToDto(attachedRole));
+            result.add(RoleMapper.mapToDto(attachedRole));
         }
 
         return result;
@@ -121,7 +121,7 @@ public class OdbRoleRepository implements IRoleRepository
             for (Object rid : roleRidObjects)
             {
                 IRole persistentRole = getRoleByRid(rid);
-                result.add(OdbRoleMapper.mapToDto(persistentRole));
+                result.add(RoleMapper.mapToDto(persistentRole));
             }
 
         }
@@ -147,7 +147,7 @@ public class OdbRoleRepository implements IRoleRepository
 
         try
         {
-            IRole attachedRole = OdbRoleMapper.mapToEntity(detachedRole);
+            IRole attachedRole = RoleMapper.mapToEntity(detachedRole);
 
             IRole persistentRole = getRoleByRid(attachedRole.getRid());
 
@@ -159,7 +159,7 @@ public class OdbRoleRepository implements IRoleRepository
 
                 if (persistentRole != null)
                 {
-                    return OdbRoleMapper.mapToDto(persistentRole);
+                    return RoleMapper.mapToDto(persistentRole);
                 }
                 else
                 {
@@ -172,7 +172,7 @@ public class OdbRoleRepository implements IRoleRepository
 
                 if (persistentRole != null)
                 {
-                    return OdbRoleMapper.mapToDto(persistentRole);
+                    return RoleMapper.mapToDto(persistentRole);
                 }
                 else
                 {
@@ -203,7 +203,7 @@ public class OdbRoleRepository implements IRoleRepository
 
         try
         {
-            List<IRole> attachedRoles = OdbRoleMapper.mapToEntities(detachedRoles);
+            List<IRole> attachedRoles = RoleMapper.mapToEntities(detachedRoles);
 
             for (IRole role : attachedRoles)
             {
@@ -250,7 +250,7 @@ public class OdbRoleRepository implements IRoleRepository
         {
             db = connectionFactory.getTx();
 
-            List<OdbRole> resultSet = db.query(new OSQLSynchQuery<OdbClient>("select from Role where @rid = "
+            List<Role> resultSet = db.query(new OSQLSynchQuery<Client>("select from Role where @rid = "
                     + rid));
             return (resultSet.size() != 0) ? resultSet.get(0) : null;
         }

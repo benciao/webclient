@@ -6,88 +6,77 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
-
 /**
  * Implementierung einer von der Persistenz detachten Benutzergruppe.
  * 
  * @author arndtmar
  */
-public class GroupDto extends BaseObjectDto implements IGroupDto
+public class GroupDto extends BaseObjectDto
 {
     @NotNull
     private String  name;
     @NotNull
     private String  description;
     private boolean enabled;
-    private String  roleRids;
+    private String  roleIds;
 
     public GroupDto()
     {}
 
-    @Override
     public String getDescription()
     {
         return description;
     }
 
-    @Override
     public String getName()
     {
         return name;
     }
 
-    @Override
-    public List<Object> getRoleRidObjects()
+    public List<Long> getRoleIdObjects()
     {
-        List<Object> result = new ArrayList<Object>();
+        List<Long> result = new ArrayList<Long>();
 
-        if (roleRids != null && !roleRids.isEmpty())
+        if (roleIds != null && !roleIds.isEmpty())
         {
-            List<String> rids = Arrays.asList(roleRids.split(","));
+            List<String> ids = Arrays.asList(roleIds.split(","));
 
-            for (String rid : rids)
+            for (String id : ids)
             {
-                result.add("#" + rid);
+                result.add(Long.parseLong(id));
             }
         }
 
         return result.size() != 0 ? result : null;
     }
 
-    @Override
-    public String getRoleRids()
+    public String getRoleIds()
     {
-        return roleRids;
+        return roleIds;
     }
 
-    @Override
     public boolean isEnabled()
     {
         return enabled;
     }
 
-    @Override
     public void setDescription(String description)
     {
         this.description = description;
     }
 
-    @Override
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
     }
 
-    @Override
     public void setName(String name)
     {
         this.name = name;
     }
 
-    @Override
-    public void setRoleRids(String roleRids)
+    public void setRoleIds(String roleIds)
     {
-        this.roleRids = roleRids;
+        this.roleIds = roleIds;
     }
 }

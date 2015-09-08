@@ -4,6 +4,8 @@ import java.util.Locale;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.Ordered;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -16,6 +18,9 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Configuration
 @EnableWebMvc
+@Import(
+{ DatabaseConfiguration.class })
+@PropertySource("classpath:application.properties")
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter
 {
     @Override
@@ -59,4 +64,5 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter
         slr.setDefaultLocale(Locale.GERMAN);
         return slr;
     }
+
 }

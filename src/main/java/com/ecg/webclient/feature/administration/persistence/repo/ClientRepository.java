@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.odbrepo;
+package com.ecg.webclient.feature.administration.persistence.repo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,32 +11,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.api.IClient;
-import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
 import com.ecg.webclient.feature.administration.persistence.api.IClientRepository;
-import com.ecg.webclient.feature.administration.persistence.api.IGroup;
-import com.ecg.webclient.feature.administration.persistence.api.IProperty;
-import com.ecg.webclient.feature.administration.persistence.api.IPropertyDto;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbClientMapper;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbPropertyMapper;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbClient;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbProperty;
+import com.ecg.webclient.feature.administration.persistence.modell.Client;
+import com.ecg.webclient.feature.administration.persistence.modell.Property;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.ClientMapper;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.PropertyMapper;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 /**
- * Repository für Mandanten und deren Eigenschaften bei Nutzung einer OrientDB.
+ * Repository für Mandanten und deren Eigenschaften.
  * 
  * @author arndtmar
  */
 @Component
-public class OdbClientRepository implements IClientRepository
+public class ClientRepository implements IClientRepository
 {
-    static final Logger          logger = LogManager.getLogger(OdbClientRepository.class.getName());
+    static final Logger          logger = LogManager.getLogger(ClientRepository.class.getName());
     private OdbConnectionFactory connectionFactory;
 
     @Autowired
-    public OdbClientRepository(OdbConnectionFactory connectionFactory)
+    public ClientRepository(OdbConnectionFactory connectionFactory)
     {
         this.connectionFactory = connectionFactory;
     }
@@ -115,11 +110,11 @@ public class OdbClientRepository implements IClientRepository
 
             if (!onlyEnabled)
             {
-                attachedClients = db.query(new OSQLSynchQuery<OdbClient>("select from Client"));
+                attachedClients = db.query(new OSQLSynchQuery<Client>("select from Client"));
             }
             else
             {
-                attachedClients = db.query(new OSQLSynchQuery<OdbClient>(
+                attachedClients = db.query(new OSQLSynchQuery<Client>(
                         "select from Client where enabled = true"));
             }
         }
@@ -139,7 +134,7 @@ public class OdbClientRepository implements IClientRepository
 
         for (IClient attachedClient : attachedClients)
         {
-            result.add(OdbClientMapper.mapToDto(attachedClient));
+            result.add(ClientMapper.mapToDto(attachedClient));
         }
 
         return result;
@@ -155,7 +150,7 @@ public class OdbClientRepository implements IClientRepository
         {
             db = connectionFactory.getTx();
 
-            List<IGroup> groups = db.query(new OSQLSynchQuery<OdbClient>("select from Group"));
+            List<IGroup> groups = db.query(new OSQLSynchQuery<Client>("select from Group"));
 
             Map<String, IClientDto> clientMap = new HashMap<String, IClientDto>();
 
@@ -163,7 +158,7 @@ public class OdbClientRepository implements IClientRepository
             {
                 if (containsGroupRid(groupRids, group.getRid()))
                 {
-                    clientMap.put(group.getClient().toString(), OdbClientMapper.mapToDto(group.getClient()));
+                    clientMap.put(group.getClient().toString(), ClientMapper.mapToDto(group.getClient()));
                 }
             }
 
@@ -194,9 +189,9 @@ public class OdbClientRepository implements IClientRepository
         {
             db = connectionFactory.getTx();
 
-            List<IClient> resultSet = db.query(new OSQLSynchQuery<OdbClient>(
+            List<IClient> resultSet = db.query(new OSQLSynchQuery<Client>(
                     "select from Client where @rid = " + id));
-            return (resultSet.size() != 0) ? OdbClientMapper.mapToDto(resultSet.get(0)) : null;
+            return (resultSet.size() != 0) ? ClientMapper.mapToDto(resultSet.get(0)) : null;
         }
         catch (final RuntimeException e)
         {
@@ -223,9 +218,9 @@ public class OdbClientRepository implements IClientRepository
         {
             db = connectionFactory.getTx();
 
-            List<IClient> resultSet = db.query(new OSQLSynchQuery<OdbClient>(
+            List<IClient> resultSet = db.query(new OSQLSynchQuery<Client>(
                     "select from Client where name = '" + name + "'"));
-            return (resultSet.size() != 0) ? OdbClientMapper.mapToDto(resultSet.get(0)) : null;
+            return (resultSet.size() != 0) ? ClientMapper.mapToDto(resultSet.get(0)) : null;
         }
         catch (final RuntimeException e)
         {
@@ -249,7 +244,7 @@ public class OdbClientRepository implements IClientRepository
 
         try
         {
-            IClient attachedClient = OdbClientMapper.mapToEntity(detachedClient);
+            IClient attachedClient = ClientMapper.mapToEntity(detachedClient);
             IClient persistentClient = getClientById(detachedClient.getRid());
 
             if (persistentClient != null)
@@ -259,7 +254,7 @@ public class OdbClientRepository implements IClientRepository
 
                 if (persistentClient != null)
                 {
-                    return OdbClientMapper.mapToDto(persistentClient);
+                    return ClientMapper.mapToDto(persistentClient);
                 }
                 else
                 {
@@ -272,7 +267,7 @@ public class OdbClientRepository implements IClientRepository
 
                 if (persistentClient != null)
                 {
-                    return OdbClientMapper.mapToDto(persistentClient);
+                    return ClientMapper.mapToDto(persistentClient);
                 }
                 else
                 {
@@ -305,7 +300,7 @@ public class OdbClientRepository implements IClientRepository
         {
             for (IClientDto client : detachedClients)
             {
-                IClient attachedClient = OdbClientMapper.mapToEntity(client);
+                IClient attachedClient = ClientMapper.mapToEntity(client);
                 IClient persistentClient = getClientById(client.getRid());
 
                 if (persistentClient != null)
@@ -347,7 +342,7 @@ public class OdbClientRepository implements IClientRepository
         {
             for (IPropertyDto property : detachedProperties)
             {
-                IProperty attachedProperty = OdbPropertyMapper.mapToEntity(property);
+                IProperty attachedProperty = PropertyMapper.mapToEntity(property);
                 IProperty persistentProperty = getPropertyById(property.getRid());
 
                 if (persistentProperty != null)
@@ -397,7 +392,7 @@ public class OdbClientRepository implements IClientRepository
         {
             db = connectionFactory.getTx();
 
-            List<IClient> resultSet = db.query(new OSQLSynchQuery<OdbClient>(
+            List<IClient> resultSet = db.query(new OSQLSynchQuery<Client>(
                     "select from Client where @rid = " + id));
             return (resultSet.size() != 0) ? resultSet.get(0) : null;
         }
@@ -425,7 +420,7 @@ public class OdbClientRepository implements IClientRepository
         {
             db = connectionFactory.getTx();
 
-            List<IProperty> resultSet = db.query(new OSQLSynchQuery<OdbProperty>(
+            List<IProperty> resultSet = db.query(new OSQLSynchQuery<Property>(
                     "select from Property where @rid = " + id));
             return (resultSet.size() != 0) ? resultSet.get(0) : null;
         }

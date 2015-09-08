@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.common.feature.FeatureRegistry;
-import com.ecg.webclient.feature.administration.persistence.odbrepo.OdbClientRepository;
+import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 
 @Controller
 public class MainController
@@ -17,7 +17,7 @@ public class MainController
     private FeatureRegistry     featureRegistry;
 
     @Autowired
-    private OdbClientRepository clientRepository;
+    private ClientRepository clientRepository;
 
     @Autowired
     private AuthenticationUtil  util;

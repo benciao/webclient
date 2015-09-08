@@ -7,26 +7,24 @@ import javax.validation.Valid;
 
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
-
 public class RoleConfig
 {
     @Valid
-    private List<IRoleDto> roles;
+    private List<RoleDto> roles;
 
-    public List<IRoleDto> getRoles()
+    public List<RoleDto> getRoles()
     {
         if (roles == null)
         {
-            roles = new AutoPopulatingList<IRoleDto>(IRoleDto.class);
+            roles = new AutoPopulatingList<RoleDto>(RoleDto.class);
         }
         return roles;
     }
 
     public void removeDeleted()
     {
-        List<IRoleDto> rolesToRemove = new ArrayList<IRoleDto>();
-        for (IRoleDto role : roles)
+        List<RoleDto> rolesToRemove = new ArrayList<RoleDto>();
+        for (RoleDto role : roles)
         {
             if (role.isDelete())
             {
@@ -36,7 +34,7 @@ public class RoleConfig
         roles.removeAll(rolesToRemove);
     }
 
-    public void setRoles(List<IRoleDto> roles)
+    public void setRoles(List<RoleDto> roles)
     {
         this.roles = roles;
     }

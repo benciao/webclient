@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.odbrepo;
+package com.ecg.webclient.feature.administration.persistence.repo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +14,10 @@ import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
 import com.ecg.webclient.feature.administration.persistence.api.IGroup;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupRepository;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbClientMapper;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbGroupMapper;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbClient;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbGroup;
+import com.ecg.webclient.feature.administration.persistence.modell.Client;
+import com.ecg.webclient.feature.administration.persistence.modell.Group;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.ClientMapper;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.GroupMapper;
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -86,11 +86,11 @@ public class OdbGroupRepository implements IGroupRepository
 
             if (!onlyEnabledGroups)
             {
-                attachedGroups = db.query(new OSQLSynchQuery<OdbClient>("select from Group"));
+                attachedGroups = db.query(new OSQLSynchQuery<Client>("select from Group"));
             }
             else
             {
-                attachedGroups = db.query(new OSQLSynchQuery<OdbClient>(
+                attachedGroups = db.query(new OSQLSynchQuery<Client>(
                         "select from Group where enabled = true"));
             }
         }
@@ -109,7 +109,7 @@ public class OdbGroupRepository implements IGroupRepository
         AutoPopulatingList<IGroupDto> result = new AutoPopulatingList<IGroupDto>(IGroupDto.class);
         for (IGroup attachedGroup : attachedGroups)
         {
-            result.add(OdbGroupMapper.mapToDto(attachedGroup));
+            result.add(GroupMapper.mapToDto(attachedGroup));
         }
 
         return result;
@@ -125,7 +125,7 @@ public class OdbGroupRepository implements IGroupRepository
         {
             db = connectionFactory.getTx();
 
-            attachedGroups = db.query(new OSQLSynchQuery<OdbClient>("select from Group where client = "
+            attachedGroups = db.query(new OSQLSynchQuery<Client>("select from Group where client = "
                     + clientId));
         }
         catch (final RuntimeException e)
@@ -143,7 +143,7 @@ public class OdbGroupRepository implements IGroupRepository
         AutoPopulatingList<IGroupDto> result = new AutoPopulatingList<IGroupDto>(IGroupDto.class);
         for (IGroup attachedGroup : attachedGroups)
         {
-            result.add(OdbGroupMapper.mapToDto(attachedGroup));
+            result.add(GroupMapper.mapToDto(attachedGroup));
         }
 
         return result;
@@ -159,7 +159,7 @@ public class OdbGroupRepository implements IGroupRepository
             IGroup persistentGroup = getGroupByRid(rid);
             if (persistentGroup != null)
             {
-                return OdbClientMapper.mapToDto(persistentGroup.getClient());
+                return ClientMapper.mapToDto(persistentGroup.getClient());
             }
         }
         catch (final RuntimeException e)
@@ -188,9 +188,9 @@ public class OdbGroupRepository implements IGroupRepository
         {
             db = connectionFactory.getTx();
 
-            List<IGroup> resultSet = db.query(new OSQLSynchQuery<OdbClient>(
+            List<IGroup> resultSet = db.query(new OSQLSynchQuery<Client>(
                     "select from Group where name = '" + name + "'"));
-            return (resultSet.size() != 0) ? OdbGroupMapper.mapToDto(resultSet.get(0)) : null;
+            return (resultSet.size() != 0) ? GroupMapper.mapToDto(resultSet.get(0)) : null;
         }
         catch (final RuntimeException e)
         {
@@ -220,7 +220,7 @@ public class OdbGroupRepository implements IGroupRepository
             for (Object rid : groupRidObjects)
             {
                 IGroup persistentGroup = getGroupByRid(rid);
-                result.add(OdbGroupMapper.mapToDto(persistentGroup));
+                result.add(GroupMapper.mapToDto(persistentGroup));
             }
 
         }
@@ -246,7 +246,7 @@ public class OdbGroupRepository implements IGroupRepository
 
         try
         {
-            IGroup attachedGroup = OdbGroupMapper.mapToEntity(detachedGroup);
+            IGroup attachedGroup = GroupMapper.mapToEntity(detachedGroup);
             IGroup persistentGroup = getGroupByRid(attachedGroup.getRid());
 
             if (persistentGroup != null)
@@ -263,7 +263,7 @@ public class OdbGroupRepository implements IGroupRepository
                     + persistentGroup.getRoleRids());
             db.command(command).execute();
 
-            return OdbGroupMapper.mapToDto(persistentGroup);
+            return GroupMapper.mapToDto(persistentGroup);
         }
         catch (final RuntimeException e)
         {
@@ -288,11 +288,11 @@ public class OdbGroupRepository implements IGroupRepository
 
         try
         {
-            List<IGroup> attachedGroups = OdbGroupMapper.mapToEntities(detachedGroups);
+            List<IGroup> attachedGroups = GroupMapper.mapToEntities(detachedGroups);
             for (IGroup group : attachedGroups)
             {
                 IGroup persistentGroup = getGroupByRid(group.getRid());
-                group.setClient(OdbClientMapper.mapToEntity(authenticationUtil.getSelectedClient()));
+                group.setClient(ClientMapper.mapToEntity(authenticationUtil.getSelectedClient()));
 
                 if (persistentGroup != null)
                 {
@@ -332,7 +332,7 @@ public class OdbGroupRepository implements IGroupRepository
         {
             db = connectionFactory.getTx();
 
-            List<OdbGroup> resultSet = db.query(new OSQLSynchQuery<OdbClient>(
+            List<Group> resultSet = db.query(new OSQLSynchQuery<Client>(
                     "select from Group where @rid = " + rid));
             return (resultSet.size() != 0) ? resultSet.get(0) : null;
         }

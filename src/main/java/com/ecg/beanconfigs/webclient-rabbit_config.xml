@@ -9,11 +9,11 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 	">
 
-	<rabbit:template id="webclientRabbitTemplate" exchange="authExchange" routing-key="authentication"
-		message-converter="protobuf" connection-factory="amqpConnectionFactory" />
+	<!-- rabbit:template id="webclientRabbitTemplate" exchange="authExchange" routing-key="authentication"
+		message-converter="protobuf" connection-factory="amqpConnectionFactory" /-->
 
-	<bean class="com.ecg.webclient.common.rabbit.RabbitMqUtil" scope="singleton">
+	<!-- bean class="com.ecg.webclient.common.rabbit.RabbitMqUtil" scope="singleton">
 		<constructor-arg name="webclientRabbitTemplate" ref="webclientRabbitTemplate" />
-	</bean>
+	</bean-->
 
 </beans>

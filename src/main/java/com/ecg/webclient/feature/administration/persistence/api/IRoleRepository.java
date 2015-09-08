@@ -2,10 +2,13 @@ package com.ecg.webclient.feature.administration.persistence.api;
 
 import java.util.List;
 
+import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
+
 /**
  * Schnittstelle für Persistenzimplementierung von Benutzerrollen.
  * 
  * @author arndtmar
+ *
  */
 public interface IRoleRepository
 {
@@ -15,37 +18,37 @@ public interface IRoleRepository
      * @param roles
      *            Liste von Benutzerrollen
      */
-    void deleteRoles(List<IRoleDto> detachedRoles);
+    void deleteRoles(List<RoleDto> roles);
 
     /**
      * @param onlyEnabledRoles
      *            true, wenn nur aktivierte Benutzerrollen zurückgegeben werden sollen, sonst false
      * @return Alle aktivierten Benutzerrollen, wenn Parameter == true, sonst alle
      */
-    List<IRoleDto> getAllRoles(boolean onlyEnabledRoles);
+    List<RoleDto> getAllRoles(boolean onlyEnabledRoles);
 
     /**
-     * @param roleRidObjects
-     *            Liste von Rollen IDs
+     * @param roleIdObjects
+     *            Liste von Gruppen IDs
      * @return Alle Rollen mit den im Parameter enhaltenen IDs
      */
-    List<IRoleDto> getRolesForIds(List<Object> roleRidObjects);
+    List<RoleDto> getRolesForIds(List<Long> roleIdObjects);
 
     /**
-     * Speichert eine Benutzerrolle in der DB
+     * Speichert eine Rolle in der DB
      * 
-     * @param role
-     *            zu speichernde Rolle
+     * @param setupRole
+     *            zu Speichernde Rolle
      * @return Gespeicherte Rolle
      */
-    IRoleDto saveRole(IRoleDto detachedRole);
+    RoleDto saveRole(RoleDto detachedRole);
 
     /**
      * Speichert alle in der Liste enthaltenen Benutzerrollen
      * 
-     * @param roles
+     * @param detachedRoles
      *            Liste von Benutzerrollen
      */
-    void saveRoles(List<IRoleDto> detachedRoles);
+    void saveRoles(List<RoleDto> detachedRoles);
 
 }

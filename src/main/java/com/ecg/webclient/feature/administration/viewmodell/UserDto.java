@@ -9,19 +9,17 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
 
-import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
-
 /**
  * Implementierung eines von der Persistenz detachten Benutzers.
  * 
  * @author arndtmar
  */
-public class UserDto extends BaseObjectDto implements IUserDto
+public class UserDto extends BaseObjectDto
 {
     @Size(min = 5, max = 20)
     @NotNull
     private String  login;
-    private boolean type;
+    private boolean internal;
     @Size(min = 2, max = 50)
     @NotNull
     private String  lastname;
@@ -35,146 +33,125 @@ public class UserDto extends BaseObjectDto implements IUserDto
     private boolean changePasswordOnNextLogin;
     @NotNull
     private String  defaultClient;
-    private String  groupRids;
+    private String  groupIds;
 
     public UserDto()
     {}
 
-    @Override
     public String getDefaultClient()
     {
         return defaultClient;
     }
 
-    @Override
     public String getEmail()
     {
         return email;
     }
 
-    @Override
     public String getFirstname()
     {
         return firstname;
     }
 
-    @Override
-    public List<Object> getGroupRidObjects()
+    public List<Long> getGroupIdObjects()
     {
-        List<Object> result = new ArrayList<Object>();
+        List<Long> result = new ArrayList<Long>();
 
-        if (groupRids != null && !groupRids.isEmpty())
+        if (groupIds != null && !groupIds.isEmpty())
         {
-            List<String> rids = Arrays.asList(groupRids.split(","));
+            List<String> ids = Arrays.asList(groupIds.split(","));
 
-            for (String rid : rids)
+            for (String id : ids)
             {
-                result.add("#" + rid);
+                result.add(Long.parseLong(id));
             }
         }
 
         return result.size() != 0 ? result : null;
     }
 
-    @Override
-    public String getGroupRids()
+    public String getGroupIds()
     {
-        return groupRids;
+        return groupIds;
     }
 
-    @Override
     public String getLastname()
     {
         return lastname;
     }
 
-    @Override
     public String getLogin()
     {
         return login;
     }
 
-    @Override
     public String getPassword()
     {
         return password;
     }
 
-    @Override
     public boolean isChangePasswordOnNextLogin()
     {
         return changePasswordOnNextLogin;
     }
 
-    @Override
     public boolean isEnabled()
     {
         return enabled;
     }
 
-    @Override
-    public boolean isType()
+    public boolean isInternal()
     {
-        return type;
+        return internal;
     }
 
-    @Override
     public void setChangePasswordOnNextLogin(boolean changePasswordOnNextLogin)
     {
         this.changePasswordOnNextLogin = changePasswordOnNextLogin;
     }
 
-    @Override
     public void setDefaultClient(String defaultClient)
     {
         this.defaultClient = defaultClient;
     }
 
-    @Override
     public void setEmail(String email)
     {
         this.email = email;
     }
 
-    @Override
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
     }
 
-    @Override
     public void setFirstname(String firstname)
     {
         this.firstname = firstname;
     }
 
-    @Override
-    public void setGroupRids(String groupRids)
+    public void setGroupIds(String groupIds)
     {
-        this.groupRids = groupRids;
+        this.groupIds = groupIds;
     }
 
-    @Override
+    public void setInternal(boolean internal)
+    {
+        this.internal = internal;
+    }
+
     public void setLastname(String lastname)
     {
         this.lastname = lastname;
     }
 
-    @Override
     public void setLogin(String login)
     {
         this.login = login;
     }
 
-    @Override
     public void setPassword(String password)
     {
         this.password = password;
-    }
-
-    @Override
-    public void setType(boolean type)
-    {
-        this.type = type;
     }
 }

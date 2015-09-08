@@ -5,19 +5,17 @@ import java.util.List;
 
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.api.IClient;
-import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
-import com.ecg.webclient.feature.administration.persistence.api.IProperty;
-import com.ecg.webclient.feature.administration.persistence.api.IPropertyDto;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbClient;
+import com.ecg.webclient.feature.administration.persistence.modell.Client;
+import com.ecg.webclient.feature.administration.persistence.modell.Property;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
 
 /**
  * Mapped die Eigenschaften einer in OrientDb bekannten Entität auf einen detachten Mandanten oder umgekehrt.
  * 
  * @author arndtmar
  */
-public class OdbClientMapper
+public class ClientMapper
 {
     /**
      * Wandelt einen persistenten Mandanten in einen detachten um
@@ -26,21 +24,21 @@ public class OdbClientMapper
      *            persistenter Mandant
      * @return Detacheter Mandant
      */
-    public static IClientDto mapToDto(IClient client)
+    public static ClientDto mapToDto(Client client)
     {
         if (client != null)
         {
-            IClientDto dto = new ClientDto();
+            ClientDto dto = new ClientDto();
             dto.setColor(client.getColor());
             dto.setDescription(client.getDescription());
             dto.setName(client.getName());
             dto.setEnabled(client.isEnabled());
             dto.setDelete(false);
-            dto.setRid(client.getRid());
+            dto.setId(client.getId());
 
-            for (IProperty property : client.getProperties())
+            for (Property property : client.getProperties())
             {
-                dto.getProperties().add(OdbPropertyMapper.mapToDto(property));
+                dto.getProperties().add(PropertyMapper.mapToDto(property));
             }
 
             return dto;
@@ -58,23 +56,23 @@ public class OdbClientMapper
      *            Liste von persistenten Mandanten
      * @return Liste von detachten Mandanten
      */
-    public static List<IClientDto> mapToDtos(List<IClient> clients)
+    public static List<ClientDto> mapToDtos(List<Client> clients)
     {
-        List<IClientDto> result = new AutoPopulatingList<IClientDto>(IClientDto.class);
+        List<ClientDto> result = new AutoPopulatingList<ClientDto>(ClientDto.class);
 
-        for (IClient client : clients)
+        for (Client client : clients)
         {
-            IClientDto dto = new ClientDto();
+            ClientDto dto = new ClientDto();
             dto.setColor(client.getColor());
             dto.setDescription(client.getDescription());
             dto.setName(client.getName());
             dto.setEnabled(client.isEnabled());
             dto.setDelete(false);
-            dto.setRid(client.getRid());
+            dto.setId(client.getId());
 
-            for (IProperty property : client.getProperties())
+            for (Property property : client.getProperties())
             {
-                dto.getProperties().add(OdbPropertyMapper.mapToDto(property));
+                dto.getProperties().add(PropertyMapper.mapToDto(property));
             }
 
             result.add(dto);
@@ -90,22 +88,21 @@ public class OdbClientMapper
      *            Liste von detachten Mandanten
      * @return Liste von persistenten Mandanten
      */
-    public static List<IClient> mapToEntities(List<IClientDto> dtos)
+    public static List<Client> mapToEntities(List<ClientDto> dtos)
     {
-        List<IClient> result = new ArrayList<IClient>();
+        List<Client> result = new ArrayList<Client>();
 
-        for (IClientDto dto : dtos)
+        for (ClientDto dto : dtos)
         {
-            IClient client = new OdbClient();
+            Client client = new Client();
             client.setColor(dto.getColor());
             client.setDescription(dto.getDescription());
             client.setName(dto.getName());
             client.setEnabled(dto.isEnabled());
-            client.setRid(dto.getRid());
 
-            for (IPropertyDto propertyDto : dto.getProperties())
+            for (PropertyDto propertyDto : dto.getProperties())
             {
-                client.getProperties().add(OdbPropertyMapper.mapToEntity(propertyDto));
+                client.getProperties().add(PropertyMapper.mapToEntity(propertyDto));
             }
 
             result.add(client);
@@ -121,18 +118,17 @@ public class OdbClientMapper
      *            Detachter Mandanten
      * @return Persistenter Mandanten
      */
-    public static IClient mapToEntity(IClientDto dto)
+    public static Client mapToEntity(ClientDto dto)
     {
-        IClient client = new OdbClient();
+        Client client = new Client();
         client.setColor(dto.getColor());
         client.setDescription(dto.getDescription());
         client.setName(dto.getName());
         client.setEnabled(dto.isEnabled());
-        client.setRid(dto.getRid());
 
-        for (IPropertyDto propertyDto : dto.getProperties())
+        for (PropertyDto propertyDto : dto.getProperties())
         {
-            client.getProperties().add(OdbPropertyMapper.mapToEntity(propertyDto));
+            client.getProperties().add(PropertyMapper.mapToEntity(propertyDto));
         }
 
         return client;

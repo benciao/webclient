@@ -1,37 +1,42 @@
 package com.ecg.webclient.feature.administration.viewmodell;
 
-import com.ecg.webclient.feature.administration.persistence.api.IBaseObjectDto;
 
 /**
  * Implementierung eines von der Persistenz detachten Basisobjektes.
  * 
  * @author arndtmar
  */
-public class BaseObjectDto implements IBaseObjectDto
+public class BaseObjectDto
 {
-    private Object  rid;
+    private long    id;
     private boolean delete = false;
 
     @Override
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        BaseObjectDto other = (BaseObjectDto) obj;
-        if (delete != other.delete) return false;
-        if (rid == null)
+        if (this == obj)
         {
-            if (other.rid != null) return false;
+            return true;
         }
-        else if (!rid.equals(other.rid)) return false;
+        if (obj == null)
+        {
+            return false;
+        }
+        if (!(obj instanceof BaseObjectDto))
+        {
+            return false;
+        }
+        BaseObjectDto other = (BaseObjectDto) obj;
+        if (id != other.id)
+        {
+            return false;
+        }
         return true;
     }
 
-    @Override
-    public Object getRid()
+    public long getId()
     {
-        return rid;
+        return id;
     }
 
     @Override
@@ -39,26 +44,22 @@ public class BaseObjectDto implements IBaseObjectDto
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (delete ? 1231 : 1237);
-        result = prime * result + ((rid == null) ? 0 : rid.hashCode());
+        result = prime * result + (int) (id ^ (id >>> 32));
         return result;
     }
 
-    @Override
     public boolean isDelete()
     {
         return delete;
     }
 
-    @Override
     public void setDelete(boolean delete)
     {
         this.delete = delete;
     }
 
-    @Override
-    public void setRid(Object rid)
+    public void setId(long id)
     {
-        this.rid = rid;
+        this.id = id;
     }
 }

@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.odbrepo;
+package com.ecg.webclient.feature.administration.persistence.repo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +14,10 @@ import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
 import com.ecg.webclient.feature.administration.persistence.api.IUser;
 import com.ecg.webclient.feature.administration.persistence.api.IUserDto;
 import com.ecg.webclient.feature.administration.persistence.api.IUserRepository;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbClientMapper;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.OdbUserMapper;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbClient;
-import com.ecg.webclient.feature.administration.persistence.odbmodell.OdbUser;
+import com.ecg.webclient.feature.administration.persistence.modell.Client;
+import com.ecg.webclient.feature.administration.persistence.modell.User;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.ClientMapper;
+import com.ecg.webclient.feature.administration.persistence.odbmapper.UserMapper;
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -83,12 +83,12 @@ public class OdbUserRepository implements IUserRepository
 
             if (!onlyEnabledUsers)
             {
-                attachedUsers = db.query(new OSQLSynchQuery<OdbUser>("select from User"));
+                attachedUsers = db.query(new OSQLSynchQuery<User>("select from User"));
             }
             else
             {
                 attachedUsers = db
-                        .query(new OSQLSynchQuery<OdbUser>("select from User where enabled = true"));
+                        .query(new OSQLSynchQuery<User>("select from User where enabled = true"));
             }
         }
         catch (final RuntimeException e)
@@ -107,7 +107,7 @@ public class OdbUserRepository implements IUserRepository
 
         for (IUser attachedUser : attachedUsers)
         {
-            result.add(OdbUserMapper.mapToDto(attachedUser));
+            result.add(UserMapper.mapToDto(attachedUser));
         }
 
         return result;
@@ -124,7 +124,7 @@ public class OdbUserRepository implements IUserRepository
 
             if (persistentUser != null)
             {
-                return OdbClientMapper.mapToDto(persistentUser.getDefaultClient());
+                return ClientMapper.mapToDto(persistentUser.getDefaultClient());
             }
         }
         catch (final RuntimeException e)
@@ -153,9 +153,9 @@ public class OdbUserRepository implements IUserRepository
         {
             db = connectionFactory.getTx();
 
-            List<IUser> users = db.query(new OSQLSynchQuery<OdbUser>("select from User where @rid = " + id));
+            List<IUser> users = db.query(new OSQLSynchQuery<User>("select from User where @rid = " + id));
 
-            return (users.size() != 0) ? OdbUserMapper.mapToDto(users.get(0)) : null;
+            return (users.size() != 0) ? UserMapper.mapToDto(users.get(0)) : null;
 
         }
         catch (final RuntimeException e)
@@ -183,10 +183,10 @@ public class OdbUserRepository implements IUserRepository
         {
             db = connectionFactory.getTx();
 
-            List<IUser> users = db.query(new OSQLSynchQuery<OdbUser>("select from User where login = '"
+            List<IUser> users = db.query(new OSQLSynchQuery<User>("select from User where login = '"
                     + login + "'"));
 
-            return (users.size() != 0) ? OdbUserMapper.mapToDto(users.get(0)) : null;
+            return (users.size() != 0) ? UserMapper.mapToDto(users.get(0)) : null;
 
         }
         catch (final RuntimeException e)
@@ -244,7 +244,7 @@ public class OdbUserRepository implements IUserRepository
 
         try
         {
-            IUser attachedUser = OdbUserMapper.mapToEntity(detachedUser);
+            IUser attachedUser = UserMapper.mapToEntity(detachedUser);
             IUser persistentUser = getUserByRid(detachedUser.getRid());
 
             if (persistentUser != null)
@@ -327,7 +327,7 @@ public class OdbUserRepository implements IUserRepository
         {
             db = connectionFactory.getTx();
 
-            List<IUser> resultSet = db.query(new OSQLSynchQuery<OdbClient>("select from User where @rid = "
+            List<IUser> resultSet = db.query(new OSQLSynchQuery<Client>("select from User where @rid = "
                     + rid));
             return (resultSet.size() != 0) ? resultSet.get(0) : null;
         }
