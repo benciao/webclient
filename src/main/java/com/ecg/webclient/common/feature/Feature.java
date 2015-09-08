@@ -11,12 +11,12 @@ package com.ecg.webclient.common.feature;
  * @author arndtmar
  *
  */
-public interface IFeature
+public interface Feature
 {
     /**
      * @return true, wenn das Objekt gleich ist, sonst false.
      */
-    boolean equals(IFeature other);
+    boolean equals(Feature other);
 
     /**
      * @return Den Pfad zum darzustellenden Icon.

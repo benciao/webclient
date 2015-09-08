@@ -2,15 +2,15 @@ package com.ecg.webclient.feature.nomination;
 
 import org.springframework.stereotype.Controller;
 
-import com.ecg.webclient.common.feature.IFeature;
+import com.ecg.webclient.common.feature.Feature;
 
 @Controller
-public class FeatureNomination implements IFeature
+public class FeatureNomination implements Feature
 {
     private boolean isActive;
 
     @Override
-    public boolean equals(IFeature other)
+    public boolean equals(Feature other)
     {
         return other.getText().equalsIgnoreCase(getText());
     }

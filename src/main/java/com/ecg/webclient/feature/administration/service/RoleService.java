@@ -9,263 +9,192 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.api.IRole;
-import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
-import com.ecg.webclient.feature.administration.persistence.api.RoleRepository;
 import com.ecg.webclient.feature.administration.persistence.mapper.RoleMapper;
-import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Role;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
+import com.ecg.webclient.feature.administration.persistence.repo.RoleRepository;
+import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 
 /**
- * Repository für Benutzerrollen bei Nutzung einer OrientDB.
+ * Service zum Bearbeiten von Benutzerrollen.
  * 
  * @author arndtmar
  */
 @Component
-public class RoleService implements RoleRepository
+public class RoleService
 {
-    static final Logger          logger = LogManager.getLogger(RoleService.class.getName());
-    private OdbConnectionFactory connectionFactory;
+	static final Logger logger = LogManager.getLogger(RoleService.class.getName());
 
-    @Autowired
-    public RoleService(OdbConnectionFactory connectionFactory)
-    {
-        this.connectionFactory = connectionFactory;
-    }
+	@Autowired
+	RoleRepository roleRepo;
 
-    @Override
-    public void deleteRoles(List<IRoleDto> detachedRoles)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
+	/**
+	 * Löscht die in der Liste enthaltenen Rollen.
+	 * 
+	 * @param detachedRoles
+	 *            Liste mit zu löschenden Rollen
+	 */
+	public void deleteRoles(List<RoleDto> detachedRoles)
+	{
+		try
+		{
+			for (RoleDto detachedRole : detachedRoles)
+			{
+				Role persistentRole = roleRepo.findOne(detachedRole.getId());
 
-        try
-        {
-            for (IRoleDto detachedRole : detachedRoles)
-            {
-                IRole persistentRole = getRoleByRid(detachedRole.getRid());
+				if (persistentRole != null)
+				{
+					roleRepo.delete(persistentRole);
+				}
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+	}
 
-                if (persistentRole != null)
-                {
-                    db.delete(persistentRole);
-                }
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-    }
+	/**
+	 * @param onlyEnabledRoles
+	 *            true, wenn nur die aktiven Rollen geladen werden sollen, sonst
+	 *            false
+	 * @return Alle Rollen, wenn false, sonst nur die aktivierten Rollen
+	 */
+	public List<RoleDto> getAllRoles(boolean onlyEnabledRoles)
+	{
+		List<Role> attachedRoles = new ArrayList<Role>();
 
-    @Override
-    public List<IRoleDto> getAllRoles(boolean onlyEnabledRoles)
-    {
-        List<IRole> attachedRoles = new ArrayList<IRole>();
-        OObjectDatabaseTx db = null;
+		try
+		{
+			if (!onlyEnabledRoles)
+			{
+				roleRepo.findAll().forEach(e -> attachedRoles.add(e));
+			}
+			else
+			{
+				roleRepo.findAllEnabledRoles(true).forEach(e -> attachedRoles.add(e));
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        try
-        {
-            db = connectionFactory.getTx();
+		AutoPopulatingList<RoleDto> result = new AutoPopulatingList<RoleDto>(RoleDto.class);
 
-            if (!onlyEnabledRoles)
-            {
-                attachedRoles = db.query(new OSQLSynchQuery<Client>("select from Role"));
-            }
-            else
-            {
-                attachedRoles = db.query(new OSQLSynchQuery<Client>(
-                        "select from Role where enabled = true"));
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+		for (Role attachedRole : attachedRoles)
+		{
+			result.add(RoleMapper.mapToDto(attachedRole));
+		}
 
-        AutoPopulatingList<IRoleDto> result = new AutoPopulatingList<IRoleDto>(IRoleDto.class);
+		return result;
+	}
 
-        for (IRole attachedRole : attachedRoles)
-        {
-            result.add(RoleMapper.mapToDto(attachedRole));
-        }
+	/**
+	 * @param roleIds
+	 *            Liste mit IDs von Rollen
+	 * @return Liste mit zu den IDs gehörenden Rollen
+	 */
+	public List<RoleDto> getRolesForIds(List<Long> roleIds)
+	{
+		List<RoleDto> result = new ArrayList<RoleDto>();
 
-        return result;
-    }
+		try
+		{
+			Iterable<Role> persistentRoles = roleRepo.findAll(roleIds);
+			for (Role role : persistentRoles)
+			{
+				result.add(RoleMapper.mapToDto(role));
+			}
 
-    @Override
-    public List<IRoleDto> getRolesForIds(List<Object> roleRidObjects)
-    {
-        List<IRoleDto> result = new ArrayList<IRoleDto>();
-        OObjectDatabaseTx db = null;
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        try
-        {
-            db = connectionFactory.getTx();
+		return result;
+	}
 
-            for (Object rid : roleRidObjects)
-            {
-                IRole persistentRole = getRoleByRid(rid);
-                result.add(RoleMapper.mapToDto(persistentRole));
-            }
+	/**
+	 * Speichert die zu übergebende Rolle.
+	 * 
+	 * @param detachedRole
+	 *            die zu speichernde Rolle
+	 * @return Die gespeicherte Rolle
+	 */
+	public RoleDto saveRole(RoleDto detachedRole)
+	{
+		try
+		{
+			Role attachedRole = RoleMapper.mapToEntity(detachedRole);
+			Role persistentRole = roleRepo.findOne(attachedRole.getId());
 
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
+			if (persistentRole != null)
+			{
+				persistentRole.bind(attachedRole);
 
-        return result;
-    }
+				persistentRole = roleRepo.save(persistentRole);
 
-    @Override
-    public IRoleDto saveRole(IRoleDto detachedRole)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
+				if (persistentRole != null)
+				{
+					return RoleMapper.mapToDto(persistentRole);
+				}
+				else
+				{
+					return null;
+				}
+			}
+			else
+			{
+				persistentRole = roleRepo.save(persistentRole);
 
-        try
-        {
-            IRole attachedRole = RoleMapper.mapToEntity(detachedRole);
+				if (persistentRole != null)
+				{
+					return RoleMapper.mapToDto(persistentRole);
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-            IRole persistentRole = getRoleByRid(attachedRole.getRid());
+		return null;
+	}
 
-            if (persistentRole != null)
-            {
-                persistentRole.bind(attachedRole);
+	/**
+	 * Speichert die in der Liste enthaltenen Rollen.
+	 * 
+	 * @param detachedRoles
+	 *            Liste mit zu speichernden Rollen
+	 */
+	public void saveRoles(List<RoleDto> detachedRoles)
+	{
+		try
+		{
+			for (RoleDto detachedRole : detachedRoles)
+			{
+				Role attachedRole = RoleMapper.mapToEntity(detachedRole);
+				Role persistentRole = roleRepo.findOne(detachedRole.getId());
 
-                persistentRole = db.save(persistentRole);
-
-                if (persistentRole != null)
-                {
-                    return RoleMapper.mapToDto(persistentRole);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                persistentRole = db.save(persistentRole);
-
-                if (persistentRole != null)
-                {
-                    return RoleMapper.mapToDto(persistentRole);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public void saveRoles(List<IRoleDto> detachedRoles)
-    {
-        final OObjectDatabaseTx db = connectionFactory.getTx();
-
-        try
-        {
-            List<IRole> attachedRoles = RoleMapper.mapToEntities(detachedRoles);
-
-            for (IRole role : attachedRoles)
-            {
-                IRole persistentRole = getRoleByRid(role.getRid());
-
-                if (persistentRole != null)
-                {
-                    persistentRole.bind(role);
-                    db.save(persistentRole);
-                }
-                else
-                {
-                    db.save(role);
-                }
-            }
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.commit();
-                db.close();
-            }
-        }
-    }
-
-    /**
-     * Sucht eine Rolle in der Db anhand der Rid und gibt diese zurück
-     * 
-     * @param rid
-     *            Rid der Rolle
-     * @return Persistente Rolle, wenn existent, sonst null
-     */
-    private IRole getRoleByRid(Object rid)
-    {
-        IRole role = null;
-        OObjectDatabaseTx db = null;
-
-        try
-        {
-            db = connectionFactory.getTx();
-
-            List<Role> resultSet = db.query(new OSQLSynchQuery<Client>("select from Role where @rid = "
-                    + rid));
-            return (resultSet.size() != 0) ? resultSet.get(0) : null;
-        }
-        catch (final RuntimeException e)
-        {
-            logger.error(e);
-        }
-        finally
-        {
-            if (db != null)
-            {
-                db.close();
-            }
-        }
-
-        return role;
-    }
+				if (persistentRole != null)
+				{
+					persistentRole.bind(attachedRole);
+					roleRepo.save(persistentRole);
+				}
+				else
+				{
+					roleRepo.save(attachedRole);
+				}
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+	}
 }

@@ -2,7 +2,7 @@ package com.ecg.webclient.feature.administration;
 
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.feature.IFeature;
+import com.ecg.webclient.common.feature.Feature;
 
 /**
  * Implementierung des Features Administration.
@@ -11,12 +11,12 @@ import com.ecg.webclient.common.feature.IFeature;
  *
  */
 @Component
-public class FeatureAdministration implements IFeature
+public class FeatureAdministration implements Feature
 {
     private boolean isActive;
 
     @Override
-    public boolean equals(IFeature other)
+    public boolean equals(Feature other)
     {
         return other.getText().equalsIgnoreCase(getText());
     }

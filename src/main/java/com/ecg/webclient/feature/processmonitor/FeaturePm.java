@@ -2,7 +2,7 @@ package com.ecg.webclient.feature.processmonitor;
 
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.feature.IFeature;
+import com.ecg.webclient.common.feature.Feature;
 
 /**
  * Dieses Feature beschreibt das des Proyess Monitors.
@@ -11,12 +11,12 @@ import com.ecg.webclient.common.feature.IFeature;
  *
  */
 @Component
-public class FeaturePm implements IFeature
+public class FeaturePm implements Feature
 {
     private boolean isActive;
 
     @Override
-    public boolean equals(IFeature other)
+    public boolean equals(Feature other)
     {
         return other.getText().equalsIgnoreCase(getText());
     }
