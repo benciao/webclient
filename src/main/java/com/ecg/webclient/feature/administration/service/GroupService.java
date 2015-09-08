@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.service;
+package com.ecg.webclient.feature.administration.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +13,11 @@ import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.persistence.api.IClientDto;
 import com.ecg.webclient.feature.administration.persistence.api.IGroup;
 import com.ecg.webclient.feature.administration.persistence.api.IGroupDto;
+import com.ecg.webclient.feature.administration.persistence.mapper.ClientMapper;
+import com.ecg.webclient.feature.administration.persistence.mapper.GroupMapper;
 import com.ecg.webclient.feature.administration.persistence.api.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.ClientMapper;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.GroupMapper;
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;

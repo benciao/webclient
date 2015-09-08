@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.odbmapper;
+package com.ecg.webclient.feature.administration.persistence.mapper;
 
 import java.util.ArrayList;
 import java.util.List;

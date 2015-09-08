@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.common.feature.FeatureRegistry;
-import com.ecg.webclient.feature.administration.persistence.service.ClientService;
+import com.ecg.webclient.feature.administration.service.ClientService;
 
 @Controller
 public class MainController

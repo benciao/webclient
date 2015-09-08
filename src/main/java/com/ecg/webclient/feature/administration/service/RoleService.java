@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration.persistence.service;
+package com.ecg.webclient.feature.administration.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import org.springframework.util.AutoPopulatingList;
 import com.ecg.webclient.feature.administration.persistence.api.IRole;
 import com.ecg.webclient.feature.administration.persistence.api.IRoleDto;
 import com.ecg.webclient.feature.administration.persistence.api.RoleRepository;
+import com.ecg.webclient.feature.administration.persistence.mapper.RoleMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Role;
-import com.ecg.webclient.feature.administration.persistence.odbmapper.RoleMapper;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
