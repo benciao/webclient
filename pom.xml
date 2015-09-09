@@ -13,6 +13,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
@@ -39,9 +43,9 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
@@ -52,50 +56,9 @@
 			<artifactId>jquery</artifactId>
 			<version>2.1.1</version>
 		</dependency>
-		<!-- dependency>
-			<groupId>ecg</groupId>
-			<artifactId>rabbitmq</artifactId>
-			<version>1.2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>ecg</groupId>
-			<artifactId>rabbitmq</artifactId>
-			<version>1.2.0-SNAPSHOT</version>
-		</dependency-->
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity3</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.orientechnologies</groupId>
-			<artifactId>orientdb-core</artifactId>
-			<version>2.0.7</version>
-		</dependency>
-		<dependency>
-			<groupId>com.orientechnologies</groupId>
-			<artifactId>orientdb-object</artifactId>
-			<version>2.0.7</version>
-		</dependency>
-		<dependency>
-			<groupId>com.orientechnologies</groupId>
-			<artifactId>orientdb-graphdb</artifactId>
-			<version>2.0.7</version>
-		</dependency>
-		<dependency>
-			<groupId>com.orientechnologies</groupId>
-			<artifactId>orientdb-client</artifactId>
-			<version>2.0.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss</groupId>
-			<artifactId>jboss-common-core</artifactId>
-			<version>2.2.10.GA</version>
-		</dependency>
-		<dependency>
-			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
-			<version>2.10.4</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -104,7 +67,6 @@
 	</dependencies>
 
 	<properties>
-		<!-- version.rabbitmq-maven-plugin>1.1.0-SNAPSHOT</version.rabbitmq-maven-plugin-->
 		<compilerLevel>1.8</compilerLevel>
 		<start-class>com.ecg.webclient.app.Application</start-class>
 	</properties>
@@ -112,11 +74,6 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!-- plugin>
-					<groupId>ecg</groupId>
-					<artifactId>rabbitmq-maven-plugin</artifactId>
-					<version>${version.rabbitmq-maven-plugin}</version>
-				</plugin-->
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -134,25 +91,6 @@
 					<testTarget>1.8</testTarget>
 				</configuration>
 			</plugin>
-
-			<!-- plugin>
-				<groupId>ecg</groupId>
-				<artifactId>rabbitmq-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>rabbitmq-prepare</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>prepare</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin-->
-			<!-- plugin> <groupId>com.google.protobuf.tools</groupId> <artifactId>maven-protoc-plugin</artifactId> 
-				<version>0.3.2</version> <extensions>true</extensions> <configuration> <protocExecutable>C:/seu/seu_utils/tools/protoc-2.6.1/protoc.exe</protocExecutable> 
-				</configuration> <executions> <execution> <goals> <goal>compile</goal> </goals> 
-				</execution> </executions> </plugin -->
-
 		</plugins>
 	</build>
 </project>

@@ -3,9 +3,9 @@ package com.ecg.webclient.feature.administration.persistence.modell;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 
 /**
  * Entität einer Benutzerrolle.

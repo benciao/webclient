@@ -94,7 +94,7 @@ public class AuthenticationUtil
 
 	public ClientDto getSelectedClient()
 	{
-		if (selectedClient.getId() != 0)
+		if (selectedClient != null)
 		{
 			selectedClient = clientService.getClient(selectedClient.getId());
 		}

@@ -232,7 +232,7 @@ public class ClientService
 			}
 			else
 			{
-				persistentClient = clientRepo.save(persistentClient);
+				persistentClient = clientRepo.save(attachedClient);
 
 				if (persistentClient != null)
 				{

@@ -2,10 +2,9 @@ package com.ecg.webclient.app;
 
 import java.util.Properties;
 
-import javax.annotation.Resource;
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -27,17 +26,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories("com.ecg.webclient.feature.administration.persistence.repo")
 public class DatabaseConfiguration
 {
-    private static final String PROPERTY_NAME_DATABASE_DRIVER                = "db.driver";
-    private static final String PROPERTY_NAME_DATABASE_PASSWORD              = "db.password";
-    private static final String PROPERTY_NAME_DATABASE_URL                   = "db.url";
-    private static final String PROPERTY_NAME_DATABASE_USERNAME              = "db.username";
+    private static final String PROPERTY_NAME_DATABASE_DRIVER                = "spring.datasource.driverClassName";
+    private static final String PROPERTY_NAME_DATABASE_URL                   = "spring.datasource.url";
+    private static final String PROPERTY_NAME_DATABASE_USERNAME              = "spring.datasource.username";
+    private static final String PROPERTY_NAME_DATABASE_PASSWORD              = "spring.datasource.password";
 
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT              = "hibernate.dialect";
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL             = "hibernate.show_sql";
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entity.package.to.scan";
 
-    @Resource
-    private Environment         env;
+    @Autowired
+    private Environment env;
 
     @Bean
     public DataSource dataSource()
@@ -53,28 +52,26 @@ public class DatabaseConfiguration
     }
 
     @Bean
-    public EntityManagerFactory entityManagerFactory()
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory()
     {
-
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(true);
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan(PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN);
+        factory.setPackagesToScan("com.ecg.webclient.feature.administration.persistence.modell");
         factory.setDataSource(dataSource());
         factory.afterPropertiesSet();
         factory.setJpaProperties(hibProperties());
 
-        return factory.getObject();
+        return factory;
     }
 
     @Bean
     public PlatformTransactionManager transactionManager()
     {
-
         JpaTransactionManager txManager = new JpaTransactionManager();
-        txManager.setEntityManagerFactory(entityManagerFactory());
+        txManager.setEntityManagerFactory(entityManagerFactory().getObject());
         return txManager;
     }
 

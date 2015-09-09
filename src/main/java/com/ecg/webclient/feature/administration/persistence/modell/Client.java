@@ -6,10 +6,9 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.OneToMany;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+import javax.persistence.Transient;
 
 /**
  * Entität eines Mandanten.

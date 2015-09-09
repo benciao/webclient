@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
@@ -289,6 +290,7 @@ public class AdministrationController
 	 * @return Template
 	 */
 	@RequestMapping(value = "/setup/system", method = RequestMethod.GET)
+	@Transactional
 	public String setupSystem()
 	{
 		ClientDto setupClient = new ClientDto();
@@ -347,7 +349,14 @@ public class AdministrationController
 		}
 		if (savedRole != null)
 		{
-			roleIds = roleIds + "," + Long.toString(savedRole.getId());
+			if (roleIds.isEmpty())
+			{
+				roleIds = Long.toString(savedRole.getId());
+			}
+			else
+			{
+				roleIds = roleIds + "," + Long.toString(savedRole.getId());
+			}
 		}
 		savedGroup.setRoleIds(roleIds);
 

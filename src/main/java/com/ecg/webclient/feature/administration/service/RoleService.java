@@ -151,7 +151,7 @@ public class RoleService
 			}
 			else
 			{
-				persistentRole = roleRepo.save(persistentRole);
+				persistentRole = roleRepo.save(attachedRole);
 
 				if (persistentRole != null)
 				{

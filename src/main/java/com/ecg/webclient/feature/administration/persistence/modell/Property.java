@@ -3,9 +3,8 @@ package com.ecg.webclient.feature.administration.persistence.modell;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 
 /**
  * Entität einer Eigenschaft.
