@@ -34,7 +34,7 @@ public class DatabaseConfiguration
 
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT              = "hibernate.dialect";
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL             = "hibernate.show_sql";
-    private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "com.ecg.webclient.feature.administration.persistence.modell";
+    private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entity.package.to.scan";
 
     @Resource
     private Environment         env;

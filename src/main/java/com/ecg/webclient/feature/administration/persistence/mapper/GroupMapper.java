@@ -143,7 +143,11 @@ public class GroupMapper
 		entity.setDescription(dto.getDescription());
 		entity.setName(dto.getName());
 		entity.setEnabled(dto.isEnabled());
-		entity.setClient(client);
+
+		if (dto.getClient() == null)
+		{
+			entity.setClient(client);
+		}
 
 		List<Role> roles = new ArrayList<Role>();
 		roleRepo.findAll(dto.getRoleIdObjects()).forEach(e -> roles.add(e));

@@ -13,70 +13,82 @@ import javax.validation.constraints.NotNull;
  */
 public class GroupDto extends BaseObjectDto
 {
-    @NotNull
-    private String  name;
-    @NotNull
-    private String  description;
-    private boolean enabled;
-    private String  roleIds;
+	@NotNull
+	private String		name;
+	@NotNull
+	private String		description;
+	private boolean		enabled;
+	private String		roleIds;
+	private ClientDto	client;
 
-    public GroupDto()
-    {}
+	public ClientDto getClient()
+	{
+		return client;
+	}
 
-    public String getDescription()
-    {
-        return description;
-    }
+	public void setClient(ClientDto client)
+	{
+		this.client = client;
+	}
 
-    public String getName()
-    {
-        return name;
-    }
+	public GroupDto()
+	{
+	}
 
-    public List<Long> getRoleIdObjects()
-    {
-        List<Long> result = new ArrayList<Long>();
+	public String getDescription()
+	{
+		return description;
+	}
 
-        if (roleIds != null && !roleIds.isEmpty())
-        {
-            List<String> ids = Arrays.asList(roleIds.split(","));
+	public String getName()
+	{
+		return name;
+	}
 
-            for (String id : ids)
-            {
-                result.add(Long.parseLong(id));
-            }
-        }
+	public List<Long> getRoleIdObjects()
+	{
+		List<Long> result = new ArrayList<Long>();
 
-        return result.size() != 0 ? result : null;
-    }
+		if (roleIds != null && !roleIds.isEmpty())
+		{
+			List<String> ids = Arrays.asList(roleIds.split(","));
 
-    public String getRoleIds()
-    {
-        return roleIds;
-    }
+			for (String id : ids)
+			{
+				result.add(Long.parseLong(id));
+			}
+		}
 
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
+		return result.size() != 0 ? result : null;
+	}
 
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
+	public String getRoleIds()
+	{
+		return roleIds;
+	}
 
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
+	public boolean isEnabled()
+	{
+		return enabled;
+	}
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 
-    public void setRoleIds(String roleIds)
-    {
-        this.roleIds = roleIds;
-    }
+	public void setEnabled(boolean enabled)
+	{
+		this.enabled = enabled;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public void setRoleIds(String roleIds)
+	{
+		this.roleIds = roleIds;
+	}
 }

@@ -333,21 +333,28 @@ public class AdministrationController
 			logger.info("SETUP_GROUP created");
 		}
 
-		List<Long> roleIds = new ArrayList<Long>();
+		String roleIds = "";
 		for (RoleDto role : roles)
 		{
-			roleIds.add(role.getId());
+			if (roleIds.isEmpty())
+			{
+				roleIds = Long.toString(role.getId());
+			}
+			else
+			{
+				roleIds = roleIds + "," + Long.toString(role.getId());
+			}
 		}
 		if (savedRole != null)
 		{
-			roleIds.add(savedRole.getId());
+			roleIds = roleIds + "," + Long.toString(savedRole.getId());
 		}
 		savedGroup.setRoleIds(roleIds);
 
 		savedGroup = groupService.saveGroup(savedGroup);
 
-		List<Object> groupRids = new ArrayList<Object>();
-		groupRids.add(savedGroup.getRid());
+		String groupIds = "";
+		groupIds = Long.toString(savedGroup.getId());
 
 		UserDto setupUser = userService.getUserByLogin("setupuser");
 
@@ -363,12 +370,12 @@ public class AdministrationController
 
 			setupUser.setEmail("setupuser@ecg-leipzig.de");
 			setupUser.setInternal(true);
-			setupUser.setGroupRids(groupRids);
+			setupUser.setGroupIds(groupIds);
 
 			logger.info("Setup-User created");
 		}
 
-		setupUser.setDefaultClientRid(savedClient.getId());
+		setupUser.setDefaultClient(Long.toString(savedClient.getId()));
 		userService.saveUser(setupUser);
 
 		return "login";
