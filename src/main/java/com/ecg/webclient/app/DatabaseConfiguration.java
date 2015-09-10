@@ -30,13 +30,14 @@ public class DatabaseConfiguration
     private static final String PROPERTY_NAME_DATABASE_URL                   = "spring.datasource.url";
     private static final String PROPERTY_NAME_DATABASE_USERNAME              = "spring.datasource.username";
     private static final String PROPERTY_NAME_DATABASE_PASSWORD              = "spring.datasource.password";
+    private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "spring.entity.packages.to.scan";
 
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT              = "hibernate.dialect";
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL             = "hibernate.show_sql";
-    private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entity.package.to.scan";
+    private static final String PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO         = "hibernate.hbm2ddl.auto";
 
     @Autowired
-    private Environment env;
+    private Environment         env;
 
     @Bean
     public DataSource dataSource()
@@ -59,7 +60,7 @@ public class DatabaseConfiguration
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("com.ecg.webclient.feature.administration.persistence.modell");
+        factory.setPackagesToScan(env.getRequiredProperty(PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN));
         factory.setDataSource(dataSource());
         factory.afterPropertiesSet();
         factory.setJpaProperties(hibProperties());
@@ -82,6 +83,8 @@ public class DatabaseConfiguration
                 env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_DIALECT));
         properties.put(PROPERTY_NAME_HIBERNATE_SHOW_SQL,
                 env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL));
+        properties.put(PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO,
+                env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO));
         return properties;
     }
 }

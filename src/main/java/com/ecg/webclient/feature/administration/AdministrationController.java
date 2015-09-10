@@ -293,20 +293,22 @@ public class AdministrationController
 	@Transactional
 	public String setupSystem()
 	{
-		ClientDto setupClient = new ClientDto();
-		setupClient.setEnabled(true);
-		setupClient.setName("SETUP_CLIENT");
-		setupClient.setDescription("Client to setup the system");
-		setupClient.setColor("#ff0000");
+        // Mandant erstellen
+        ClientDto setupClient = new ClientDto();
+        setupClient.setEnabled(true);
+        setupClient.setName("SETUP_CLIENT");
+        setupClient.setDescription("Client to setup the system");
+        setupClient.setColor("#ff0000");
 
-		ClientDto savedClient = clientService.getClientByName("Setup Client");
+        ClientDto savedClient = clientService.getClientByName("Setup Client");
 
-		if (savedClient == null)
-		{
-			savedClient = clientService.saveClient(setupClient);
-			logger.info("SETUP_CLIENT created");
-		}
+        if (savedClient == null)
+        {
+            savedClient = clientService.saveClient(setupClient);
+            logger.info("SETUP_CLIENT created");
+        }
 
+        // Benutzerrollen erstellen
 		List<RoleDto> roles = roleService.getAllRoles(false);
 
 		RoleDto setupRole = null;
@@ -322,70 +324,70 @@ public class AdministrationController
 			logger.info("SETUP_ROLE created");
 		}
 
-		GroupDto savedGroup = groupService.getGroupByName("SETUP_GROUP");
+        GroupDto savedGroup = groupService.getGroupByName("SETUP_GROUP");
 
-		if (savedGroup == null)
-		{
-			GroupDto setupGroup = new GroupDto();
-			setupGroup.setClient(savedClient);
-			setupGroup.setName("SETUP_GROUP");
-			setupGroup.setDescription("Group to setup system");
-			setupGroup.setEnabled(true);
-			savedGroup = setupGroup;
-			logger.info("SETUP_GROUP created");
-		}
+        if (savedGroup == null)
+        {
+            GroupDto setupGroup = new GroupDto();
+            setupGroup.setClient(savedClient);
+            setupGroup.setName("SETUP_GROUP");
+            setupGroup.setDescription("Group to setup system");
+            setupGroup.setEnabled(true);
+            savedGroup = setupGroup;
+            logger.info("SETUP_GROUP created");
+        }
 
-		String roleIds = "";
-		for (RoleDto role : roles)
-		{
-			if (roleIds.isEmpty())
-			{
-				roleIds = Long.toString(role.getId());
-			}
-			else
-			{
-				roleIds = roleIds + "," + Long.toString(role.getId());
-			}
-		}
-		if (savedRole != null)
-		{
-			if (roleIds.isEmpty())
-			{
-				roleIds = Long.toString(savedRole.getId());
-			}
-			else
-			{
-				roleIds = roleIds + "," + Long.toString(savedRole.getId());
-			}
-		}
-		savedGroup.setRoleIds(roleIds);
+        String roleIds = "";
+        for (RoleDto role : roles)
+        {
+            if (roleIds.isEmpty())
+            {
+                roleIds = Long.toString(role.getId());
+            }
+            else
+            {
+                roleIds = roleIds + "," + Long.toString(role.getId());
+            }
+        }
+        if (savedRole != null)
+        {
+            if (roleIds.isEmpty())
+            {
+                roleIds = Long.toString(savedRole.getId());
+            }
+            else
+            {
+                roleIds = roleIds + "," + Long.toString(savedRole.getId());
+            }
+        }
+        savedGroup.setRoleIds(roleIds);
 
-		savedGroup = groupService.saveGroup(savedGroup);
+        savedGroup = groupService.saveGroup(savedGroup);
 
-		String groupIds = "";
-		groupIds = Long.toString(savedGroup.getId());
+        String groupIds = "";
+        groupIds = Long.toString(savedGroup.getId());
 
-		UserDto setupUser = userService.getUserByLogin("setupuser");
+        UserDto setupUser = userService.getUserByLogin("setupuser");
 
-		if (setupUser == null)
-		{
-			setupUser = new UserDto();
-			setupUser.setLogin("setupuser");
-			setupUser.setPassword(PasswordEncoder.encodeSimple("SetupSystem!"));
-			setupUser.setFirstname("Setup");
-			setupUser.setLastname("User");
-			setupUser.setEnabled(true);
-			setupUser.setChangePasswordOnNextLogin(false);
+        if (setupUser == null)
+        {
+            setupUser = new UserDto();
+            setupUser.setLogin("setupuser");
+            setupUser.setPassword(PasswordEncoder.encodeSimple("SetupSystem!"));
+            setupUser.setFirstname("Setup");
+            setupUser.setLastname("User");
+            setupUser.setEnabled(true);
+            setupUser.setChangePasswordOnNextLogin(false);
 
-			setupUser.setEmail("setupuser@ecg-leipzig.de");
-			setupUser.setInternal(true);
-			setupUser.setGroupIds(groupIds);
+            setupUser.setEmail("setupuser@ecg-leipzig.de");
+            setupUser.setInternal(true);
+            setupUser.setGroupIds(groupIds);
 
-			logger.info("Setup-User created");
-		}
+            logger.info("Setup-User created");
+        }
 
-		setupUser.setDefaultClient(Long.toString(savedClient.getId()));
-		userService.saveUser(setupUser);
+        setupUser.setDefaultClient(Long.toString(savedClient.getId()));
+        userService.saveUser(setupUser);
 
 		return "login";
 	}

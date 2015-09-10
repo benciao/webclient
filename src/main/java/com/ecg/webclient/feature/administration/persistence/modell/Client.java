@@ -7,7 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 /**
@@ -16,6 +18,7 @@ import javax.persistence.Transient;
  * @author arndtmar
  */
 @Entity
+@Table(name = "SEC_CLIENT")
 public class Client
 {
     @Id
@@ -25,7 +28,8 @@ public class Client
     private String         description;
     private String         name;
     private boolean        enabled;
-    @OneToMany(targetEntity = Property.class)
+    @OneToMany
+    @JoinColumn(name = "id")
     private List<Property> properties;
 
     public Client()

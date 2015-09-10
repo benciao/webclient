@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 /**
@@ -12,13 +13,14 @@ import javax.persistence.Transient;
  * @author arndtmar
  */
 @Entity
+@Table(name = "SEC_PROPERTY")
 public class Property
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long   id;
-    private String key;
-    private String value;
+    private String prop_key;
+    private String prop_value;
 
     public Property()
     {}
@@ -50,25 +52,25 @@ public class Property
         {
             return false;
         }
-        if (key == null)
+        if (prop_key == null)
         {
-            if (other.key != null)
+            if (other.prop_key != null)
             {
                 return false;
             }
         }
-        else if (!key.equals(other.key))
+        else if (!prop_key.equals(other.prop_key))
         {
             return false;
         }
-        if (value == null)
+        if (prop_value == null)
         {
-            if (other.value != null)
+            if (other.prop_value != null)
             {
                 return false;
             }
         }
-        else if (!value.equals(other.value))
+        else if (!prop_value.equals(other.prop_value))
         {
             return false;
         }
@@ -82,12 +84,12 @@ public class Property
 
     public String getKey()
     {
-        return key;
+        return prop_key;
     }
 
     public String getValue()
     {
-        return value;
+        return prop_value;
     }
 
     @Override
@@ -96,18 +98,18 @@ public class Property
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((key == null) ? 0 : key.hashCode());
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + ((prop_key == null) ? 0 : prop_key.hashCode());
+        result = prime * result + ((prop_value == null) ? 0 : prop_value.hashCode());
         return result;
     }
 
     public void setKey(String key)
     {
-        this.key = key;
+        this.prop_key = key;
     }
 
     public void setValue(String value)
     {
-        this.value = value;
+        this.prop_value = value;
     }
 }
