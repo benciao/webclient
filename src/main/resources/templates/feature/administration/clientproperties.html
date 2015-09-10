@@ -45,7 +45,7 @@
 																	+ "<input class='form-control' placeholder='[[#{clientPropertiesTableValue}]]' id='value-" + rowIndex + "' name='properties[" + rowIndex + "].value' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<a href='#' class='a_delete' title='[[#{clientPropertiesActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='properties["+ rowIndex +"].rid' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='properties[" + rowIndex + "].delete}' />"
+																	+ "<a href='#' class='a_delete' title='[[#{clientPropertiesActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='properties["+ rowIndex +"].id' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='properties[" + rowIndex + "].delete}' />"
 																	+ "</td>"
 																	+ "</tr>");
 						
@@ -249,7 +249,7 @@ body {
 									href="#" th:title="#{clientPropertiesActionDelete}"><span
 										class="glyphicon glyphicon-remove"> </span></a><input
 									type="hidden" th:id="${'hiddenRid-'+stat.index}"
-									th:field="*{properties[__${stat.index}__].rid}" /><input
+									th:field="*{properties[__${stat.index}__].id}" /><input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
 									th:field="*{properties[__${stat.index}__].delete}" /></td>
 							</tr>

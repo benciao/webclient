@@ -42,7 +42,7 @@
 																	+ "<input class='form-control' placeholder='[[#{usersTableLogin}]]' id='login-" + rowIndex + "' name='users[" + rowIndex + "].login' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<select class='form-control' id='type-" + rowIndex + "' name='users[" + rowIndex + "].type'><option value='true' text='[[#{usersTypeSelectAtlas}]]'>[[#{usersTypeSelectAtlas}]]</option><option value='false' text='[[#{usersTypeSelectLdap}]]'>[[#{usersTypeSelectLdap}]]</option></select>"
+																	+ "<select class='form-control' id='type-" + rowIndex + "' name='users[" + rowIndex + "].internal'><option value='true' text='[[#{usersTypeSelectAtlas}]]'>[[#{usersTypeSelectAtlas}]]</option><option value='false' text='[[#{usersTypeSelectLdap}]]'>[[#{usersTypeSelectLdap}]]</option></select>"
 																	+ "</td>"
 																	+ "<td>"
 																	+ "<input class='form-control' placeholder='[[#{usersTableFirstName}]]' id='firstname-" + rowIndex + "' name='users[" + rowIndex + "].firstname' />"
@@ -54,7 +54,7 @@
 																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='user-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='users[" + rowIndex + "].enabled' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><a href='#' class='a_login-as' id='a_login-as-"+ rowIndex +"' title='[[#{usersActionLoginAs}]]'><span class='glyphicon glyphicon-random'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].rid' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' />"
+																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><a href='#' class='a_login-as' id='a_login-as-"+ rowIndex +"' title='[[#{usersActionLoginAs}]]'><span class='glyphicon glyphicon-random'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].id' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' />"
 																	+ "<input type='hidden' id='hiddenGroupRids-"+ rowIndex +"' name='users["+ rowIndex +"].groupRids'/>"
 																	+ "<input type='hidden' id='hiddenEmail-"+ rowIndex +"' name='users["+ rowIndex +"].email' />"
 																	+ "<input type='hidden' id='hiddenDefaultClient-"+ rowIndex +"' name='users["+ rowIndex +"].defaultClient' />"
@@ -634,11 +634,11 @@ body {
 									th:errors="*{users[__${stat.index}__].login}"></span></td>
 								<td><select class="form-control"
 									th:id="${'type-'+stat.index}"
-									th:field="*{users[__${stat.index}__].type}">
+									th:field="*{users[__${stat.index}__].internal}">
 										<option th:value="true" th:text="#{usersTypeSelectAtlas}"
-											th:selected="*{users[__${stat.index}__].type}"></option>
+											th:selected="*{users[__${stat.index}__].internal}"></option>
 										<option th:value="false" th:text="#{usersTypeSelectLdap}"
-											th:selected="*{users[__${stat.index}__].type}"></option>
+											th:selected="*{users[__${stat.index}__].internal}"></option>
 								</select></td>
 								<td><input th:id="${'firstname-'+stat.index}" type="text"
 									class="form-control" placeholder="Vorname"
@@ -666,7 +666,7 @@ body {
 									th:title="#{usersActionLoginAs}"><span
 										class="glyphicon glyphicon-random"> </span></a> <input
 									type="hidden" th:id="${'hiddenRid-'+stat.index}"
-									th:field="*{users[__${stat.index}__].rid}" /><input
+									th:field="*{users[__${stat.index}__].id}" /><input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
 									th:field="*{users[__${stat.index}__].delete}" /><input
 									type="hidden" th:id="${'hiddenGroupRids-'+stat.index}"
@@ -762,7 +762,7 @@ body {
 													th:text="#{clientSelection}"></span></label> <select
 													id="clientGroupSelect" class="form-control">
 													<option th:each="client : ${beans.authenticationUtil.getClients()}"
-														th:value="${client.rid}" th:text="${client.name}">
+														th:value="${client.id}" th:text="${client.name}">
 													</option>
 												</select>
 
@@ -808,7 +808,7 @@ body {
 						type="hidden" th:id="${'hiddenGroupSwitchValue-'+stat.index}"
 						value="false" /><input class="hiddenGroupRid"
 						th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
-						th:value="${group.rid}" /></td>
+						th:value="${group.id}" /></td>
 				</tr>
 			</tbody>
 		</table>
@@ -820,8 +820,8 @@ body {
 		<label class="control-label"><span th:text="#{clientDefault}"></span></label>
 		<select id="defaultClientGroupSelect" class="form-control">
 			<option th:each="client : ${availableClients}"
-				th:value="${client.rid}" th:text="${client.name}"
-				th:selected="${client.rid.toString() == defaultClient}"></option>
+				th:value="${client.id}" th:text="${client.name}"
+				th:selected="${client.id.toString() == defaultClient}"></option>
 		</select>
 	</div>
 </body>

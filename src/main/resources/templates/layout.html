@@ -30,7 +30,7 @@
 									<select id="clientSelect" class="selectpicker select-xs"
 										th:name="selectedClient">
 										<option th:each="client : ${beans.authenticationUtil.getClients()}"
-											th:value="${client.rid}" th:text="${client.name}"
+											th:value="${client.id}" th:text="${client.name}"
 											th:selected="${client.id == beans.authenticationUtil.getSelectedClient().getId()}"><p
 												th:text="${client.name}" />
 										</option>

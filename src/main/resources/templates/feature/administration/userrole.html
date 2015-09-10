@@ -48,7 +48,7 @@
 																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='role-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='roles[" + rowIndex + "].enabled' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<a href='#' class='a_delete' title='[[#{rolesActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='roles["+ rowIndex +"].rid' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='roles[" + rowIndex + "].delete}' />"
+																	+ "<a href='#' class='a_delete' title='[[#{rolesActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='roles["+ rowIndex +"].id' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='roles[" + rowIndex + "].delete}' />"
 																	+ "</td>"
 																	+ "</tr>");
 						
@@ -292,7 +292,7 @@ body {
 									href="#" th:title="#{rolesActionDelete}"><span
 										class="glyphicon glyphicon-remove"> </span></a><input
 									type="hidden" th:id="${'hiddenRid-'+stat.index}"
-									th:field="*{roles[__${stat.index}__].rid}" /><input
+									th:field="*{roles[__${stat.index}__].id}" /><input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
 									th:field="*{roles[__${stat.index}__].delete}" /></td>
 							</tr>
