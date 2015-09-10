@@ -3,6 +3,7 @@ package com.ecg.webclient.feature.administration.persistence.modell;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,7 +29,7 @@ public class Group
     private String     name;
     private String     description;
     private boolean    enabled;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "SEC_GROUP_SEC_ROLE", joinColumns = @JoinColumn(name = "GROUP_ID"), inverseJoinColumns = @JoinColumn(name = "ROLE_ID"))
     private List<Role> roles;
     @OneToOne

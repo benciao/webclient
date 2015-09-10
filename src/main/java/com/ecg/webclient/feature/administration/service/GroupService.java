@@ -14,6 +14,7 @@ import com.ecg.webclient.feature.administration.persistence.mapper.ClientMapper;
 import com.ecg.webclient.feature.administration.persistence.mapper.GroupMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
+import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.RoleRepository;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
@@ -31,6 +32,8 @@ public class GroupService
 
 	@Autowired
 	AuthenticationUtil	authenticationUtil;
+	@Autowired
+	ClientRepository	clientRepo;
 	@Autowired
 	GroupRepository		groupRepo;
 	@Autowired
@@ -161,13 +164,13 @@ public class GroupService
 		try
 		{
 			Group persistentGroup = null;
-			
+
 			Iterable<Group> groups = groupRepo.findGroupByName(name);
 			if (groups.iterator().hasNext())
 			{
 				persistentGroup = groups.iterator().next();
 			}
-			
+
 			return (persistentGroup != null) ? GroupMapper.mapToDto(persistentGroup) : null;
 		}
 		catch (final Exception e)
@@ -215,27 +218,29 @@ public class GroupService
 	{
 		try
 		{
-			Client client = null;
+			Client draftClient = null;
 			if (authenticationUtil.getSelectedClient() == null)
 			{
-				client = ClientMapper.mapToEntity(detachedGroup.getClient());
+				draftClient = ClientMapper.mapToEntity(detachedGroup.getClient());
 			}
 			else
 			{
-				client = ClientMapper.mapToEntity(authenticationUtil.getSelectedClient());
+				draftClient = ClientMapper.mapToEntity(authenticationUtil.getSelectedClient());
 			}
 
-			Group attachedGroup = GroupMapper.mapToEntity(detachedGroup, roleRepo, client);
-			Group persistentGroup = groupRepo.findOne(attachedGroup.getId());
+			Client persistentClient = clientRepo.findOne(detachedGroup.getClient().getId());
+			persistentClient.bind(draftClient);
+			Group draftGroup = GroupMapper.mapToEntity(detachedGroup, roleRepo, persistentClient);
+			Group persistentGroup = groupRepo.findOne(draftGroup.getId());
 
 			if (persistentGroup != null)
 			{
-				persistentGroup.bind(attachedGroup);
+				persistentGroup.bind(draftGroup);
 				persistentGroup = groupRepo.save(persistentGroup);
 			}
 			else
 			{
-				persistentGroup = groupRepo.save(attachedGroup);
+				persistentGroup = groupRepo.save(draftGroup);
 			}
 
 			return GroupMapper.mapToDto(persistentGroup);
@@ -260,19 +265,7 @@ public class GroupService
 		{
 			for (GroupDto detachedGroup : detachedGroups)
 			{
-				Group attachedGroup = GroupMapper.mapToEntity(detachedGroup, roleRepo,
-						ClientMapper.mapToEntity(authenticationUtil.getSelectedClient()));
-				Group persistentGroup = groupRepo.findOne(detachedGroup.getId());
-
-				if (persistentGroup != null)
-				{
-					persistentGroup.bind(attachedGroup);
-					persistentGroup = groupRepo.save(persistentGroup);
-				}
-				else
-				{
-					persistentGroup = groupRepo.save(attachedGroup);
-				}
+				saveGroup(detachedGroup);
 			}
 		}
 		catch (final Exception e)

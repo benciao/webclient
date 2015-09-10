@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
 import com.ecg.webclient.feature.administration.persistence.modell.User;
 import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
@@ -135,16 +134,7 @@ public class UserMapper
 		entity.setFirstname(dto.getFirstname());
 		entity.setEnabled(dto.isEnabled());
 		entity.setEmail(dto.getEmail());
-
-		if (setInitialPassword)
-		{
-			String pw = dto.getPassword();
-			if (pw == null || pw.isEmpty())
-			{
-				pw = PasswordEncoder.encodeSimple("NewUser123?");
-			}
-			entity.setPassword(PasswordEncoder.encodeComplex(pw, Long.toString(dto.getId())));
-		}
+		entity.setPassword(dto.getPassword());
 
 		entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
 		entity.setDefaultClient(clientRepo.findOne(Long.parseLong(dto.getDefaultClient())));

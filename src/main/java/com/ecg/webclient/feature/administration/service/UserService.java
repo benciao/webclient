@@ -224,14 +224,34 @@ public class UserService
 
 			if (persistentUser != null)
 			{
-				User attachedUser = UserMapper.mapToEntity(detachedUser, false, clientRepo, groupRepo);
-				persistentUser.bind(attachedUser);
+				User draftUser = UserMapper.mapToEntity(detachedUser, false, clientRepo, groupRepo);
+				persistentUser.bind(draftUser);
 				persistentUser = userRepo.save(persistentUser);
+
+				// Passwort wurde bei einem schon persistenten Benutzer
+				// geändert; Erste Verschlüsselung von vor der Übertragung zum
+				// Service statt
+				if (detachedUser.getPassword() != null && !detachedUser.getPassword().isEmpty())
+				{
+					persistentUser.setPassword(PasswordEncoder.encodeComplex(detachedUser.getPassword(),
+							Long.toString(persistentUser.getId())));
+				}
 			}
 			else
 			{
-				User attachedUser = UserMapper.mapToEntity(detachedUser, true, clientRepo, groupRepo);
-				persistentUser = userRepo.save(attachedUser);
+				User draftUser = UserMapper.mapToEntity(detachedUser, true, clientRepo, groupRepo);
+				persistentUser = userRepo.save(draftUser);
+
+				// Passwort wurde bei einem neuen Benutzer
+				// vor der Übertragung zum Service statt gesetzt und einmal
+				// verschlüsselt. Wurde kein Passwort vor der ersten Übertragung
+				// gesetzt, wird es hier generiert.
+				String pw = detachedUser.getPassword();
+				if (pw == null || pw.isEmpty())
+				{
+					pw = PasswordEncoder.encodeSimple("NewUser123?");
+				}
+				persistentUser.setPassword(PasswordEncoder.encodeComplex(pw, Long.toString(persistentUser.getId())));
 			}
 		}
 		catch (final Exception e)
