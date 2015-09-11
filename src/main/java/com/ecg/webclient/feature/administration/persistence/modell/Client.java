@@ -37,13 +37,15 @@ public class Client
     {}
 
     @Transient
-    public void bind(Client newClient)
+    public Client bind(Client newClient)
     {
         setColor(newClient.getColor());
         setName(newClient.getName());
         setDescription(newClient.getDescription());
         setEnabled(newClient.isEnabled());
         setProperties(newClient.getProperties());
+
+        return this;
     }
 
     @Override
@@ -149,6 +151,11 @@ public class Client
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
     }
 
     public void setName(String name)

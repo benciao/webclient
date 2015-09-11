@@ -30,294 +30,250 @@ import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
 @Component
 public class ClientService
 {
-	static final Logger logger = LogManager.getLogger(ClientService.class.getName());
+    static final Logger logger = LogManager.getLogger(ClientService.class.getName());
 
-	ClientRepository	clientRepo;
-	PropertyRepository	propertyRepo;
-	GroupRepository		groupRepo;
+    ClientRepository    clientRepo;
+    PropertyRepository  propertyRepo;
+    GroupRepository     groupRepo;
+    PropertyMapper      propertyMapper;
+    ClientMapper        clientMapper;
 
-	@Autowired
-	public ClientService(PropertyRepository propertyRepo, GroupRepository groupRepo, ClientRepository clientRepo)
-	{
-		this.propertyRepo = propertyRepo;
-		this.groupRepo = groupRepo;
-		this.clientRepo = clientRepo;
-	}
+    @Autowired
+    public ClientService(PropertyRepository propertyRepo, GroupRepository groupRepo,
+            ClientRepository clientRepo, PropertyMapper propertyMapper, ClientMapper clientMapper)
+    {
+        this.propertyRepo = propertyRepo;
+        this.groupRepo = groupRepo;
+        this.clientRepo = clientRepo;
+        this.propertyMapper = propertyMapper;
+        this.clientMapper = clientMapper;
+    }
 
-	/**
-	 * Löscht alle in der Liste enthaltenen Mandanten.
-	 * 
-	 * @param detachedClients
-	 *            Liste von zu löschenden Mandanten
-	 */
-	public void deleteClients(List<ClientDto> detachedClients)
-	{
-		try
-		{
-			for (ClientDto client : detachedClients)
-			{
-				Client persistentClient = clientRepo.findOne(client.getId());
+    /**
+     * Löscht alle in der Liste enthaltenen Mandanten.
+     * 
+     * @param detachedClients
+     *            Liste von zu löschenden Mandanten
+     */
+    public void deleteClients(List<ClientDto> detachedClients)
+    {
+        try
+        {
+            for (ClientDto client : detachedClients)
+            {
+                Client persistentClient = clientRepo.findOne(client.getId());
 
-				if (persistentClient != null)
-				{
-					clientRepo.delete(persistentClient);
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-	}
+                if (persistentClient != null)
+                {
+                    clientRepo.delete(persistentClient);
+                }
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+    }
 
-	/**
-	 * Löscht alle in der Liste enthaltenen Mandanteneigenschaften.
-	 * 
-	 * @param detachedProperties
-	 *            Liste von Mandanteneigenschaften
-	 */
-	public void deleteProperties(List<PropertyDto> detachedProperties)
-	{
-		try
-		{
-			for (PropertyDto property : detachedProperties)
-			{
-				Property persistentProperty = propertyRepo.findOne(property.getId());
+    /**
+     * Löscht alle in der Liste enthaltenen Mandanteneigenschaften.
+     * 
+     * @param detachedProperties
+     *            Liste von Mandanteneigenschaften
+     */
+    public void deleteProperties(List<PropertyDto> detachedProperties)
+    {
+        try
+        {
+            for (PropertyDto property : detachedProperties)
+            {
+                Property persistentProperty = propertyRepo.findOne(property.getId());
 
-				if (persistentProperty != null)
-				{
-					propertyRepo.delete(persistentProperty);
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-	}
+                if (persistentProperty != null)
+                {
+                    propertyRepo.delete(persistentProperty);
+                }
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+    }
 
-	/**
-	 * @param onlyEnabled
-	 *            true, wenn nur die aktiven Mandanten geladen werden sollen,
-	 *            sonst false
-	 * @return Alle Mandanten, wenn false, sonst nur die aktivierten Mandanten
-	 */
-	public List<ClientDto> getAllClients(boolean onlyEnabled)
-	{
-		final List<Client> attachedClients = new ArrayList<Client>();
+    /**
+     * @param onlyEnabled
+     *            true, wenn nur die aktiven Mandanten geladen werden sollen, sonst false
+     * @return Alle Mandanten, wenn false, sonst nur die aktivierten Mandanten
+     */
+    public List<ClientDto> getAllClients(boolean onlyEnabled)
+    {
+        final List<Client> attachedClients = new ArrayList<Client>();
 
-		try
-		{
-			if (!onlyEnabled)
-			{
-				clientRepo.findAll().forEach(e -> attachedClients.add(e));
-			}
-			else
-			{
-				clientRepo.findAllEnabledClients(true).forEach(e -> attachedClients.add(e));
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+        try
+        {
+            if (!onlyEnabled)
+            {
+                clientRepo.findAll().forEach(e -> attachedClients.add(e));
+            }
+            else
+            {
+                clientRepo.findAllEnabledClients(true).forEach(e -> attachedClients.add(e));
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-		AutoPopulatingList<ClientDto> result = new AutoPopulatingList<ClientDto>(ClientDto.class);
+        AutoPopulatingList<ClientDto> result = new AutoPopulatingList<ClientDto>(ClientDto.class);
 
-		for (Client attachedClient : attachedClients)
-		{
-			result.add(ClientMapper.mapToDto(attachedClient));
-		}
+        for (Client attachedClient : attachedClients)
+        {
+            result.add(clientMapper.mapToDto(attachedClient));
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	/**
-	 * @param groupIds
-	 *            Liste von Gruppen-IDs
-	 * @return Alle zu den Gruppen gehörende Mandanten
-	 */
-	public List<ClientDto> getAssignedClientsForGroups(List<Long> groupIds)
-	{
-		List<ClientDto> result = new ArrayList<ClientDto>();
+    /**
+     * @param groupIds
+     *            Liste von Gruppen-IDs
+     * @return Alle zu den Gruppen gehörende Mandanten
+     */
+    public List<ClientDto> getAssignedClientsForGroups(List<Long> groupIds)
+    {
+        List<ClientDto> result = new ArrayList<ClientDto>();
 
-		try
-		{
-			Iterable<Group> groups = groupRepo.findAll(groupIds);
+        try
+        {
+            Iterable<Group> groups = groupRepo.findAll(groupIds);
 
-			Map<String, ClientDto> clientMap = new HashMap<String, ClientDto>();
+            Map<String, ClientDto> clientMap = new HashMap<String, ClientDto>();
 
-			for (Group group : groups)
-			{
-				clientMap.put(group.getClient().toString(), ClientMapper.mapToDto(group.getClient()));
-			}
+            for (Group group : groups)
+            {
+                clientMap.put(group.getClient().toString(), clientMapper.mapToDto(group.getClient()));
+            }
 
-			result.addAll(clientMap.values());
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+            result.addAll(clientMap.values());
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	/**
-	 * @param id
-	 *            Mandanten-ID
-	 * @return Zur ID gehörender Mandant
-	 */
-	public ClientDto getClient(Long id)
-	{
-		try
-		{
-			Client client = clientRepo.findOne(id);
-			return (client != null) ? ClientMapper.mapToDto(client) : null;
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+    /**
+     * @param id
+     *            Mandanten-ID
+     * @return Zur ID gehörender Mandant
+     */
+    public ClientDto getClient(Long id)
+    {
+        try
+        {
+            Client client = clientRepo.findOne(id);
+            return (client != null) ? clientMapper.mapToDto(client) : null;
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * @param name
-	 *            Mandantenname
-	 * @return Zum Namen gehörender Mandant
-	 */
-	public ClientDto getClientByName(String name)
-	{
-		try
-		{
-			Client client = clientRepo.findClientByName(name);
-			return (client != null) ? ClientMapper.mapToDto(client) : null;
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+    /**
+     * @param name
+     *            Mandantenname
+     * @return Zum Namen gehörender Mandant
+     */
+    public ClientDto getClientByName(String name)
+    {
+        try
+        {
+            Client client = clientRepo.findClientByName(name);
+            return (client != null) ? clientMapper.mapToDto(client) : null;
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Speichert einen Mandanten.
-	 * 
-	 * @param detachedClient
-	 *            zu aktualisierender Mandant
-	 * @return Aktualisierter Mandant
-	 */
-	public ClientDto saveClient(ClientDto detachedClient)
-	{
-		try
-		{
-			Client attachedClient = ClientMapper.mapToEntity(detachedClient);
-			Client persistentClient = clientRepo.findOne(detachedClient.getId());
+    /**
+     * Speichert einen Mandanten.
+     * 
+     * @param detachedClient
+     *            zu aktualisierender Mandant
+     * @return Aktualisierter Mandant
+     */
+    public ClientDto saveClient(ClientDto detachedClient)
+    {
+        try
+        {
+            Client draftClient = clientMapper.mapToEntity(detachedClient);
+            Client persistedClient = clientRepo.save(draftClient);
 
-			if (persistentClient != null)
-			{
-				persistentClient.bind(attachedClient);
-				persistentClient = clientRepo.save(persistentClient);
+            if (persistedClient != null)
+            {
+                return clientMapper.mapToDto(persistedClient);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-				if (persistentClient != null)
-				{
-					return ClientMapper.mapToDto(persistentClient);
-				}
-				else
-				{
-					return null;
-				}
-			}
-			else
-			{
-				persistentClient = clientRepo.save(attachedClient);
+        return null;
+    }
 
-				if (persistentClient != null)
-				{
-					return ClientMapper.mapToDto(persistentClient);
-				}
-				else
-				{
-					return null;
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+    /**
+     * Speichert eine Liste von Mandanten.
+     * 
+     * @param detachedClients
+     *            Liste von Mandanten
+     */
+    public void saveClients(List<ClientDto> detachedClients)
+    {
+        try
+        {
+            detachedClients.forEach(e -> saveClient(e));
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+    }
 
-		return null;
-	}
-
-	/**
-	 * Speichert eine Liste von Mandanten.
-	 * 
-	 * @param detachedClients
-	 *            Liste von Mandanten
-	 */
-	public void saveClients(List<ClientDto> detachedClients)
-	{
-		try
-		{
-			for (ClientDto client : detachedClients)
-			{
-				Client attachedClient = ClientMapper.mapToEntity(client);
-				Client persistentClient = clientRepo.findOne(client.getId());
-
-				if (persistentClient != null)
-				{
-					if (client.getProperties().size() == 0)
-					{
-						attachedClient.setProperties(persistentClient.getProperties());
-					}
-
-					persistentClient.bind(attachedClient);
-					clientRepo.save(persistentClient);
-				}
-				else
-				{
-					clientRepo.save(attachedClient);
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-	}
-
-	/**
-	 * Speichert eine Liste von Mandanteneigenschaften
-	 * 
-	 * @param detachedProperties
-	 *            Liste von Mandanteneigenschaften
-	 */
-	public void saveProperties(List<PropertyDto> detachedProperties)
-	{
-		try
-		{
-			for (PropertyDto property : detachedProperties)
-			{
-				Property attachedProperty = PropertyMapper.mapToEntity(property);
-				Property persistentProperty = propertyRepo.findOne(property.getId());
-
-				if (persistentProperty != null)
-				{
-					persistentProperty.bind(attachedProperty);
-					propertyRepo.save(persistentProperty);
-				}
-				else
-				{
-					propertyRepo.save(attachedProperty);
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-	}
+    /**
+     * Speichert eine Liste von Mandanteneigenschaften
+     * 
+     * @param detachedProperties
+     *            Liste von Mandanteneigenschaften
+     */
+    public void saveProperties(List<PropertyDto> detachedProperties)
+    {
+        try
+        {
+            for (PropertyDto property : detachedProperties)
+            {
+                Property draftProperty = propertyMapper.mapToEntity(property);
+                propertyRepo.save(draftProperty);
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+    }
 }

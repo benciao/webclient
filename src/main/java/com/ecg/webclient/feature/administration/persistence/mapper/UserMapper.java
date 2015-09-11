@@ -3,147 +3,126 @@ package com.ecg.webclient.feature.administration.persistence.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
 import com.ecg.webclient.feature.administration.persistence.modell.User;
 import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
+import com.ecg.webclient.feature.administration.persistence.repo.UserRepository;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
 /**
- * Mapped die Eigenschaften einer in OrientDb bekannten Entität auf einen
- * detachten Benutzer oder umgekehrt.
+ * Mapped die Eigenschaften einer der Persistenz bekannten Entität auf einen detachten Benutzer oder
+ * umgekehrt.
  * 
  * @author arndtmar
  */
+@Component
 public class UserMapper
 {
-	/**
-	 * Wandelt einen persistenten Benutzer in einen detachten um
-	 * 
-	 * @param user
-	 *            persistenter Benutzer
-	 * @return Detacheter Benutzer
-	 */
-	public static UserDto mapToDto(User user)
-	{
-		UserDto dto = new UserDto();
-		dto.setLogin(user.getLogin());
-		dto.setInternal(user.isInternal());
-		dto.setLastname(user.getLastname());
-		dto.setFirstname(user.getFirstname());
-		dto.setEnabled(user.isEnabled());
-		dto.setDelete(false);
-		dto.setId(user.getId());
-		dto.setEmail(user.getEmail());
-		dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
+    @Autowired
+    ClientRepository clientRepo;
+    @Autowired
+    GroupRepository  groupRepo;
+    @Autowired
+    UserRepository   userRepo;
 
-		if (user.getDefaultClient() != null)
-		{
-			dto.setDefaultClient(Long.toString(user.getDefaultClient().getId()));
-		}
+    /**
+     * Wandelt einen attachten Benutzer in einen detachten um.
+     * 
+     * @param user
+     *            attachten Benutzer
+     * @return Detacheter Benutzer
+     */
+    public UserDto mapToDto(User user)
+    {
+        UserDto dto = new UserDto();
+        dto.setLogin(user.getLogin());
+        dto.setInternal(user.isInternal());
+        dto.setLastname(user.getLastname());
+        dto.setFirstname(user.getFirstname());
+        dto.setEnabled(user.isEnabled());
+        dto.setDelete(false);
+        dto.setId(user.getId());
+        dto.setEmail(user.getEmail());
+        dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
 
-		if (user.getGroups() != null)
-		{
-			String groups = "";
-			for (Group group : user.getGroups())
-			{
-				if (groups.length() == 0)
-				{
-					groups = Long.toString(group.getId());
-				}
-				else
-				{
-					groups = groups + "," + group.getId();
-				}
-			}
-			dto.setGroupIds(groups);
-		}
+        if (user.getDefaultClient() != null)
+        {
+            dto.setDefaultClient(Long.toString(user.getDefaultClient().getId()));
+        }
 
-		return dto;
-	}
+        if (user.getGroups() != null)
+        {
+            String groups = "";
+            for (Group group : user.getGroups())
+            {
+                if (groups.length() == 0)
+                {
+                    groups = Long.toString(group.getId());
+                }
+                else
+                {
+                    groups = groups + "," + group.getId();
+                }
+            }
+            dto.setGroupIds(groups);
+        }
 
-	/**
-	 * Wandelt eine Liste von persistenten Benutzern in eine Liste von detachten
-	 * Benutzern um
-	 * 
-	 * @param users
-	 *            Liste von persistenten Benutzern
-	 * @return Liste von detachten Benutzern
-	 */
-	public static List<UserDto> mapToDtos(List<User> users)
-	{
-		List<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
+        return dto;
+    }
 
-		for (User user : users)
-		{
-			UserDto dto = new UserDto();
-			dto.setLogin(user.getLogin());
-			dto.setInternal(user.isInternal());
-			dto.setLastname(user.getLastname());
-			dto.setFirstname(user.getFirstname());
-			dto.setEnabled(user.isEnabled());
-			dto.setDelete(false);
-			dto.setId(user.getId());
-			dto.setEmail(user.getEmail());
-			dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
+    /**
+     * Wandelt eine Liste von attachten Benutzern in eine Liste von detachten Benutzern um.
+     * 
+     * @param users
+     *            Liste von attachten Benutzern
+     * @return Liste von detachten Benutzern
+     */
+    public List<UserDto> mapToDtos(List<User> users)
+    {
+        List<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
 
-			if (user.getDefaultClient() != null)
-			{
-				dto.setDefaultClient(Long.toString(user.getDefaultClient().getId()));
-			}
+        users.forEach(e -> result.add(mapToDto(e)));
 
-			if (user.getGroups() != null)
-			{
-				String groups = "";
-				for (Group group : user.getGroups())
-				{
-					if (groups.length() == 0)
-					{
-						groups = Long.toString(group.getId());
-					}
-					else
-					{
-						groups = groups + "," + group.getId();
-					}
-				}
-				dto.setGroupIds(groups);
-			}
+        return result;
+    }
 
-			result.add(dto);
-		}
+    /**
+     * Wandelt einen detachten Benutzer in einen attachten um.
+     * 
+     * @param dto
+     *            Detachter Benutzer
+     * @return attachter Benutzer
+     */
+    public User mapToEntity(UserDto dto)
+    {
+        User entity = new User();
+        entity.setId(dto.getId());
+        entity.setLogin(dto.getLogin());
+        entity.setInternal(dto.isInternal());
+        entity.setLastname(dto.getLastname());
+        entity.setFirstname(dto.getFirstname());
+        entity.setEnabled(dto.isEnabled());
+        entity.setEmail(dto.getEmail());
+        entity.setPassword(dto.getPassword());
+        entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
+        entity.setDefaultClient(clientRepo.findOne(Long.parseLong(dto.getDefaultClient())));
 
-		return result;
-	}
+        List<Group> groups = new ArrayList<Group>();
+        groupRepo.findAll(dto.getGroupIdObjects()).forEach(e -> groups.add(e));
 
-	/**
-	 * Wandelt einen detachten Benutzer in einen persistenten um
-	 * 
-	 * @param dto
-	 *            Detachter Benutzer
-	 * @return Persistenter Benutzer
-	 */
-	public static User mapToEntity(UserDto dto, boolean setInitialPassword, ClientRepository clientRepo,
-			GroupRepository groupRepo)
-	{
-		User entity = new User();
-		entity.setLogin(dto.getLogin());
-		entity.setInternal(dto.isInternal());
-		entity.setLastname(dto.getLastname());
-		entity.setFirstname(dto.getFirstname());
-		entity.setEnabled(dto.isEnabled());
-		entity.setEmail(dto.getEmail());
-		entity.setPassword(dto.getPassword());
+        entity.setGroups(groups);
 
-		entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
-		entity.setDefaultClient(clientRepo.findOne(Long.parseLong(dto.getDefaultClient())));
+        User persistentUser = userRepo.findOne(entity.getId());
+        if (persistentUser != null)
+        {
+            return persistentUser.bind(entity);
+        }
 
-		List<Group> groups = new ArrayList<Group>();
-		groupRepo.findAll(dto.getGroupIdObjects()).forEach(e -> groups.add(e));
-
-		entity.setGroups(groups);
-
-		return entity;
-	}
+        return entity;
+    }
 }

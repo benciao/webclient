@@ -46,7 +46,7 @@ public class User
     {}
 
     @Transient
-    public void bind(User newUser)
+    public User bind(User newUser)
     {
         setLogin(newUser.getLogin());
         setInternal(newUser.isInternal());
@@ -62,6 +62,8 @@ public class User
         setEnabled(newUser.isEnabled());
         setEmail(newUser.getEmail());
         setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
+
+        return this;
     }
 
     @Override
@@ -227,6 +229,11 @@ public class User
     public void setGroups(List<Group> groups)
     {
         this.groups = groups;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
     }
 
     public void setInternal(boolean internal)

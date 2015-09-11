@@ -28,11 +28,13 @@ public class Role
     {}
 
     @Transient
-    public void bind(Role newRole)
+    public Role bind(Role newRole)
     {
         setName(newRole.getName());
         setDescription(newRole.getDescription());
         setEnabled(newRole.isEnabled());
+
+        return this;
     }
 
     @Override
@@ -119,6 +121,11 @@ public class Role
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
     }
 
     public void setName(String name)

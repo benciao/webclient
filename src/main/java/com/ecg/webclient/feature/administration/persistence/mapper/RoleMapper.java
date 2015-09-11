@@ -3,26 +3,33 @@ package com.ecg.webclient.feature.administration.persistence.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.modell.Role;
+import com.ecg.webclient.feature.administration.persistence.repo.RoleRepository;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 
 /**
- * Mapped die Eigenschaften einer in OrientDb bekannten Entität auf eine detachted Rolle oder umgekehrt.
+ * Mapped die Eigenschaften einer der Parsistenz bekannten Entität auf eine detachted Rolle oder umgekehrt.
  * 
  * @author arndtmar
  */
+@Component
 public class RoleMapper
 {
+    @Autowired
+    RoleRepository      roleRepo;
+    
     /**
-     * Wandelt eine persistente Rolle in eine detachte um
+     * Wandelt eine attachte Rolle in eine detachte um.
      * 
      * @param role
-     *            persistente Rolle
+     *            attachte Rolle
      * @return Detachete Rolle
      */
-    public static RoleDto mapToDto(Role attachedRole)
+    public RoleDto mapToDto(Role attachedRole)
     {
         RoleDto detachedRole = new RoleDto();
         detachedRole.setDescription(attachedRole.getDescription());
@@ -35,68 +42,57 @@ public class RoleMapper
     }
 
     /**
-     * Wandelt eine Liste von persistenten Rollen in eine Liste von detachten Rollen um
+     * Wandelt eine Liste von attacheten Rollen in eine Liste von detachten Rollen um.
      * 
      * @param roles
-     *            Liste von Persistenten Rollen
+     *            Liste von attacheten Rollen
      * @return Liste von detachten Rollen
      */
-    public static List<RoleDto> mapToDtos(List<Role> attachedRoles)
+    public List<RoleDto> mapToDtos(List<Role> attachedRoles)
     {
         List<RoleDto> result = new AutoPopulatingList<RoleDto>(RoleDto.class);
 
-        for (Role attachedRole : attachedRoles)
-        {
-            RoleDto detachedRole = new RoleDto();
-            detachedRole.setDescription(attachedRole.getDescription());
-            detachedRole.setName(attachedRole.getName());
-            detachedRole.setEnabled(attachedRole.isEnabled());
-            detachedRole.setDelete(false);
-            detachedRole.setId(attachedRole.getId());
-
-            result.add(detachedRole);
-        }
+        attachedRoles.forEach(e -> result.add(mapToDto(e)));
 
         return result;
     }
 
     /**
-     * Wandelt eine Liste von detachten Rollen in eine Liste von persistenten Rollen um
+     * Wandelt eine Liste von detachten Rollen in eine Liste von attachten Rollen um.
      * 
      * @param dtos
      *            Liste von detachten Rollen
-     * @return Liste von persistenten Rollen
+     * @return Liste von zum Speichern vorbereiteten Rollen
      */
-    public static List<Role> mapToEntities(List<RoleDto> detachedRoles)
+    public List<Role> mapToEntities(List<RoleDto> detachedRoles)
     {
         List<Role> result = new ArrayList<Role>();
 
-        for (RoleDto detachedRole : detachedRoles)
-        {
-            Role entity = new Role();
-            entity.setDescription(detachedRole.getDescription());
-            entity.setName(detachedRole.getName());
-            entity.setEnabled(detachedRole.isEnabled());
-
-            result.add(entity);
-        }
+        detachedRoles.forEach(e -> result.add(mapToEntity(e)));
 
         return result;
     }
 
     /**
-     * Wandelt eine detachte Rolle in eine persistente um
+     * Wandelt eine detachte Rolle in eine attachte um.
      * 
      * @param dto
      *            Detachte Rolle
-     * @return Persistente Rolle
+     * @return zum Speichern vorbereitete Rolle
      */
-    public static Role mapToEntity(RoleDto detachedRole)
+    public Role mapToEntity(RoleDto detachedRole)
     {
         Role entity = new Role();
+        entity.setId(detachedRole.getId());
         entity.setDescription(detachedRole.getDescription());
         entity.setName(detachedRole.getName());
         entity.setEnabled(detachedRole.isEnabled());
+        
+        Role persistentRole = roleRepo.findOne(entity.getId());
+        if (persistentRole != null)
+        {
+            return persistentRole.bind(entity);
+        }
 
         return entity;
     }

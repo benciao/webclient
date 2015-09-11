@@ -26,10 +26,12 @@ public class Property
     {}
 
     @Transient
-    public void bind(Property newProperty)
+    public Property bind(Property newProperty)
     {
         setKey(newProperty.getKey());
         setValue(newProperty.getValue());
+
+        return this;
     }
 
     @Override
@@ -101,6 +103,11 @@ public class Property
         result = prime * result + ((prop_key == null) ? 0 : prop_key.hashCode());
         result = prime * result + ((prop_value == null) ? 0 : prop_value.hashCode());
         return result;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
     }
 
     public void setKey(String key)

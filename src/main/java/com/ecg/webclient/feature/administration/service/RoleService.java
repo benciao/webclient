@@ -22,184 +22,151 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 @Component
 public class RoleService
 {
-	static final Logger logger = LogManager.getLogger(RoleService.class.getName());
+    static final Logger logger = LogManager.getLogger(RoleService.class.getName());
 
-	RoleRepository roleRepo;
+    RoleRepository      roleRepo;
+    RoleMapper          roleMapper;
 
-	@Autowired
-	public RoleService(RoleRepository roleRepo)
-	{
-		this.roleRepo = roleRepo;
-	}
+    @Autowired
+    public RoleService(RoleRepository roleRepo, RoleMapper roleMapper)
+    {
+        this.roleRepo = roleRepo;
+        this.roleMapper = roleMapper;
+    }
 
-	/**
-	 * Löscht die in der Liste enthaltenen Rollen.
-	 * 
-	 * @param detachedRoles
-	 *            Liste mit zu löschenden Rollen
-	 */
-	public void deleteRoles(List<RoleDto> detachedRoles)
-	{
-		try
-		{
-			for (RoleDto detachedRole : detachedRoles)
-			{
-				Role persistentRole = roleRepo.findOne(detachedRole.getId());
+    /**
+     * Löscht die in der Liste enthaltenen Rollen.
+     * 
+     * @param detachedRoles
+     *            Liste mit zu löschenden Rollen
+     */
+    public void deleteRoles(List<RoleDto> detachedRoles)
+    {
+        try
+        {
+            for (RoleDto detachedRole : detachedRoles)
+            {
+                Role persistentRole = roleRepo.findOne(detachedRole.getId());
 
-				if (persistentRole != null)
-				{
-					roleRepo.delete(persistentRole);
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-	}
+                if (persistentRole != null)
+                {
+                    roleRepo.delete(persistentRole);
+                }
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+    }
 
-	/**
-	 * @param onlyEnabledRoles
-	 *            true, wenn nur die aktiven Rollen geladen werden sollen, sonst
-	 *            false
-	 * @return Alle Rollen, wenn false, sonst nur die aktivierten Rollen
-	 */
-	public List<RoleDto> getAllRoles(boolean onlyEnabledRoles)
-	{
-		List<Role> attachedRoles = new ArrayList<Role>();
+    /**
+     * @param onlyEnabledRoles
+     *            true, wenn nur die aktiven Rollen geladen werden sollen, sonst false
+     * @return Alle Rollen, wenn false, sonst nur die aktivierten Rollen
+     */
+    public List<RoleDto> getAllRoles(boolean onlyEnabledRoles)
+    {
+        List<Role> attachedRoles = new ArrayList<Role>();
 
-		try
-		{
-			if (!onlyEnabledRoles)
-			{
-				roleRepo.findAll().forEach(e -> attachedRoles.add(e));
-			}
-			else
-			{
-				roleRepo.findAllEnabledRoles(true).forEach(e -> attachedRoles.add(e));
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+        try
+        {
+            if (!onlyEnabledRoles)
+            {
+                roleRepo.findAll().forEach(e -> attachedRoles.add(e));
+            }
+            else
+            {
+                roleRepo.findAllEnabledRoles(true).forEach(e -> attachedRoles.add(e));
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-		AutoPopulatingList<RoleDto> result = new AutoPopulatingList<RoleDto>(RoleDto.class);
+        AutoPopulatingList<RoleDto> result = new AutoPopulatingList<RoleDto>(RoleDto.class);
 
-		for (Role attachedRole : attachedRoles)
-		{
-			result.add(RoleMapper.mapToDto(attachedRole));
-		}
+        for (Role attachedRole : attachedRoles)
+        {
+            result.add(roleMapper.mapToDto(attachedRole));
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	/**
-	 * @param roleIds
-	 *            Liste mit IDs von Rollen
-	 * @return Liste mit zu den IDs gehörenden Rollen
-	 */
-	public List<RoleDto> getRolesForIds(List<Long> roleIds)
-	{
-		List<RoleDto> result = new ArrayList<RoleDto>();
+    /**
+     * @param roleIds
+     *            Liste mit IDs von Rollen
+     * @return Liste mit zu den IDs gehörenden Rollen
+     */
+    public List<RoleDto> getRolesForIds(List<Long> roleIds)
+    {
+        List<RoleDto> result = new ArrayList<RoleDto>();
 
-		try
-		{
-			Iterable<Role> persistentRoles = roleRepo.findAll(roleIds);
-			for (Role role : persistentRoles)
-			{
-				result.add(RoleMapper.mapToDto(role));
-			}
+        try
+        {
+            Iterable<Role> persistentRoles = roleRepo.findAll(roleIds);
+            for (Role role : persistentRoles)
+            {
+                result.add(roleMapper.mapToDto(role));
+            }
 
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	/**
-	 * Speichert die zu übergebende Rolle.
-	 * 
-	 * @param detachedRole
-	 *            die zu speichernde Rolle
-	 * @return Die gespeicherte Rolle
-	 */
-	public RoleDto saveRole(RoleDto detachedRole)
-	{
-		try
-		{
-			Role attachedRole = RoleMapper.mapToEntity(detachedRole);
-			Role persistentRole = roleRepo.findOne(attachedRole.getId());
+    /**
+     * Speichert die zu übergebende Rolle.
+     * 
+     * @param detachedRole
+     *            die zu speichernde Rolle
+     * @return Die gespeicherte Rolle
+     */
+    public RoleDto saveRole(RoleDto detachedRole)
+    {
+        try
+        {
+            Role draftRole = roleMapper.mapToEntity(detachedRole);
+            Role persistedRole = roleRepo.save(draftRole);
 
-			if (persistentRole != null)
-			{
-				persistentRole.bind(attachedRole);
+            if (persistedRole != null)
+            {
+                return roleMapper.mapToDto(persistedRole);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-				persistentRole = roleRepo.save(persistentRole);
+        return null;
+    }
 
-				if (persistentRole != null)
-				{
-					return RoleMapper.mapToDto(persistentRole);
-				}
-				else
-				{
-					return null;
-				}
-			}
-			else
-			{
-				persistentRole = roleRepo.save(attachedRole);
-
-				if (persistentRole != null)
-				{
-					return RoleMapper.mapToDto(persistentRole);
-				}
-				else
-				{
-					return null;
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Speichert die in der Liste enthaltenen Rollen.
-	 * 
-	 * @param detachedRoles
-	 *            Liste mit zu speichernden Rollen
-	 */
-	public void saveRoles(List<RoleDto> detachedRoles)
-	{
-		try
-		{
-			for (RoleDto detachedRole : detachedRoles)
-			{
-				Role attachedRole = RoleMapper.mapToEntity(detachedRole);
-				Role persistentRole = roleRepo.findOne(detachedRole.getId());
-
-				if (persistentRole != null)
-				{
-					persistentRole.bind(attachedRole);
-					roleRepo.save(persistentRole);
-				}
-				else
-				{
-					roleRepo.save(attachedRole);
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-	}
+    /**
+     * Speichert die in der Liste enthaltenen Rollen.
+     * 
+     * @param detachedRoles
+     *            Liste mit zu speichernden Rollen
+     */
+    public void saveRoles(List<RoleDto> detachedRoles)
+    {
+        try
+        {
+            detachedRoles.forEach(e -> saveRole(e));
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+    }
 }

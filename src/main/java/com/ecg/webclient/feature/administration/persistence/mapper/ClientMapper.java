@@ -3,141 +3,120 @@ package com.ecg.webclient.feature.administration.persistence.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Property;
+import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
-import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
 
 /**
- * Mapped die Eigenschaften einer in OrientDb bekannten Entität auf einen
- * detachten Mandanten oder umgekehrt.
+ * Mapped die Eigenschaften einer der Persistenz bekannten Entität auf einen detachten Mandanten oder
+ * umgekehrt.
  * 
  * @author arndtmar
  */
+@Component
 public class ClientMapper
 {
-	/**
-	 * Wandelt einen persistenten Mandanten in einen detachten um
-	 * 
-	 * @param client
-	 *            persistenter Mandant
-	 * @return Detacheter Mandant
-	 */
-	public static ClientDto mapToDto(Client client)
-	{
-		if (client != null)
-		{
-			ClientDto dto = new ClientDto();
-			dto.setColor(client.getColor());
-			dto.setDescription(client.getDescription());
-			dto.setName(client.getName());
-			dto.setEnabled(client.isEnabled());
-			dto.setDelete(false);
-			dto.setId(client.getId());
+    @Autowired
+    ClientRepository clientRepo;
+    @Autowired
+    PropertyMapper   propertyMapper;
 
-			for (Property property : client.getProperties())
-			{
-				dto.getProperties().add(PropertyMapper.mapToDto(property));
-			}
+    /**
+     * Wandelt einen attachten Mandanten in einen detachten um.
+     * 
+     * @param client
+     *            attachten Mandant
+     * @return Detacheter Mandant
+     */
+    public ClientDto mapToDto(Client client)
+    {
+        if (client != null)
+        {
+            ClientDto dto = new ClientDto();
+            dto.setColor(client.getColor());
+            dto.setDescription(client.getDescription());
+            dto.setName(client.getName());
+            dto.setEnabled(client.isEnabled());
+            dto.setDelete(false);
+            dto.setId(client.getId());
 
-			return dto;
-		}
-		else
-		{
-			return null;
-		}
-	}
+            for (Property property : client.getProperties())
+            {
+                dto.getProperties().add(propertyMapper.mapToDto(property));
+            }
 
-	/**
-	 * Wandelt eine Liste von persistenten Mandanten in eine Liste von detachten
-	 * Mandanten um
-	 * 
-	 * @param clients
-	 *            Liste von persistenten Mandanten
-	 * @return Liste von detachten Mandanten
-	 */
-	public static List<ClientDto> mapToDtos(List<Client> clients)
-	{
-		List<ClientDto> result = new AutoPopulatingList<ClientDto>(ClientDto.class);
+            return dto;
+        }
+        else
+        {
+            return null;
+        }
+    }
 
-		for (Client client : clients)
-		{
-			ClientDto dto = new ClientDto();
-			dto.setColor(client.getColor());
-			dto.setDescription(client.getDescription());
-			dto.setName(client.getName());
-			dto.setEnabled(client.isEnabled());
-			dto.setDelete(false);
-			dto.setId(client.getId());
+    /**
+     * Wandelt eine Liste von attachten Mandanten in eine Liste von detachten Mandanten um.
+     * 
+     * @param clients
+     *            Liste von attachten Mandanten
+     * @return Liste von detachten Mandanten
+     */
+    public List<ClientDto> mapToDtos(List<Client> clients)
+    {
+        List<ClientDto> result = new AutoPopulatingList<ClientDto>(ClientDto.class);
 
-			for (Property property : client.getProperties())
-			{
-				dto.getProperties().add(PropertyMapper.mapToDto(property));
-			}
+        clients.forEach(e -> result.add(mapToDto(e)));
 
-			result.add(dto);
-		}
+        return result;
+    }
 
-		return result;
-	}
+    /**
+     * Wandelt eine Liste von detachten Mandanten in eine Liste von attachten Mandanten um.
+     * 
+     * @param dtos
+     *            Liste von detachten Mandanten
+     * @return Liste von attachten Mandanten
+     */
+    public List<Client> mapToEntities(List<ClientDto> dtos)
+    {
+        List<Client> result = new ArrayList<Client>();
 
-	/**
-	 * Wandelt eine Liste von detachten Mandanten in eine Liste von persistenten
-	 * Mandanten um
-	 * 
-	 * @param dtos
-	 *            Liste von detachten Mandanten
-	 * @return Liste von persistenten Mandanten
-	 */
-	public static List<Client> mapToEntities(List<ClientDto> dtos)
-	{
-		List<Client> result = new ArrayList<Client>();
+        dtos.forEach(e -> result.add(mapToEntity(e)));
 
-		for (ClientDto dto : dtos)
-		{
-			Client client = new Client();
-			client.setColor(dto.getColor());
-			client.setDescription(dto.getDescription());
-			client.setName(dto.getName());
-			client.setEnabled(dto.isEnabled());
+        return result;
+    }
 
-			for (PropertyDto propertyDto : dto.getProperties())
-			{
-				client.getProperties().add(PropertyMapper.mapToEntity(propertyDto));
-			}
+    /**
+     * Wandelt einen detachten Mandanten in einen attachter um.
+     * 
+     * @param dto
+     *            Detachter Mandant
+     * @return attachter Mandant
+     */
+    public Client mapToEntity(ClientDto dto)
+    {
+        if (dto != null)
+        {
+            Client client = new Client();
+            client.setId(dto.getId());
+            client.setColor(dto.getColor());
+            client.setDescription(dto.getDescription());
+            client.setName(dto.getName());
+            client.setEnabled(dto.isEnabled());
+            dto.getProperties().forEach(p -> client.getProperties().add(propertyMapper.mapToEntity(p)));
 
-			result.add(client);
-		}
+            Client persistentClient = clientRepo.findOne(client.getId());
+            if (persistentClient != null)
+            {
+                return persistentClient.bind(client);
+            }
 
-		return result;
-	}
-
-	/**
-	 * Wandelt einen detachten Mandanten in einen persistenten um
-	 * 
-	 * @param dto
-	 *            Detachter Mandanten
-	 * @return Persistenter Mandanten
-	 */
-	public static Client mapToEntity(ClientDto dto)
-	{
-		if (dto != null)
-		{
-			Client client = new Client();
-			client.setColor(dto.getColor());
-			client.setDescription(dto.getDescription());
-			client.setName(dto.getName());
-			client.setEnabled(dto.isEnabled());
-
-			for (PropertyDto propertyDto : dto.getProperties())
-			{
-				client.getProperties().add(PropertyMapper.mapToEntity(propertyDto));
-			}
-
-			return client;
-		}
-		return null;
-	}
+            return client;
+        }
+        return null;
+    }
 }

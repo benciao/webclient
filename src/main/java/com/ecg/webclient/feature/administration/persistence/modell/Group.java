@@ -39,13 +39,15 @@ public class Group
     {}
 
     @Transient
-    public void bind(Group newGroup)
+    public Group bind(Group newGroup)
     {
         setName(newGroup.getName());
         setDescription(newGroup.getDescription());
         setEnabled(newGroup.isEnabled());
         setClient(newGroup.getClient());
         setRoles(newGroup.getRoles());
+
+        return this;
     }
 
     @Override
@@ -154,6 +156,11 @@ public class Group
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
     }
 
     public void setName(String name)
