@@ -54,8 +54,8 @@
 																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='user-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='users[" + rowIndex + "].enabled' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><a href='#' class='a_login-as' id='a_login-as-"+ rowIndex +"' title='[[#{usersActionLoginAs}]]'><span class='glyphicon glyphicon-random'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].id' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' />"
-																	+ "<input type='hidden' id='hiddenGroupRids-"+ rowIndex +"' name='users["+ rowIndex +"].groupRids'/>"
+																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><a href='#' class='a_login-as' id='a_login-as-"+ rowIndex +"' title='[[#{usersActionLoginAs}]]'><span class='glyphicon glyphicon-random'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' value='false' />"
+																	+ "<input type='hidden' id='hiddenGroupRids-"+ rowIndex +"' name='users["+ rowIndex +"].groupIds'/>"
 																	+ "<input type='hidden' id='hiddenEmail-"+ rowIndex +"' name='users["+ rowIndex +"].email' />"
 																	+ "<input type='hidden' id='hiddenDefaultClient-"+ rowIndex +"' name='users["+ rowIndex +"].defaultClient' />"
 																	+ "<input type='hidden' id='hiddenChangePasswordOnNextLogin-"+ rowIndex +"' name='users["+ rowIndex +"].changePasswordOnNextLogin' />"
@@ -231,11 +231,7 @@
 		var assignedGroupRids = $("#hiddenGroupRids-" + userIndex).val();
 		var uRid = $("#hiddenRid-" + userIndex).val();
 
-		var collectionIndex = uRid.split("#");
-		var userRid = collectionIndex[1];
-		var groupRids = removeHashTag(assignedGroupRids);
-
-		url = url + '/' + groupRids + "/" + userRid;
+		url = url + '/' + assignedGroupRids + "/" + uRid;
 
 		$("#availableClientsResult").load(url, function() {
 			$("#defaultClientGroupSelect").change(function(event, state) {
@@ -256,32 +252,10 @@
 
 	}
 
-	// notwendig, da Steuerzeichen
-	function removeHashTag(assignedGroupRids) {
-
-		var ridsArray = assignedGroupRids.split(",");
-		var result = "";
-
-		for (var i = 0; i < ridsArray.length; i++) {
-			var collectionIndex = ridsArray[i].split("#");
-
-			if (i == 0) {
-				result = result + collectionIndex[1];
-			} else {
-				result = result + "," + collectionIndex[1];
-			}
-		}
-
-		return result;
-	}
-
 	function retrieveClientGroups(clientId) {
 		var url = '/admin/user/clientgroups';
 
-		// notwendig, da Steuerzeichen
-		var collectionIndex = clientId.split("#");
-
-		url = url + '/' + collectionIndex[1];
+		url = url + '/' + clientId;
 
 		$("#clientGroupsResult")
 				.load(
@@ -670,7 +644,7 @@ body {
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
 									th:field="*{users[__${stat.index}__].delete}" /><input
 									type="hidden" th:id="${'hiddenGroupRids-'+stat.index}"
-									th:field="*{users[__${stat.index}__].groupRids}" /> <input
+									th:field="*{users[__${stat.index}__].groupIds}" /> <input
 									type="hidden" th:id="${'hiddenEmail-'+stat.index}"
 									th:field="*{users[__${stat.index}__].email}" /> <input
 									type="hidden" th:id="${'hiddenDefaultClient-'+stat.index}"

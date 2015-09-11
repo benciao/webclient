@@ -226,7 +226,7 @@ public class UserService
             User draftUser = userMapper.mapToEntity(detachedUser);
             User persistedUser = userRepo.save(draftUser);
 
-            if (persistedUser.getId() != 0)
+            if (detachedUser.getId() > -1)
             {
                 // Passwort wurde bei einem schon persistenten Benutzer
                 // geändert; Erste Verschlüsselung fand vor der Übertragung zum

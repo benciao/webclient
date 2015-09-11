@@ -91,46 +91,6 @@ public class AdministrationController
 	}
 
 	/**
-	 * Behandelt POST-Requests vom Typ "/admin/client/save". Speichert
-	 * Änderungen an Mandanten.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/client/save", method = RequestMethod.POST)
-	public String save(@Valid ClientConfig clientConfig, BindingResult bindingResult)
-	{
-		List<ClientDto> updateDtos = new ArrayList<ClientDto>();
-		List<ClientDto> deleteDtos = new ArrayList<ClientDto>();
-
-		for (ClientDto dto : clientConfig.getClients())
-		{
-			if (dto.isDelete())
-			{
-				deleteDtos.add(dto);
-			}
-			else
-			{
-				updateDtos.add(dto);
-			}
-		}
-
-		clientService.deleteClients(deleteDtos);
-		updateSelectedClient(deleteDtos);
-
-		clientConfig.removeDeleted();
-
-		if (bindingResult.hasErrors())
-		{
-			return getLoadingRedirectTemplate() + "clientConfig";
-		}
-
-		clientService.saveClients(updateDtos);
-		updateSelectedClient(updateDtos);
-
-		return "redirect:";
-	}
-
-	/**
 	 * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert
 	 * Änderungen an Mandanteneigenschaften.
 	 * 
@@ -279,6 +239,46 @@ public class AdministrationController
 		}
 
 		userService.saveUsers(updateDtos);
+
+		return "redirect:";
+	}
+
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/client/save". Speichert
+	 * Änderungen an Mandanten.
+	 * 
+	 * @return Template
+	 */
+	@RequestMapping(value = "/client/save", method = RequestMethod.POST)
+	public String saveClient(@Valid ClientConfig clientConfig, BindingResult bindingResult)
+	{
+		List<ClientDto> updateDtos = new ArrayList<ClientDto>();
+		List<ClientDto> deleteDtos = new ArrayList<ClientDto>();
+
+		for (ClientDto dto : clientConfig.getClients())
+		{
+			if (dto.isDelete())
+			{
+				deleteDtos.add(dto);
+			}
+			else
+			{
+				updateDtos.add(dto);
+			}
+		}
+
+		clientService.deleteClients(deleteDtos);
+		updateSelectedClient(deleteDtos);
+
+		clientConfig.removeDeleted();
+
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate() + "clientConfig";
+		}
+
+		clientService.saveClients(updateDtos);
+		updateSelectedClient(updateDtos);
 
 		return "redirect:";
 	}

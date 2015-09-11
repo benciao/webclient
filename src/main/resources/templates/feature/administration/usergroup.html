@@ -48,7 +48,7 @@
 																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='group-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='groups[" + rowIndex + "].enabled' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<a href='#' class='a_delete' title='[[#{groupsActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"'' title='[[#{groupsActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='groups["+ rowIndex +"].id' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='groups[" + rowIndex + "].delete' /><input type='hidden' id='hiddenRoleRids-" + rowIndex +"' name='groups[" + rowIndex + "].roleRids' />"
+																	+ "<a href='#' class='a_delete' title='[[#{groupsActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"'' title='[[#{groupsActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='groups["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='groups[" + rowIndex + "].delete' value='false' /><input type='hidden' id='hiddenRoleRids-" + rowIndex +"' name='groups[" + rowIndex + "].roleIds' />"
 																	+ "</td>"
 																	+ "</tr>");
 
@@ -453,7 +453,7 @@ body {
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
 									th:field="*{groups[__${stat.index}__].delete}" /><input
 									type="hidden" th:id="${'hiddenRoleRids-'+stat.index}"
-									th:field="*{groups[__${stat.index}__].roleRids}" /></td>
+									th:field="*{groups[__${stat.index}__].roleIds}" /></td>
 							</tr>
 						</tbody>
 					</table>
