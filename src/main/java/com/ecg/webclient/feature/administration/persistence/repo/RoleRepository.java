@@ -15,4 +15,7 @@ public interface RoleRepository extends CrudRepository<Role, Long>
 {
 	@Query("select r from Role r where r.enabled = :enabled")
 	public Iterable<Role> findAllEnabledRoles(@Param("enabled") boolean isEnabled);
+
+	@Query("select r from Role r where r.name = :name")
+	public Role findRoleByName(@Param("name") String name);
 }

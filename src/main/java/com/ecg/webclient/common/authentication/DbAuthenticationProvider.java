@@ -37,7 +37,7 @@ public class DbAuthenticationProvider implements AuthenticationProvider
 		String login = authentication.getName();
 		String password = authentication.getCredentials().toString();
 
-		if (userService.isUserAuthorized(login, password))
+		if (userService.isUserAuthenticated(login, password))
 		{
 			UserDto user = userService.getUserByLogin(login);
 			ClientDto defaultClient = userService.getDefaultClientForUser(user);

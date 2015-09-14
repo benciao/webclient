@@ -32,7 +32,6 @@ public class RoleMapper
     public RoleDto mapToDto(Role attachedRole)
     {
         RoleDto detachedRole = new RoleDto();
-        detachedRole.setDescription(attachedRole.getDescription());
         detachedRole.setName(attachedRole.getName());
         detachedRole.setEnabled(attachedRole.isEnabled());
         detachedRole.setDelete(false);
@@ -84,7 +83,6 @@ public class RoleMapper
     {
         Role entity = new Role();
         entity.setId(detachedRole.getId());
-        entity.setDescription(detachedRole.getDescription());
         entity.setName(detachedRole.getName());
         entity.setEnabled(detachedRole.isEnabled());
         

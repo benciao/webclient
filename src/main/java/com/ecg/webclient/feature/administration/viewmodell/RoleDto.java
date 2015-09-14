@@ -11,17 +11,10 @@ public class RoleDto extends BaseObjectDto
 {
     @NotNull
     private String  name;
-    @NotNull
-    private String  description;
     private boolean enabled;
 
     public RoleDto()
     {}
-
-    public String getDescription()
-    {
-        return description;
-    }
 
     public String getName()
     {
@@ -31,11 +24,6 @@ public class RoleDto extends BaseObjectDto
     public boolean isEnabled()
     {
         return enabled;
-    }
-
-    public void setDescription(String description)
-    {
-        this.description = description;
     }
 
     public void setEnabled(boolean enabled)

@@ -7,7 +7,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-
 /**
  * Entität einer Benutzerrolle.
  * 
@@ -17,122 +16,87 @@ import javax.persistence.Transient;
 @Table(name = "SEC_ROLE")
 public class Role
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long    id;
-    private String  name;
-    private String  description;
-    private boolean enabled;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long	id;
+	private String	name;
+	private boolean	enabled;
 
-    public Role()
-    {}
+	public Role()
+	{
+	}
 
-    @Transient
-    public Role bind(Role newRole)
-    {
-        setName(newRole.getName());
-        setDescription(newRole.getDescription());
-        setEnabled(newRole.isEnabled());
+	@Transient
+	public Role bind(Role newRole)
+	{
+		setName(newRole.getName());
+		setEnabled(newRole.isEnabled());
 
-        return this;
-    }
+		return this;
+	}
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (!(obj instanceof Role))
-        {
-            return false;
-        }
-        Role other = (Role) obj;
-        if (description == null)
-        {
-            if (other.description != null)
-            {
-                return false;
-            }
-        }
-        else if (!description.equals(other.description))
-        {
-            return false;
-        }
-        if (id != other.id)
-        {
-            return false;
-        }
-        if (name == null)
-        {
-            if (other.name != null)
-            {
-                return false;
-            }
-        }
-        else if (!name.equals(other.name))
-        {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
 
-    public String getDescription()
-    {
-        return description;
-    }
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Role other = (Role) obj;
+		if (id != other.id)
+			return false;
+		if (name == null)
+		{
+			if (other.name != null)
+				return false;
+		}
+		else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
 
-    public long getId()
-    {
-        return id;
-    }
+	public long getId()
+	{
+		return id;
+	}
 
-    public String getName()
-    {
-        return name;
-    }
+	public String getName()
+	{
+		return name;
+	}
 
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
-    }
+	public boolean isEnabled()
+	{
+		return enabled;
+	}
 
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
+	public void setEnabled(boolean enabled)
+	{
+		this.enabled = enabled;
+	}
 
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
+	public void setId(long id)
+	{
+		if (id != -1)
+		{
+			this.id = id;
+		}
+	}
 
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-    public void setId(long id)
-    {
-        if (id != -1)
-        {
-            this.id = id;
-        }
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+	public void setName(String name)
+	{
+		this.name = name;
+	}
 }
