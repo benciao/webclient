@@ -91,45 +91,6 @@ public class AdministrationController
 	}
 
 	/**
-	 * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert
-	 * Änderungen an Mandanteneigenschaften.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/clientp/save", method = RequestMethod.POST)
-	public String save(@Valid ClientProperties clientProperties, BindingResult bindingResult)
-	{
-		List<PropertyDto> updateDtos = new ArrayList<PropertyDto>();
-		List<PropertyDto> deleteDtos = new ArrayList<PropertyDto>();
-
-		for (PropertyDto dto : clientProperties.getProperties())
-		{
-			if (dto.isDelete())
-			{
-				deleteDtos.add(dto);
-			}
-			else
-			{
-				updateDtos.add(dto);
-			}
-		}
-
-		ClientDto updatedClient = util.getSelectedClient();
-		updatedClient.setProperties(updateDtos);
-		clientProperties.removeDeleted();
-
-		if (bindingResult.hasErrors())
-		{
-			return getLoadingRedirectTemplate() + "clientProperties";
-		}
-
-		clientService.saveClient(updatedClient);
-		util.setSelectedClientWithNewAuthority(updatedClient);
-
-		return "redirect:";
-	}
-
-	/**
 	 * Behandelt POST-Requests vom Typ "/admin/usergroup/save". Speichert
 	 * Änderungen an Benutzergruppen.
 	 * 
@@ -279,6 +240,45 @@ public class AdministrationController
 
 		clientService.saveClients(updateDtos);
 		updateSelectedClient(updateDtos);
+
+		return "redirect:";
+	}
+
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert
+	 * Änderungen an Mandanteneigenschaften.
+	 * 
+	 * @return Template
+	 */
+	@RequestMapping(value = "/clientp/save", method = RequestMethod.POST)
+	public String saveProperties(@Valid ClientProperties clientProperties, BindingResult bindingResult)
+	{
+		List<PropertyDto> updateDtos = new ArrayList<PropertyDto>();
+		List<PropertyDto> deleteDtos = new ArrayList<PropertyDto>();
+
+		for (PropertyDto dto : clientProperties.getProperties())
+		{
+			if (dto.isDelete())
+			{
+				deleteDtos.add(dto);
+			}
+			else
+			{
+				updateDtos.add(dto);
+			}
+		}
+
+		ClientDto updatedClient = util.getSelectedClient();
+		updatedClient.setProperties(updateDtos);
+		clientProperties.removeDeleted();
+
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate() + "clientProperties";
+		}
+
+		clientService.saveClient(updatedClient);
+		util.setSelectedClientWithNewAuthority(updatedClient);
 
 		return "redirect:";
 	}

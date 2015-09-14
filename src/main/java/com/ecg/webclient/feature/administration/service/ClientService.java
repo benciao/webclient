@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.Transactional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,11 +215,18 @@ public class ClientService
      *            zu aktualisierender Mandant
      * @return Aktualisierter Mandant
      */
+    @Transactional
     public ClientDto saveClient(ClientDto detachedClient)
     {
         try
         {
+            List<Property> draftedProperties = propertyMapper.mapToEntities(detachedClient.getProperties());
+            Iterable<Property> persistedProperties = propertyRepo.save(draftedProperties);
+            List<Property> relatedProperties = new ArrayList<Property>();
+            persistedProperties.forEach(e -> relatedProperties.add(e));
+
             Client draftClient = clientMapper.mapToEntity(detachedClient);
+            draftClient.setProperties(relatedProperties);
             Client persistedClient = clientRepo.save(draftClient);
 
             if (persistedClient != null)

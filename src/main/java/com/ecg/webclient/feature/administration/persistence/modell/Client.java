@@ -155,7 +155,10 @@ public class Client
 
     public void setId(long id)
     {
-        this.id = id;
+        if (id != -1)
+        {
+            this.id = id;
+        }
     }
 
     public void setName(String name)
