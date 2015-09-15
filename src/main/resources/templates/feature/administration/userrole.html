@@ -231,7 +231,7 @@
 									<td>
 										<input th:id="${'description-'+stat.index}" type="text"
 											class="form-control" placeholder="Beschreibung"
-											th:value="#{accessrole.(*{roles[__${stat.index}__].name})}"/>
+											th:value="#{*{'accessrole.' + roles[__${stat.index}__].name}}"/>
 									</td>
 									<td>
 										<input th:id="${'switch-'+stat.index}" type="checkbox"

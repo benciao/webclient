@@ -1,5 +1,13 @@
 package com.ecg.webclient.common.authentication.accessrole.api;
 
+import com.ecg.webclient.feature.administration.service.RoleService;
+
+/**
+ * Basisklasse für eine zu registrierende Rolle. Registriert wird eine Rolle ausschließlich bei
+ * Anwendungsstart über {@link RoleService}
+ * 
+ * @author arndtmar
+ */
 public abstract class WebClientAccessRole
 {
 	String	featureId;

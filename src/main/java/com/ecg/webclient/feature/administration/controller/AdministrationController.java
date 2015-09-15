@@ -1,4 +1,4 @@
-package com.ecg.webclient.feature.administration;
+package com.ecg.webclient.feature.administration.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.ecg.webclient.common.authentication.AuthenticationUtil;
 import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.common.feature.FeatureRegistry;
+import com.ecg.webclient.feature.administration.FeatureAdministration;
 import com.ecg.webclient.feature.administration.service.ClientService;
 import com.ecg.webclient.feature.administration.service.GroupService;
 import com.ecg.webclient.feature.administration.service.RoleService;
