@@ -3,6 +3,8 @@ package com.ecg.webclient.common.authentication;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,6 +40,54 @@ public class AuthenticationUtil
 		this.groupService = groupService;
 		this.roleService = roleService;
 		initSelectedClient();
+	}
+
+    @Transactional
+	public void changeUserPassword(String simpleEncodedPw)
+	{
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String login = auth.getName();
+
+        UserDto user = userService.getUserByLogin(login);
+        //Pw wird im Service ein 2. Mal encoded
+        user.setPassword(simpleEncodedPw);
+        user.setChangePasswordOnNextLogin(false);
+        userService.saveUser(user);
+        
+        // da Service kein neues PW zurückliefert, wird hier für das Token nochmal verschlüsselt
+        String password = PasswordEncoder.encodeComplex(simpleEncodedPw, Long.toString(user.getId()));
+
+        List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+        // zugeordnete Rollen für den Client setzen
+        for (GroupDto group : groupService.getGroupsForIds(user.getGroupIdObjects()))
+        {
+            // Nutzer mit dieser Rolle erhält alle ihm zugeordneten Rollen über
+            // alle Mandanten
+            if (auth.getAuthorities().contains(new DbGrantedAuthoritiy("SETUP_ROLE")))
+            {
+                for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
+                {
+                    DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getName());
+                    grantedAuths.add(newAuth);
+                }
+            }
+            // jeder andere Nutzer erhält nur die ihm zugeordneten Rollen des
+            // gerade ausgewählten Mandanten
+            else
+            {
+                if (groupService.getClientForGroupId(group.getId()).getId() == selectedClient.getId())
+                {
+                    for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
+                    {
+                        DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getName());
+                        grantedAuths.add(newAuth);
+                    }
+                }
+            }
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(login, password, grantedAuths));
 	}
 
 	public String getClientChangePath()
@@ -106,7 +156,7 @@ public class AuthenticationUtil
 		this.selectedClient = selectedClient;
 	}
 
-	public void setSelectedClientWithNewAuthority(ClientDto selectedClient)
+    public void setSelectedClientWithNewAuthority(ClientDto selectedClient)
 	{
 		this.selectedClient = selectedClient;
 

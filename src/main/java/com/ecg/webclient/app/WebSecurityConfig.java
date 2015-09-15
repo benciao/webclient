@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -16,12 +17,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 {
     @Autowired
     @Qualifier("dbAuthenticationProvider")
-    AuthenticationProvider authenticationProvider;
+    AuthenticationProvider       authenticationProvider;
+
+    @Autowired
+    @Qualifier("webClientAuthenticationSuccessHandler")
+    AuthenticationSuccessHandler successHandler;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
     {
-        auth.authenticationProvider(authenticationProvider);;
+        auth.authenticationProvider(authenticationProvider);
         auth.eraseCredentials(false);
     }
 
@@ -31,7 +36,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         http.authorizeRequests()
                 .antMatchers("/resources/**", "/css/**", "/icons/**", "/js/**", "/fonts/**",
                         "/img/bootstrap-colorpicker/**", "/admin/setup/system").permitAll().anyRequest()
-                .authenticated().and().formLogin().loginPage("/login").permitAll().and().logout()
+                .authenticated().and().formLogin().loginPage("/login").permitAll()
+                .successHandler(successHandler).and().logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login");
     }
 }
