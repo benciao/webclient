@@ -311,70 +311,12 @@ body {
 
 	<div class="wrapper" id="wrapper">
 		<!-- div class="row"-->
-		<div id="navigation" class="navigation">
-
-			<div id="submenu" class="container navigation-submenu">
-				<div class="panel-group" id="accordion">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion"
-									href="#collapseOne"><span class="glyphicon glyphicon-home">
-								</span><span th:text="#{menuTreeClient}"></span></a>
-							</h4>
-						</div>
-						<div id="collapseOne" class="panel-collapse collapse">
-							<div class="panel-body">
-								<table class="table">
-									<tr sec:authorize="hasAnyRole('SETUP_ROLE', 'SECURITY_ADMIN_ROLE')">
-										<td><a href="/admin/client"><span
-												th:text="#{menuTreeClientConfig}"></span></a></td>
-									</tr>
-									<tr>
-										<td><a href="/admin/clientp"><span
-												th:text="#{menuTreeClientProperties}"></span></a></td>
-									</tr>
-								</table>
-							</div>
-						</div>
-					</div>
-					<div class="panel panel-default" sec:authorize="hasAnyRole('SETUP_ROLE', 'SECURITY_ADMIN_ROLE')">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion"
-									href="#collapseTwo"><span class="glyphicon glyphicon-user">
-								</span><span th:text="#{menuTreeUser}"></span></a>
-							</h4>
-						</div>
-						<div id="collapseTwo" class="panel-collapse collapse in">
-							<div class="panel-body">
-								<table class="table">
-									<tr>
-										<td><a href="/admin/user"><span
-												th:text="#{menuTreeUserConfig}"></span></a></td>
-									</tr>
-									<tr class="warning">
-										<td><a href="/admin/usergroup"><span
-												th:text="#{menuTreeUserGroups}"></span></a></td>
-									</tr>
-									<tr>
-										<td><a href="/admin/userrole"><span
-												th:text="#{menuTreeUserRoles}"></span></a></td>
-									</tr>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="separator"></div>
-			<div class="separator-content">
-				<a href="javascript:toggle_sub_menu_visibility();"> <img
-					th:src="@{'/icons/separator_clickable.png'}"></img>
-				</a>
-			</div>
-		</div>
+		
+		<!-- {!begin navigation} -->
+		<div
+			th:include="feature/administration/adminmenu :: navigation('group', 'user')"></div>
+		<!-- {!end navigation} -->
+		
 		<div id="content" class="content">
 			<nav class="navbar navbar-default navbar-top sub-nav">
 				<div class="container-fluid">
@@ -485,8 +427,8 @@ body {
 											class="hiddenRoleSwitchValue" type="hidden"
 											th:id="${'hiddenRoleSwitchValue-'+stat.index}" value="false" /><input
 											class="hiddenRoleRid" th:id="${'hiddenRoleRid-'+stat.index}"
-											type="hidden" th:field="*{roles[__${stat.index}__].id}" />
-											<input class="hiddenGroupRid"
+											type="hidden" th:field="*{roles[__${stat.index}__].id}" /> <input
+											class="hiddenGroupRid"
 											th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
 											value="" /></td>
 									</tr>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<body>
+	<div th:fragment="navigation(selectedItem,collapseIn)" id="navigation"
+		class="navigation">
+
+		<div id="submenu" class="container navigation-submenu">
+			<div class="panel-group" id="accordion">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#accordion"
+								href="#collapseOne"><span class="glyphicon glyphicon-home">
+							</span><span th:text="#{menuTreeClient}"></span></a>
+						</h4>
+					</div>
+					<div th:if="${collapseIn == 'client'}" id="collapseOne"
+						class="panel-collapse collapse in">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Mandanten-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM')">
+									<tr th:if="${selectedItem == 'client'}" class="warning">
+										<td><a href="/admin/client"><span
+												th:text="#{menuTreeClientConfig}"></span></a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'client'}">
+										<td><a href="/admin/client"><span
+												th:text="#{menuTreeClientConfig}"></span></a></td>
+									</tr>
+								</div>
+								<!-- Mandanteneigenschaften-Knoten -->
+								<div>
+									<tr th:if="${selectedItem == 'properties'}" class="warning">
+										<td><a href="/admin/clientp"><span
+												th:text="#{menuTreeClientProperties}"></span></a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'properties'}">
+										<td><a href="/admin/clientp"><span
+												th:text="#{menuTreeClientProperties}"></span></a></td>
+									</tr>
+								</div>
+							</table>
+						</div>
+					</div>
+					<div th:if="${collapseIn != 'client'}" id="collapseOne"
+						class="panel-collapse collapse">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Mandanten-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM')">
+								<tr th:if="${selectedItem == 'client'}" class="warning">
+									<td><a href="/admin/client"><span
+											th:text="#{menuTreeClientConfig}"></span></a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'client'}">
+									<td><a href="/admin/client"><span
+											th:text="#{menuTreeClientConfig}"></span></a></td>
+								</tr>
+								</div>
+								<!-- Mandanteneigenschaften-Knoten -->
+								<div>
+								<tr th:if="${selectedItem == 'properties'}" class="warning">
+									<td><a href="/admin/clientp"><span
+											th:text="#{menuTreeClientProperties}"></span></a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'properties'}">
+									<td><a href="/admin/clientp"><span
+											th:text="#{menuTreeClientProperties}"></span></a></td>
+								</tr>
+								</div>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default"
+					sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM')">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#accordion"
+								href="#collapseTwo"><span class="glyphicon glyphicon-user">
+							</span><span th:text="#{menuTreeUser}"></span></a>
+						</h4>
+					</div>
+					<div th:if="${collapseIn == 'user'}" id="collapseTwo"
+						class="panel-collapse collapse in">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Benutzer-Knoten -->
+								<tr th:if="${selectedItem == 'user'}" class="warning">
+									<td><a href="/admin/user"><span
+											th:text="#{menuTreeUserConfig}"></span></a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'user'}">
+									<td><a href="/admin/user"><span
+											th:text="#{menuTreeUserConfig}"></span></a></td>
+								</tr>
+								<!-- Gruppen-Knoten -->
+								<tr th:if="${selectedItem == 'group'}" class="warning">
+									<td><a href="/admin/usergroup"><span
+											th:text="#{menuTreeUserGroups}"></span></a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'group'}">
+									<td><a href="/admin/usergroup"><span
+											th:text="#{menuTreeUserGroups}"></span></a></td>
+								</tr>
+								<!-- Rollen-Knoten -->
+								<tr th:if="${selectedItem == 'role'}" class="warning">
+									<td><a href="/admin/userrole"><span
+											th:text="#{menuTreeUserRoles}"></span></a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'role'}">
+									<td><a href="/admin/userrole"><span
+											th:text="#{menuTreeUserRoles}"></span></a></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div th:if="${collapseIn != 'user'}" id="collapseTwo"
+						class="panel-collapse collapse">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Benutzer-Knoten -->
+								<tr th:if="${selectedItem == 'user'}" class="warning">
+									<td><a href="/admin/user"><span
+											th:text="#{menuTreeUserConfig}"></span></a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'user'}">
+									<td><a href="/admin/user"><span
+											th:text="#{menuTreeUserConfig}"></span></a></td>
+								</tr>
+								<!-- Gruppen-Knoten -->
+								<tr th:if="${selectedItem == 'group'}" class="warning">
+									<td><a href="/admin/usergroup"><span
+											th:text="#{menuTreeUserGroups}"></span></a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'group'}">
+									<td><a href="/admin/usergroup"><span
+											th:text="#{menuTreeUserGroups}"></span></a></td>
+								</tr>
+								<!-- Rollen-Knoten -->
+								<tr th:if="${selectedItem == 'role'}" class="warning">
+									<td><a href="/admin/userrole"><span
+											th:text="#{menuTreeUserRoles}"></span></a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'role'}">
+									<td><a href="/admin/userrole"><span
+											th:text="#{menuTreeUserRoles}"></span></a></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="separator"></div>
+		<div class="separator-content">
+			<a href="javascript:toggle_sub_menu_visibility();"> <img
+				th:src="@{'/icons/separator_clickable.png'}"></img>
+			</a>
+		</div>
+	</div>
+</body>
+</html>
