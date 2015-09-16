@@ -4,8 +4,7 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <body>
-	<div th:fragment="navigation(selectedItem,collapseIn)" id="navigation"
-		class="navigation">
+	<div th:fragment="navigation(selectedItem,collapseIn)">
 
 		<div id="submenu" class="container navigation-submenu">
 			<div class="panel-group" id="accordion">
@@ -52,25 +51,25 @@
 							<table class="table">
 								<!-- Mandanten-Knoten -->
 								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM')">
-								<tr th:if="${selectedItem == 'client'}" class="warning">
-									<td><a href="/admin/client"><span
-											th:text="#{menuTreeClientConfig}"></span></a></td>
-								</tr>
-								<tr th:if="${selectedItem != 'client'}">
-									<td><a href="/admin/client"><span
-											th:text="#{menuTreeClientConfig}"></span></a></td>
-								</tr>
+									<tr th:if="${selectedItem == 'client'}" class="warning">
+										<td><a href="/admin/client"><span
+												th:text="#{menuTreeClientConfig}"></span></a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'client'}">
+										<td><a href="/admin/client"><span
+												th:text="#{menuTreeClientConfig}"></span></a></td>
+									</tr>
 								</div>
 								<!-- Mandanteneigenschaften-Knoten -->
 								<div>
-								<tr th:if="${selectedItem == 'properties'}" class="warning">
-									<td><a href="/admin/clientp"><span
-											th:text="#{menuTreeClientProperties}"></span></a></td>
-								</tr>
-								<tr th:if="${selectedItem != 'properties'}">
-									<td><a href="/admin/clientp"><span
-											th:text="#{menuTreeClientProperties}"></span></a></td>
-								</tr>
+									<tr th:if="${selectedItem == 'properties'}" class="warning">
+										<td><a href="/admin/clientp"><span
+												th:text="#{menuTreeClientProperties}"></span></a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'properties'}">
+										<td><a href="/admin/clientp"><span
+												th:text="#{menuTreeClientProperties}"></span></a></td>
+									</tr>
 								</div>
 							</table>
 						</div>
@@ -158,11 +157,13 @@
 			</div>
 		</div>
 
-		<div class="separator"></div>
-		<div class="separator-content">
-			<a href="javascript:toggle_sub_menu_visibility();"> <img
-				th:src="@{'/icons/separator_clickable.png'}"></img>
-			</a>
+		<div id="separator">
+			<div class="separator-content">
+				<a href="javascript:toggle_sub_menu_visibility();"> <img
+					th:src="@{'/icons/separator_clickable.png'}"></img>
+				</a>
+			</div>
+			<div id="separator-line"></div>
 		</div>
 	</div>
 </body>

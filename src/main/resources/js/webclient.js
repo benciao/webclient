@@ -17,18 +17,16 @@ function toggle_menu_visibility(id) {
 }
 
 function toggle_sub_menu_visibility() {
-	var navigationDiv = document.getElementById('navigation');
 	var contentDiv = document.getElementById('content');
-	var navigationTreeDiv = document.getElementById('submenu');
 
-	if (navigationDiv.style.width != '1%') {
-		navigationDiv.style.width = '1%';
-		contentDiv.style.width = '99%';
-		navigationTreeDiv.style.display = 'none';
-	} else {
-		navigationDiv.style.width = '12%';
-		contentDiv.style.width = '88%';
-		navigationTreeDiv.style.display = 'block';
+	if ($("#submenu").is(":visible")) {
+		$("#navigation").removeClass('navigation');
+		$("#navigation").addClass('navigation-off');
+		$("#submenu").hide();
+	} else {		
+		$("#navigation").removeClass('navigation-off');
+		$("#navigation").addClass('navigation');
+		$("#submenu").show();
 	}
 }
 

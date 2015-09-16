@@ -145,11 +145,10 @@ a {
 
 .navigation {
 	float: left;
-	width: 12%;
+	width: 230px !important;
 	height: 100%;
 	padding-left: 0;
 	padding-right: 0;
-	overflow: auto;
 }
 
 .container.navigation-submenu {
@@ -158,6 +157,14 @@ a {
 	padding-left: 5px;
 	padding-right: 0px;
 	width: 215px !important;
+}
+
+.navigation-off{
+	float: left;
+	width: 10px !important;
+	height: 100%;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .glyphicon {
@@ -177,11 +184,10 @@ a {
 }
 
 .content {
-	float: right;
-	width: 88%;
 	height: 100%;
 	padding-left: 0;
 	padding-right: 0;
+	width: auto;
 	overflow: auto;
 }
 
@@ -204,8 +210,14 @@ a {
 	
 }
 
-.separator {
-	width: 1px;
+#separator {
+	width: 10px;
+	height: 100%;
+	float: right;
+}
+
+#separator-line {
+	width: 1px !important;
 	height: 100%;
 	background-color: #222;
 	float: right;
@@ -215,7 +227,7 @@ a {
 	position: relative;
 	top: 50%;
 	transform: translateY(-50%);
-	float: right;
+	float: left;
 }
 
 .panel-webclient {
