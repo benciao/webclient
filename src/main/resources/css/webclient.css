@@ -241,8 +241,8 @@ a {
 }
 
 .panel-info .panel-heading {
-	color: #ffffff !important;
-	background: #F5B951;
+	color: #222222 !important;
+	background: #fcf8e3;
 	border-color: #797A7A;
 }
 
@@ -333,7 +333,7 @@ a {
 }
 
 .table-striped tbody tr.highlight td {
-	background-color: #F5B951;
+	background-color: #fcf8e3;
 }
 
 .margin-content{
