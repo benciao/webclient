@@ -42,6 +42,19 @@ public class ChangePasswordController
     }
 
     /**
+     * Behandelt GET-Requests vom Typ "/admin/changeuserpw". Zeigt den Dialog zum Ändern des Passwortes durch
+     * den jeweiligen Benutzer an.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    public String changePasswordByUser(@ModelAttribute NewPassword newPassword, Model model)
+    {
+        authUtil.changeUserPassword(newPassword.getPw());
+        return getLoadingRedirectTemplate() + "changeuserpw";
+    }
+
+    /**
      * Behandelt GET-Requests vom Typ "/changepw".
      * 
      * @return Template
@@ -52,6 +65,20 @@ public class ChangePasswordController
         model.addAttribute("newPassword", new NewPassword());
 
         return getLoadingRedirectTemplate() + "changepw";
+    }
+
+    /**
+     * Behandelt GET-Requests vom Typ "/admin/changeuserpw". Zeigt den Dialog zum Ändern des Passwortes durch
+     * den jeweiligen Benutzer an.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public String showChangeUserPw(Model model)
+    {
+        model.addAttribute("newPassword", new NewPassword());
+
+        return getLoadingRedirectTemplate() + "changeuserpw";
     }
 
     protected String getLoadingRedirectTemplate()

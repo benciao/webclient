@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.accessrole.WebClientAccessRole;
+import com.ecg.webclient.common.authentication.accessrole.WebClientAccessRole;
 import com.ecg.webclient.feature.administration.persistence.mapper.RoleMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.Role;
 import com.ecg.webclient.feature.administration.persistence.repo.RoleRepository;
