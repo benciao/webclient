@@ -12,7 +12,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.common.authentication.PasswordEncoder;
+import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.persistence.mapper.ClientMapper;
 import com.ecg.webclient.feature.administration.persistence.mapper.UserMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.User;
@@ -136,6 +136,15 @@ public class UserService
 		}
 
 		return null;
+	}
+
+	/**
+	 * @param userId Id des Benutzers
+	 * @return das Passwort des Benutzers
+	 */
+	public String getPassword(Long userId)
+	{
+        return userRepo.getPassword(userId);
 	}
 
 	/**
@@ -269,7 +278,7 @@ public class UserService
 
 	}
 
-	/**
+    /**
 	 * Speichert eine Liste von Benutzern.
 	 * 
 	 * @param detachedUsers

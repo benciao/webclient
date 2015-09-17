@@ -1,4 +1,4 @@
-package com.ecg.webclient.common.authentication.accessrole.api;
+package com.ecg.webclient.feature.administration.accessrole;
 
 import com.ecg.webclient.feature.administration.service.RoleService;
 

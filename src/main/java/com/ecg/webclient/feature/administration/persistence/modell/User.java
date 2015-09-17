@@ -14,7 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.ecg.webclient.common.authentication.PasswordEncoder;
+import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 
 /**
  * Implementierung eines Benutzers. OrientDb spezifisch.

@@ -17,4 +17,7 @@ public interface UserRepository extends CrudRepository<User, Long>
 	public Iterable<User> findAllEnabledUsers(@Param("enabled") boolean isEnabled);
 
 	public User findUserByLogin(String login);
+
+    @Query("select u.password from User u where u.id = :id")
+    public String getPassword(@Param("id") Long id);
 }

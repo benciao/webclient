@@ -54,7 +54,7 @@
 																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='user-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='users[" + rowIndex + "].enabled' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><a href='#' class='a_login-as' id='a_login-as-"+ rowIndex +"' title='[[#{usersActionLoginAs}]]'><span class='glyphicon glyphicon-random'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' value='false' />"
+																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' value='false' />"
 																	+ "<input type='hidden' id='hiddenGroupRids-"+ rowIndex +"' name='users["+ rowIndex +"].groupIds'/>"
 																	+ "<input type='hidden' id='hiddenEmail-"+ rowIndex +"' name='users["+ rowIndex +"].email' />"
 																	+ "<input type='hidden' id='hiddenDefaultClient-"+ rowIndex +"' name='users["+ rowIndex +"].defaultClient' />"
@@ -491,11 +491,13 @@ body {
 
 	<div class="wrapper" id="wrapper">
 		<!-- div class="row"-->
-		
+
 		<!-- {!begin navigation} -->
-		<div th:include="feature/administration/adminmenu :: navigation('user', 'user')" id="navigation" class="navigation"></div>
+		<div
+			th:include="feature/administration/adminmenu :: navigation('user', 'user')"
+			id="navigation" class="navigation"></div>
 		<!-- {!end navigation} -->
-		
+
 		<div id="content" class="content">
 			<nav class="navbar navbar-default navbar-top sub-nav">
 				<div class="container-fluid">
@@ -583,7 +585,10 @@ body {
 									th:id="${'a_edit-'+stat.index}" href="#"
 									th:title="#{usersActionEdit}"><span
 										class="glyphicon glyphicon-edit"> </span></a> <a
-									class="a_login-as" th:id="${'a_login-as-'+stat.index}" href="#"
+									sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')"
+									th:if="*{users[__${stat.index}__].login} != ${#authentication.name}"
+									class="a_login-as" th:id="${'a_login-as-'+stat.index}"
+									th:href="'/admin/user/loginas/' + *{users[__${stat.index}__].id}"
 									th:title="#{usersActionLoginAs}"><span
 										class="glyphicon glyphicon-random"> </span></a> <input
 									type="hidden" th:id="${'hiddenRid-'+stat.index}"

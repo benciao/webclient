@@ -21,7 +21,7 @@
 						<div class="panel-body">
 							<table class="table">
 								<!-- Mandanten-Knoten -->
-								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM')">
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
 									<tr th:if="${selectedItem == 'client'}" class="warning">
 										<td><a href="/admin/client"><span
 												th:text="#{menuTreeClientConfig}"></span></a></td>
@@ -50,7 +50,7 @@
 						<div class="panel-body">
 							<table class="table">
 								<!-- Mandanten-Knoten -->
-								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM')">
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
 									<tr th:if="${selectedItem == 'client'}" class="warning">
 										<td><a href="/admin/client"><span
 												th:text="#{menuTreeClientConfig}"></span></a></td>
@@ -76,7 +76,7 @@
 					</div>
 				</div>
 				<div class="panel panel-default"
-					sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM')">
+					sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
 					<div class="panel-heading">
 						<h4 class="panel-title">
 							<a data-toggle="collapse" data-parent="#accordion"

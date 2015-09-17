@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ecg.webclient.common.authentication.AuthenticationUtil;
-import com.ecg.webclient.common.authentication.PasswordEncoder;
 import com.ecg.webclient.common.feature.FeatureRegistry;
 import com.ecg.webclient.feature.administration.FeatureAdministration;
+import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
+import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.service.ClientService;
 import com.ecg.webclient.feature.administration.service.GroupService;
 import com.ecg.webclient.feature.administration.service.RoleService;
@@ -68,7 +68,7 @@ public class AdministrationController
 	private UserService userService;
 
 	@Autowired
-	private AuthenticationUtil util;
+    private AuthenticationUtil authUtil;
 
 	@Autowired
 	private Environment env;
@@ -97,6 +97,14 @@ public class AdministrationController
 		featureRegistry.updateActiveFeature(feature, isMinimized);
 		return getLoadingRedirectTemplate() + "administration";
 	}
+
+    @RequestMapping(value = "/user/loginas/{userId}", method = RequestMethod.GET)
+    public String loginAsUser(Model model, @PathVariable("userId") String userId)
+    {
+        authUtil.loginAsUser(Long.parseLong(userId));
+
+        return "/main";
+    }
 
 	/**
 	 * Behandelt POST-Requests vom Typ "/admin/usergroup/save". Speichert
@@ -276,7 +284,7 @@ public class AdministrationController
 			}
 		}
 
-		ClientDto updatedClient = util.getSelectedClient();
+        ClientDto updatedClient = authUtil.getSelectedClient();
 		updatedClient.setProperties(updateDtos);
 		clientProperties.removeDeleted();
 
@@ -286,7 +294,7 @@ public class AdministrationController
 		}
 
 		clientService.saveClient(updatedClient);
-		util.setSelectedClientWithNewAuthority(updatedClient);
+        authUtil.setSelectedClientWithNewAuthority(updatedClient);
 
 		return "redirect:";
 	}
@@ -377,7 +385,7 @@ public class AdministrationController
 		return "login";
 	}
 
-	/**
+    /**
 	 * Behandelt einen Ajax Request zum Anzeigen von außschließlich Mandanten,
 	 * welchen die zugeordneten Gruppen angehören.
 	 * 
@@ -445,7 +453,7 @@ public class AdministrationController
 	public String showClientProperties(Model model)
 	{
 		ClientProperties clientProperties = new ClientProperties();
-		clientProperties.setProperties(util.getSelectedClient().getProperties());
+        clientProperties.setProperties(authUtil.getSelectedClient().getProperties());
 		model.addAttribute("clientProperties", clientProperties);
 		return getLoadingRedirectTemplate() + "clientproperties";
 	}
@@ -461,7 +469,7 @@ public class AdministrationController
 	public String showGroupConfig(Model model)
 	{
 		GroupConfig groupConfig = new GroupConfig();
-		groupConfig.setGroups(groupService.getAllGroupsForClient(util.getSelectedClient().getId()));
+        groupConfig.setGroups(groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId()));
 		groupConfig.setRoles(roleService.getAllRoles(false));
 		model.addAttribute("groupConfig", groupConfig);
 
@@ -508,9 +516,9 @@ public class AdministrationController
 	{
 		for (ClientDto clientDto : clientDtos)
 		{
-			if (util.getSelectedClient().getId() == clientDto.getId())
+            if (authUtil.getSelectedClient().getId() == clientDto.getId())
 			{
-				util.setSelectedClientWithNewAuthority(clientDto);
+                authUtil.setSelectedClientWithNewAuthority(clientDto);
 				break;
 			}
 		}

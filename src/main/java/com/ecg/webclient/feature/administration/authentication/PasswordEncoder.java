@@ -1,4 +1,4 @@
-package com.ecg.webclient.common.authentication;
+package com.ecg.webclient.feature.administration.authentication;
 
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
