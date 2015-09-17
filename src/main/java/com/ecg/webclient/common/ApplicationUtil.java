@@ -9,6 +9,7 @@ public class ApplicationUtil
 
 	public ApplicationUtil()
 	{
+        this.isMenuMinimized = false;
 	}
 
 	public boolean isMenuMinimized()

@@ -68,9 +68,7 @@
 									role="presentation"
 									th:attr="class=${feature.isActive() ? 'active' : 'inactive' }">
 									<form th:attr="id=${feature.getId()}"
-										th:action="@{${feature.getLink()}}" method="POST">
-										<input class="sizing" type="hidden" th:name="isMinimized"
-											th:value="${beans.applicationUtil.isMenuMinimized()}" /> <input
+										th:action="@{${feature.getLink()}}" method="POST"><input
 											type="hidden" th:name="currentFeature" th:value="${feature}" />
 									</form> <a
 									th:href="'javascript:document.getElementById(' + '\'' + ${feature.getId()} + '\'' + ').submit();'"><img
@@ -93,9 +91,7 @@
 									th:attr="class=${feature.isActive() ? 'text-color-active' : 'text-color-inactive' }"
 									th:each="feature : ${beans.featureRegistry.getRegisteredFeatures()}"
 									role="presentation"><form th:attr="id=${feature.getId()}"
-										th:action="@{${feature.getLink()}}" method="POST">
-										<input class="sizing" type="hidden" th:name="isMinimized"
-											th:value="${beans.applicationUtil.isMenuMinimized()}" /> <input
+										th:action="@{${feature.getLink()}}" method="POST"><input
 											type="hidden" th:name="currentFeature" th:value="${feature}" />
 									</form> <a
 									th:href="'javascript:document.getElementById(' + '\'' + ${feature.getId()} + '\'' + ').submit();'"><div

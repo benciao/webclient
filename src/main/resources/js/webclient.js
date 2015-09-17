@@ -3,17 +3,27 @@ function toggle_menu_visibility(id) {
 	var minimizedDiv = document.getElementById('minimizedMenu');
 	var contentWrapperDiv = document.getElementById('wrapper');
 
+	var url = '/main/tooglemenue';
+
 	if (id == 'minimizedMenu') {
 		minimizedDiv.style.display = 'none';
 		maximizedDiv.style.display = 'block';
-		contentWrapperDiv.style.top = '130px';
+		if (contentWrapperDiv != null) {
+			contentWrapperDiv.style.top = '130px';
+		}
 		$('input.sizing').attr('value', 'false');
+		url = url + '/false';
 	} else {
 		minimizedDiv.style.display = 'block';
 		maximizedDiv.style.display = 'none';
-		contentWrapperDiv.style.top = '105px';
+		if (contentWrapperDiv != null) {
+			contentWrapperDiv.style.top = '105px';
+		}
 		$('input.sizing').attr('value', 'true');
+		url = url + '/true';
 	}
+
+	$.ajax(url);
 }
 
 function toggle_sub_menu_visibility() {
@@ -23,7 +33,7 @@ function toggle_sub_menu_visibility() {
 		$("#navigation").removeClass('navigation');
 		$("#navigation").addClass('navigation-off');
 		$("#submenu").hide();
-	} else {		
+	} else {
 		$("#navigation").removeClass('navigation-off');
 		$("#navigation").addClass('navigation');
 		$("#submenu").show();
@@ -94,10 +104,14 @@ $(document).ready(function() {
 	var classContent = $('#minimizedMenu').attr('class');
 	if (classContent.indexOf("hide-menu") > -1) {
 		var contentWrapperDiv = document.getElementById('wrapper');
-		contentWrapperDiv.style.top = '130px';
+		if (contentWrapperDiv != null) {
+			contentWrapperDiv.style.top = '130px';
+		}
 	} else {
 		var contentWrapperDiv = document.getElementById('wrapper');
-		contentWrapperDiv.style.top = '105px';
+		if (contentWrapperDiv != null) {
+			contentWrapperDiv.style.top = '105px';
+		}
 	}
 });
 

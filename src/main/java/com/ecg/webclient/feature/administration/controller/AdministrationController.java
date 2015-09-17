@@ -91,10 +91,9 @@ public class AdministrationController
 	 * @return Template
 	 */
 	@RequestMapping(method = RequestMethod.POST)
-	public String load(@ModelAttribute("isMinimized") Boolean isMinimized,
-			@ModelAttribute("currentFeature") FeatureAdministration feature)
+    public String load(@ModelAttribute("currentFeature") FeatureAdministration feature)
 	{
-		featureRegistry.updateActiveFeature(feature, isMinimized);
+        featureRegistry.updateActiveFeature(feature);
 		return getLoadingRedirectTemplate() + "administration";
 	}
 

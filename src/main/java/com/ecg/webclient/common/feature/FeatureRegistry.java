@@ -5,14 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.ApplicationUtil;
-
 @Component
 public class FeatureRegistry
 {
     private List<Feature> registeredFeatures;
-    @Autowired
-    private ApplicationUtil           util;
 
     @Autowired
     FeatureRegistry(List<Feature> features)
@@ -30,9 +26,8 @@ public class FeatureRegistry
         registeredFeatures.forEach(value -> value.setActive(false));
     }
 
-    public void updateActiveFeature(Feature feature, Boolean isMinimized)
+    public void updateActiveFeature(Feature feature)
     {
         registeredFeatures.forEach(value -> value.setActive(value.getId().equalsIgnoreCase(feature.getId())));
-        util.setMenuMinimized(isMinimized);
     }
 }

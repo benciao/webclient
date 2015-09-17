@@ -22,10 +22,9 @@ public class NominationController
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String load(@ModelAttribute("isMinimized") Boolean isMinimized,
-            @ModelAttribute("currentFeature") FeatureNomination feature)
+    public String load(@ModelAttribute("currentFeature") FeatureNomination feature)
     {
-        featureRegistry.updateActiveFeature(feature, isMinimized);
+        featureRegistry.updateActiveFeature(feature);
         return getLoadingRedirectTemplate();
     }
 

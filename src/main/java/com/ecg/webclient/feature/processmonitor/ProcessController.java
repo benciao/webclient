@@ -22,10 +22,9 @@ public class ProcessController
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String load(@ModelAttribute("isMinimized") Boolean isMinimized,
-            @ModelAttribute("currentFeature") FeaturePm feature)
+    public String load(@ModelAttribute("currentFeature") FeaturePm feature)
     {
-        featureRegistry.updateActiveFeature(feature, isMinimized);
+        featureRegistry.updateActiveFeature(feature);
         return getLoadingRedirectTemplate();
     }
 
