@@ -1,6 +1,5 @@
 package com.ecg.webclient.feature.administration.viewmodell;
 
-import javax.validation.constraints.NotNull;
 
 /**
  * Implementierung einer von der Persistenz detachten Eigenschaft.
@@ -9,10 +8,14 @@ import javax.validation.constraints.NotNull;
  */
 public class PropertyDto extends BaseObjectDto
 {
-    @NotNull
-    private String key;
-    @NotNull
-    private String value;
+    private String    key;
+    private String    value;
+    private ClientDto client;
+
+    public ClientDto getClient()
+    {
+        return client;
+    }
 
     public String getKey()
     {
@@ -22,6 +25,11 @@ public class PropertyDto extends BaseObjectDto
     public String getValue()
     {
         return value;
+    }
+
+    public void setClient(ClientDto client)
+    {
+        this.client = client;
     }
 
     public void setKey(String key)

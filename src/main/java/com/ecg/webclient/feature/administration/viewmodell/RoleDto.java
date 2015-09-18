@@ -1,6 +1,6 @@
 package com.ecg.webclient.feature.administration.viewmodell;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Implementierung einer von der Persistenz detachten Benutzerrolle.
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
  */
 public class RoleDto extends BaseObjectDto
 {
-    @NotNull
+    @Size(min = 4, max = 100)
     private String  name;
     private boolean enabled;
 

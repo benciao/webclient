@@ -2,9 +2,6 @@ package com.ecg.webclient.feature.administration.viewmodell;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import org.springframework.util.AutoPopulatingList;
 
 /**
@@ -16,11 +13,7 @@ public class ClientDto extends BaseObjectDto
 {
     private String            color;
 
-    @Size(min = 10, max = 50)
-    @NotNull
     private String            description;
-    @Size(min = 2, max = 30)
-    @NotNull
     private String            name;
     private boolean           enabled;
     private List<PropertyDto> properties;

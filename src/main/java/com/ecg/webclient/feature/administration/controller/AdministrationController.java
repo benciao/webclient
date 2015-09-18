@@ -14,6 +14,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +39,8 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleConfig;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserConfig;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
+import com.ecg.webclient.feature.administration.viewmodell.validator.ClientDtoValidator;
+import com.ecg.webclient.feature.administration.viewmodell.validator.PropertyDtoValidator;
 
 /**
  * Controller zur Bearbeitung von Requests aus Administrationsdialogen.
@@ -48,54 +52,60 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 @RequestMapping(value = "/admin")
 public class AdministrationController
 {
-	static final Logger	logger								= LogManager
-			.getLogger(AdministrationController.class.getName());
-	static final String	PROPERTY_NAME_SETUP_USER_PASSWORD	= "sec.setup.user.pw";
+    static final Logger        logger                            = LogManager
+                                                                         .getLogger(AdministrationController.class
+                                                                                 .getName());
+    static final String        PROPERTY_NAME_SETUP_USER_PASSWORD = "sec.setup.user.pw";
 
-	@Autowired
-	private FeatureRegistry featureRegistry;
+    @Autowired
+    private FeatureRegistry    featureRegistry;
 
-	@Autowired
-	private ClientService clientService;
+    @Autowired
+    private ClientService      clientService;
 
-	@Autowired
-	private RoleService roleService;
+    @Autowired
+    private RoleService        roleService;
 
-	@Autowired
-	private GroupService groupService;
+    @Autowired
+    private GroupService       groupService;
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService        userService;
 
-	@Autowired
+    @Autowired
     private AuthenticationUtil authUtil;
 
-	@Autowired
-	private Environment env;
+    @Autowired
+    private Environment        env;
 
-	/**
-	 * Behandelt GET-Requests vom Typ "/admin".
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(method = RequestMethod.GET)
-	public String load()
-	{
-		return getLoadingRedirectTemplate() + "administration";
-	}
+    @Autowired
+    ClientDtoValidator         clientDtoValidator;
 
-	/**
-	 * Behandelt POST-Requests vom Typ "/admin". Aktualisiert serverseitig das
-	 * ausgewählte Feature.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(method = RequestMethod.POST)
+    @Autowired
+    PropertyDtoValidator       propertyDtoValidator;
+
+    /**
+     * Behandelt GET-Requests vom Typ "/admin".
+     * 
+     * @return Template
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public String load()
+    {
+        return getLoadingRedirectTemplate() + "administration";
+    }
+
+    /**
+     * Behandelt POST-Requests vom Typ "/admin". Aktualisiert serverseitig das ausgewählte Feature.
+     * 
+     * @return Template
+     */
+    @RequestMapping(method = RequestMethod.POST)
     public String load(@ModelAttribute("currentFeature") FeatureAdministration feature)
-	{
+    {
         featureRegistry.updateActiveFeature(feature);
-		return getLoadingRedirectTemplate() + "administration";
-	}
+        return getLoadingRedirectTemplate() + "administration";
+    }
 
     @RequestMapping(value = "/user/loginas/{userId}", method = RequestMethod.GET)
     public String loginAsUser(Model model, @PathVariable("userId") String userId)
@@ -105,435 +115,439 @@ public class AdministrationController
         return "/main";
     }
 
-	/**
-	 * Behandelt POST-Requests vom Typ "/admin/usergroup/save". Speichert
-	 * Änderungen an Benutzergruppen.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/usergroup/save", method = RequestMethod.POST)
-	public String save(@Valid GroupConfig groupConfig, BindingResult bindingResult)
-	{
-		List<GroupDto> updateDtos = new ArrayList<GroupDto>();
-		List<GroupDto> deleteDtos = new ArrayList<GroupDto>();
+    /**
+     * Behandelt POST-Requests vom Typ "/admin/usergroup/save". Speichert Änderungen an Benutzergruppen.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/usergroup/save", method = RequestMethod.POST)
+    public String save(@Valid GroupConfig groupConfig, BindingResult bindingResult)
+    {
+        List<GroupDto> updateDtos = new ArrayList<GroupDto>();
+        List<GroupDto> deleteDtos = new ArrayList<GroupDto>();
 
-		for (GroupDto dto : groupConfig.getGroups())
-		{
-			if (dto.isDelete())
-			{
-				deleteDtos.add(dto);
-			}
-			else
-			{
-				updateDtos.add(dto);
-			}
-		}
+        for (GroupDto dto : groupConfig.getGroups())
+        {
+            if (dto.isDelete())
+            {
+                deleteDtos.add(dto);
+            }
+            else
+            {
+                updateDtos.add(dto);
+            }
+        }
 
-		groupService.deleteGroups(deleteDtos);
+        groupService.deleteGroups(deleteDtos);
 
-		groupConfig.removeDeleted();
+        groupConfig.removeDeleted();
 
-		if (bindingResult.hasErrors())
-		{
-			return getLoadingRedirectTemplate() + "userGroup";
-		}
+        if (bindingResult.hasErrors())
+        {
+            return getLoadingRedirectTemplate() + "userGroup";
+        }
 
-		groupService.saveGroups(updateDtos);
+        groupService.saveGroups(updateDtos);
 
-		return "redirect:";
-	}
-
-	/**
-	 * Behandelt POST-Requests vom Typ "/admin/userrole/save". Speichert
-	 * Änderungen an Benutzerrollen.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/userrole/save", method = RequestMethod.POST)
-	public String save(@Valid RoleConfig roleConfig, BindingResult bindingResult)
-	{
-		List<RoleDto> updateDtos = new ArrayList<RoleDto>();
-		List<RoleDto> deleteDtos = new ArrayList<RoleDto>();
-
-		for (RoleDto dto : roleConfig.getRoles())
-		{
-			if (dto.isDelete())
-			{
-				deleteDtos.add(dto);
-			}
-			else
-			{
-				updateDtos.add(dto);
-			}
-		}
-
-		roleService.deleteRoles(deleteDtos);
-
-		roleConfig.removeDeleted();
-
-		if (bindingResult.hasErrors())
-		{
-			return getLoadingRedirectTemplate() + "userRole";
-		}
-
-		roleService.saveRoles(updateDtos);
-
-		return "redirect:";
-	}
-
-	/**
-	 * Behandelt POST-Requests vom Typ "/admin/user/save". Speichert Änderungen
-	 * an Benutzern.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/user/save", method = RequestMethod.POST)
-	public String save(@Valid UserConfig userConfig, BindingResult bindingResult)
-	{
-		List<UserDto> updateDtos = new ArrayList<UserDto>();
-		List<UserDto> deleteDtos = new ArrayList<UserDto>();
-
-		for (UserDto dto : userConfig.getUsers())
-		{
-			if (dto.isDelete())
-			{
-				deleteDtos.add(dto);
-			}
-			else
-			{
-				updateDtos.add(dto);
-			}
-		}
-
-		userService.deleteUsers(deleteDtos);
-
-		userConfig.removeDeleted();
-
-		if (bindingResult.hasErrors())
-		{
-			return getLoadingRedirectTemplate() + "user";
-		}
-
-		userService.saveUsers(updateDtos);
-
-		return "redirect:";
-	}
-
-	/**
-	 * Behandelt POST-Requests vom Typ "/admin/client/save". Speichert
-	 * Änderungen an Mandanten.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/client/save", method = RequestMethod.POST)
-	public String saveClient(@Valid ClientConfig clientConfig, BindingResult bindingResult)
-	{
-		List<ClientDto> updateDtos = new ArrayList<ClientDto>();
-		List<ClientDto> deleteDtos = new ArrayList<ClientDto>();
-
-		for (ClientDto dto : clientConfig.getClients())
-		{
-			if (dto.isDelete())
-			{
-				deleteDtos.add(dto);
-			}
-			else
-			{
-				updateDtos.add(dto);
-			}
-		}
-
-		clientService.deleteClients(deleteDtos);
-		updateSelectedClient(deleteDtos);
-
-		clientConfig.removeDeleted();
-
-		if (bindingResult.hasErrors())
-		{
-			return getLoadingRedirectTemplate() + "clientConfig";
-		}
-
-		clientService.saveClients(updateDtos);
-		updateSelectedClient(updateDtos);
-
-		return "redirect:";
-	}
-
-	/**
-	 * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert
-	 * Änderungen an Mandanteneigenschaften.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/clientp/save", method = RequestMethod.POST)
-	public String saveProperties(@Valid ClientProperties clientProperties, BindingResult bindingResult)
-	{
-		List<PropertyDto> updateDtos = new ArrayList<PropertyDto>();
-		List<PropertyDto> deleteDtos = new ArrayList<PropertyDto>();
-
-		for (PropertyDto dto : clientProperties.getProperties())
-		{
-			if (dto.isDelete())
-			{
-				deleteDtos.add(dto);
-			}
-			else
-			{
-				updateDtos.add(dto);
-			}
-		}
-
-        ClientDto updatedClient = authUtil.getSelectedClient();
-		updatedClient.setProperties(updateDtos);
-		clientProperties.removeDeleted();
-
-		if (bindingResult.hasErrors())
-		{
-			return getLoadingRedirectTemplate() + "clientProperties";
-		}
-
-		clientService.saveClient(updatedClient);
-        authUtil.setSelectedClientWithNewAuthority(updatedClient);
-
-		return "redirect:";
-	}
-
-	/**
-	 * Behandelt POST-Requests vom Typ "/admin/setup/system". Initialisiert das
-	 * System mit Standardmandant, Standardbenutzer usw.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/setup/system", method = RequestMethod.GET)
-	@Transactional
-	public String setupSystem()
-	{
-		// Mandant erstellen
-		ClientDto setupClient = new ClientDto();
-		setupClient.setEnabled(true);
-		setupClient.setName("SETUP_CLIENT");
-		setupClient.setDescription("Client to setup the system");
-		setupClient.setColor("#ff0000");
-
-		ClientDto savedClient = clientService.getClientByName("SETUP_CLIENT");
-
-		if (savedClient == null)
-		{
-			savedClient = clientService.saveClient(setupClient);
-			logger.info("SETUP_CLIENT created");
-		}
-
-		// Benutzerrollen erstellen
-		List<RoleDto> roles = roleService.getAllRoles(false);
-
-		GroupDto savedGroup = groupService.getGroupByName("SETUP_GROUP");
-
-		if (savedGroup == null)
-		{
-			GroupDto setupGroup = new GroupDto();
-			setupGroup.setClient(savedClient);
-			setupGroup.setName("SETUP_GROUP");
-			setupGroup.setDescription("Group to setup system");
-			setupGroup.setEnabled(true);
-			savedGroup = setupGroup;
-			logger.info("SETUP_GROUP created");
-		}
-
-		String roleIds = "";
-		for (RoleDto role : roles)
-		{
-			if (roleIds.isEmpty())
-			{
-				roleIds = Long.toString(role.getId());
-			}
-			else
-			{
-				roleIds = roleIds + "," + Long.toString(role.getId());
-			}
-		}
-		savedGroup.setRoleIds(roleIds);
-
-		savedGroup = groupService.saveGroup(savedGroup);
-
-		String groupIds = "";
-		groupIds = Long.toString(savedGroup.getId());
-
-		UserDto setupUser = userService.getUserByLogin("setupuser");
-
-		if (setupUser == null)
-		{
-			setupUser = new UserDto();
-			setupUser.setLogin("setupuser");
-			setupUser.setPassword(
-					PasswordEncoder.encodeSimple(env.getRequiredProperty(PROPERTY_NAME_SETUP_USER_PASSWORD)));
-			setupUser.setFirstname("Setup");
-			setupUser.setLastname("User");
-			setupUser.setEnabled(true);
-			setupUser.setChangePasswordOnNextLogin(false);
-
-			setupUser.setEmail("setupuser@ecg-leipzig.de");
-			setupUser.setInternal(true);
-			setupUser.setGroupIds(groupIds);
-
-			logger.info("Setup-User created");
-		}
-
-		setupUser.setDefaultClient(Long.toString(savedClient.getId()));
-		userService.saveUser(setupUser);
-
-		return "login";
-	}
+        return "redirect:";
+    }
 
     /**
-	 * Behandelt einen Ajax Request zum Anzeigen von außschließlich Mandanten,
-	 * welchen die zugeordneten Gruppen angehören.
-	 * 
-	 * @return
-	 */
-	@RequestMapping(value = "/user/availableClients/{groupIds}/{userId}", method = RequestMethod.GET)
-	public String showAvailableClients(Model model, @PathVariable("groupIds") String groupIds,
-			@PathVariable("userId") String userId)
-	{
-		List<Long> realGroupIds = getGroupIds(groupIds);
-		List<ClientDto> clients = clientService.getAssignedClientsForGroups(realGroupIds);
-		UserDto user = userService.getUserById(Long.parseLong(userId));
+     * Behandelt POST-Requests vom Typ "/admin/userrole/save". Speichert Änderungen an Benutzerrollen.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/userrole/save", method = RequestMethod.POST)
+    public String save(@Valid RoleConfig roleConfig, BindingResult bindingResult)
+    {
+        List<RoleDto> updateDtos = new ArrayList<RoleDto>();
+        List<RoleDto> deleteDtos = new ArrayList<RoleDto>();
 
-		model.addAttribute("availableClients", clients);
+        for (RoleDto dto : roleConfig.getRoles())
+        {
+            if (dto.isDelete())
+            {
+                deleteDtos.add(dto);
+            }
+            else
+            {
+                updateDtos.add(dto);
+            }
+        }
 
-		if (user != null)
-		{
-			model.addAttribute("defaultClient", user.getDefaultClient());
-		}
-		else
-		{
-			model.addAttribute("defaultClient", "");
-		}
+        roleService.deleteRoles(deleteDtos);
 
-		return getLoadingRedirectTemplate() + "user :: availableClients";
-	}
+        roleConfig.removeDeleted();
 
-	/**
-	 * Behandelt GET-Requests vom Typ "/admin/client". Lädt alle Mandanten.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/client", method = RequestMethod.GET)
-	public String showClientConfig(Model model)
-	{
-		ClientConfig clientConfig = new ClientConfig();
-		clientConfig.setClients(clientService.getAllClients(false));
-		model.addAttribute("clientConfig", clientConfig);
-		return getLoadingRedirectTemplate() + "clientconfig";
-	}
+        if (bindingResult.hasErrors())
+        {
+            return getLoadingRedirectTemplate() + "userRole";
+        }
 
-	/**
-	 * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten
-	 * gehörende Gruppen.
-	 * 
-	 * @return
-	 */
-	@RequestMapping(value = "/user/clientgroups/{clientId}", method = RequestMethod.GET)
-	public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
-	{
-		List<GroupDto> groups = groupService.getAllGroupsForClient(Long.parseLong(clientId));
+        roleService.saveRoles(updateDtos);
 
-		model.addAttribute("groups", groups);
+        return "redirect:";
+    }
 
-		return getLoadingRedirectTemplate() + "user :: clientGroups";
-	}
+    /**
+     * Behandelt POST-Requests vom Typ "/admin/user/save". Speichert Änderungen an Benutzern.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/user/save", method = RequestMethod.POST)
+    public String save(@Valid UserConfig userConfig, BindingResult bindingResult)
+    {
+        List<UserDto> updateDtos = new ArrayList<UserDto>();
+        List<UserDto> deleteDtos = new ArrayList<UserDto>();
 
-	/**
-	 * Behandelt GET-Requests vom Typ "/admin/clientp". Lädt alle zum aktuell
-	 * ausgewählten Mandanten gehörige Mandanteneigenschaften.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/clientp", method = RequestMethod.GET)
-	public String showClientProperties(Model model)
-	{
-		ClientProperties clientProperties = new ClientProperties();
+        for (UserDto dto : userConfig.getUsers())
+        {
+            if (dto.isDelete())
+            {
+                deleteDtos.add(dto);
+            }
+            else
+            {
+                updateDtos.add(dto);
+            }
+        }
+
+        userService.deleteUsers(deleteDtos);
+
+        userConfig.removeDeleted();
+
+        if (bindingResult.hasErrors())
+        {
+            return getLoadingRedirectTemplate() + "user";
+        }
+
+        userService.saveUsers(updateDtos);
+
+        return "redirect:";
+    }
+
+    /**
+     * Behandelt POST-Requests vom Typ "/admin/client/save". Speichert Änderungen an Mandanten.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/client/save", method = RequestMethod.POST)
+    public String saveClient(@Valid ClientConfig clientConfig, BindingResult bindingResult)
+    {
+        List<ClientDto> updateDtos = new ArrayList<ClientDto>();
+        List<ClientDto> deleteDtos = new ArrayList<ClientDto>();
+
+        for (ClientDto dto : clientConfig.getClients())
+        {
+            if (dto.isDelete())
+            {
+                deleteDtos.add(dto);
+            }
+            else
+            {
+                updateDtos.add(dto);
+            }
+        }
+
+        clientService.deleteClients(deleteDtos);
+        updateSelectedClient(deleteDtos);
+
+        clientConfig.removeDeleted();
+
+        if (bindingResult.hasErrors())
+        {
+            return getLoadingRedirectTemplate() + "clientConfig";
+        }
+
+        clientService.saveClients(updateDtos);
+        updateSelectedClient(updateDtos);
+
+        return "redirect:";
+    }
+
+    /**
+     * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert Änderungen an Mandanteneigenschaften.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/clientp/save", method = RequestMethod.POST)
+    public String saveProperties(@Valid ClientProperties clientProperties, BindingResult bindingResult)
+    {
+        List<PropertyDto> updateDtos = new ArrayList<PropertyDto>();
+        List<PropertyDto> deleteDtos = new ArrayList<PropertyDto>();
+
+        for (PropertyDto dto : clientProperties.getProperties())
+        {
+            if (dto.isDelete())
+            {
+                deleteDtos.add(dto);
+            }
+            else
+            {
+                updateDtos.add(dto);
+            }
+        }
+
+        ClientDto updatedClient = authUtil.getSelectedClient();
+        updatedClient.setProperties(updateDtos);
+        clientProperties.removeDeleted();
+
+        if (bindingResult.hasErrors())
+        {
+            return getLoadingRedirectTemplate() + "clientProperties";
+        }
+
+        clientService.saveClient(updatedClient);
+        authUtil.setSelectedClientWithNewAuthority(updatedClient);
+
+        return "redirect:";
+    }
+
+    /**
+     * Behandelt POST-Requests vom Typ "/admin/setup/system". Initialisiert das System mit Standardmandant,
+     * Standardbenutzer usw.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/setup/system", method = RequestMethod.GET)
+    @Transactional
+    public String setupSystem()
+    {
+        // Mandant erstellen
+        ClientDto setupClient = new ClientDto();
+        setupClient.setEnabled(true);
+        setupClient.setName("SETUP_CLIENT");
+        setupClient.setDescription("Client to setup the system");
+        setupClient.setColor("#ff0000");
+
+        ClientDto savedClient = clientService.getClientByName("SETUP_CLIENT");
+
+        if (savedClient == null)
+        {
+            savedClient = clientService.saveClient(setupClient);
+            logger.info("SETUP_CLIENT created");
+        }
+
+        // Benutzerrollen erstellen
+        List<RoleDto> roles = roleService.getAllRoles(false);
+
+        GroupDto savedGroup = groupService.getGroupByName("SETUP_GROUP");
+
+        if (savedGroup == null)
+        {
+            GroupDto setupGroup = new GroupDto();
+            setupGroup.setClient(savedClient);
+            setupGroup.setName("SETUP_GROUP");
+            setupGroup.setDescription("Group to setup system");
+            setupGroup.setEnabled(true);
+            savedGroup = setupGroup;
+            logger.info("SETUP_GROUP created");
+        }
+
+        String roleIds = "";
+        for (RoleDto role : roles)
+        {
+            if (roleIds.isEmpty())
+            {
+                roleIds = Long.toString(role.getId());
+            }
+            else
+            {
+                roleIds = roleIds + "," + Long.toString(role.getId());
+            }
+        }
+        savedGroup.setRoleIds(roleIds);
+
+        savedGroup = groupService.saveGroup(savedGroup);
+
+        String groupIds = "";
+        groupIds = Long.toString(savedGroup.getId());
+
+        UserDto setupUser = userService.getUserByLogin("setupuser");
+
+        if (setupUser == null)
+        {
+            setupUser = new UserDto();
+            setupUser.setLogin("setupuser");
+            setupUser.setPassword(PasswordEncoder.encodeSimple(env
+                    .getRequiredProperty(PROPERTY_NAME_SETUP_USER_PASSWORD)));
+            setupUser.setFirstname("Setup");
+            setupUser.setLastname("User");
+            setupUser.setEnabled(true);
+            setupUser.setChangePasswordOnNextLogin(false);
+
+            setupUser.setEmail("setupuser@ecg-leipzig.de");
+            setupUser.setInternal(true);
+            setupUser.setGroupIds(groupIds);
+
+            logger.info("Setup-User created");
+        }
+
+        setupUser.setDefaultClient(Long.toString(savedClient.getId()));
+        userService.saveUser(setupUser);
+
+        return "login";
+    }
+
+    /**
+     * Behandelt einen Ajax Request zum Anzeigen von außschließlich Mandanten, welchen die zugeordneten
+     * Gruppen angehören.
+     * 
+     * @return
+     */
+    @RequestMapping(value = "/user/availableClients/{groupIds}/{userId}", method = RequestMethod.GET)
+    public String showAvailableClients(Model model, @PathVariable("groupIds") String groupIds,
+            @PathVariable("userId") String userId)
+    {
+        List<Long> realGroupIds = getGroupIds(groupIds);
+        List<ClientDto> clients = clientService.getAssignedClientsForGroups(realGroupIds);
+        UserDto user = userService.getUserById(Long.parseLong(userId));
+
+        model.addAttribute("availableClients", clients);
+
+        if (user != null)
+        {
+            model.addAttribute("defaultClient", user.getDefaultClient());
+        }
+        else
+        {
+            model.addAttribute("defaultClient", "");
+        }
+
+        return getLoadingRedirectTemplate() + "user :: availableClients";
+    }
+
+    /**
+     * Behandelt GET-Requests vom Typ "/admin/client". Lädt alle Mandanten.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/client", method = RequestMethod.GET)
+    public String showClientConfig(Model model)
+    {
+        ClientConfig clientConfig = new ClientConfig();
+        clientConfig.setClients(clientService.getAllClients(false));
+        model.addAttribute("clientConfig", clientConfig);
+        return getLoadingRedirectTemplate() + "clientconfig";
+    }
+
+    /**
+     * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten gehörende Gruppen.
+     * 
+     * @return
+     */
+    @RequestMapping(value = "/user/clientgroups/{clientId}", method = RequestMethod.GET)
+    public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
+    {
+        List<GroupDto> groups = groupService.getAllGroupsForClient(Long.parseLong(clientId));
+
+        model.addAttribute("groups", groups);
+
+        return getLoadingRedirectTemplate() + "user :: clientGroups";
+    }
+
+    /**
+     * Behandelt GET-Requests vom Typ "/admin/clientp". Lädt alle zum aktuell ausgewählten Mandanten gehörige
+     * Mandanteneigenschaften.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/clientp", method = RequestMethod.GET)
+    public String showClientProperties(Model model)
+    {
+        ClientProperties clientProperties = new ClientProperties();
         clientProperties.setProperties(authUtil.getSelectedClient().getProperties());
-		model.addAttribute("clientProperties", clientProperties);
-		return getLoadingRedirectTemplate() + "clientproperties";
-	}
+        model.addAttribute("clientProperties", clientProperties);
+        return getLoadingRedirectTemplate() + "clientproperties";
+    }
 
-	/**
-	 * Behandelt GET-Requests vom Typ "/admin/usergroup". Lädt alle zum aktuell
-	 * ausgewählten Mandanten gehörige Benutzergruppen und deren zugeordnete
-	 * Benutzerrollen.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/usergroup", method = RequestMethod.GET)
-	public String showGroupConfig(Model model)
-	{
-		GroupConfig groupConfig = new GroupConfig();
+    /**
+     * Behandelt GET-Requests vom Typ "/admin/usergroup". Lädt alle zum aktuell ausgewählten Mandanten
+     * gehörige Benutzergruppen und deren zugeordnete Benutzerrollen.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/usergroup", method = RequestMethod.GET)
+    public String showGroupConfig(Model model)
+    {
+        GroupConfig groupConfig = new GroupConfig();
         groupConfig.setGroups(groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId()));
-		groupConfig.setRoles(roleService.getAllRoles(false));
-		model.addAttribute("groupConfig", groupConfig);
+        groupConfig.setRoles(roleService.getAllRoles(false));
+        model.addAttribute("groupConfig", groupConfig);
 
-		return getLoadingRedirectTemplate() + "usergroup";
-	}
+        return getLoadingRedirectTemplate() + "usergroup";
+    }
 
-	/**
-	 * Behandelt GET-Requests vom Typ "/admin/userrole". Lädt alle
-	 * Benutzerrollen.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/userrole", method = RequestMethod.GET)
-	public String showRoleConfig(Model model)
-	{
-		RoleConfig roleConfig = new RoleConfig();
-		roleConfig.setRoles(roleService.getAllRoles(false));
-		model.addAttribute("roleConfig", roleConfig);
+    /**
+     * Behandelt GET-Requests vom Typ "/admin/userrole". Lädt alle Benutzerrollen.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/userrole", method = RequestMethod.GET)
+    public String showRoleConfig(Model model)
+    {
+        RoleConfig roleConfig = new RoleConfig();
+        roleConfig.setRoles(roleService.getAllRoles(false));
+        model.addAttribute("roleConfig", roleConfig);
 
-		return getLoadingRedirectTemplate() + "userrole";
-	}
+        return getLoadingRedirectTemplate() + "userrole";
+    }
 
-	/**
-	 * Behandelt GET-Requests vom Typ "/admin/user". Lädt alle Benutzer.
-	 * 
-	 * @return Template
-	 */
-	@RequestMapping(value = "/user", method = RequestMethod.GET)
-	public String showUserConfig(Model model)
-	{
-		UserConfig userConfig = new UserConfig();
-		userConfig.setUsers(userService.getAllUsers(false));
-		model.addAttribute("userConfig", userConfig);
+    /**
+     * Behandelt GET-Requests vom Typ "/admin/user". Lädt alle Benutzer.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public String showUserConfig(Model model)
+    {
+        UserConfig userConfig = new UserConfig();
+        userConfig.setUsers(userService.getAllUsers(false));
+        model.addAttribute("userConfig", userConfig);
 
-		return getLoadingRedirectTemplate() + "user";
-	}
+        return getLoadingRedirectTemplate() + "user";
+    }
 
-	protected String getLoadingRedirectTemplate()
-	{
-		return "feature/administration/";
-	}
+    protected String getLoadingRedirectTemplate()
+    {
+        return "feature/administration/";
+    }
 
-	private void updateSelectedClient(List<ClientDto> clientDtos)
-	{
-		for (ClientDto clientDto : clientDtos)
-		{
+    @InitBinder("clientConfig")
+    protected void initClientBinder(WebDataBinder binder)
+    {
+        binder.setValidator(clientDtoValidator);
+    }
+
+    @InitBinder("clientProperties")
+    protected void initPropertyBinder(WebDataBinder binder)
+    {
+        binder.setValidator(propertyDtoValidator);
+    }
+
+    private void updateSelectedClient(List<ClientDto> clientDtos)
+    {
+        for (ClientDto clientDto : clientDtos)
+        {
             if (authUtil.getSelectedClient().getId() == clientDto.getId())
-			{
+            {
                 authUtil.setSelectedClientWithNewAuthority(clientDto);
-				break;
-			}
-		}
-	}
+                break;
+            }
+        }
+    }
 
-	private static List<Long> getGroupIds(String groupIds)
-	{
-		List<Long> result = new ArrayList<Long>();
+    private static List<Long> getGroupIds(String groupIds)
+    {
+        List<Long> result = new ArrayList<Long>();
 
-		List<String> ids = Arrays.asList(groupIds.split(","));
+        List<String> ids = Arrays.asList(groupIds.split(","));
 
-		for (String id : ids)
-		{
-			result.add(Long.parseLong(id));
-		}
+        for (String id : ids)
+        {
+            result.add(Long.parseLong(id));
+        }
 
-		return result.size() != 0 ? result : null;
-	}
+        return result.size() != 0 ? result : null;
+    }
 }

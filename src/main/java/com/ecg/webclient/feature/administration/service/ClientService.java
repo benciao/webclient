@@ -263,26 +263,4 @@ public class ClientService
             logger.error(e);
         }
     }
-
-    /**
-     * Speichert eine Liste von Mandanteneigenschaften
-     * 
-     * @param detachedProperties
-     *            Liste von Mandanteneigenschaften
-     */
-    public void saveProperties(List<PropertyDto> detachedProperties)
-    {
-        try
-        {
-            for (PropertyDto property : detachedProperties)
-            {
-                Property draftProperty = propertyMapper.mapToEntity(property);
-                propertyRepo.save(draftProperty);
-            }
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
-    }
 }

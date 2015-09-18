@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Implementierung einer von der Persistenz detachten Benutzergruppe.
@@ -13,26 +13,21 @@ import javax.validation.constraints.NotNull;
  */
 public class GroupDto extends BaseObjectDto
 {
-	@NotNull
+    @Size(min = 4, max = 100)
 	private String		name;
-	@NotNull
+    @Size(min = 1, max = 100)
 	private String		description;
 	private boolean		enabled;
 	private String		roleIds;
 	private ClientDto	client;
 
+	public GroupDto()
+	{
+	}
+
 	public ClientDto getClient()
 	{
 		return client;
-	}
-
-	public void setClient(ClientDto client)
-	{
-		this.client = client;
-	}
-
-	public GroupDto()
-	{
 	}
 
 	public String getDescription()
@@ -70,6 +65,11 @@ public class GroupDto extends BaseObjectDto
 	public boolean isEnabled()
 	{
 		return enabled;
+	}
+
+	public void setClient(ClientDto client)
+	{
+		this.client = client;
 	}
 
 	public void setDescription(String description)

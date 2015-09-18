@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
@@ -17,21 +16,17 @@ import org.hibernate.validator.constraints.Email;
 public class UserDto extends BaseObjectDto
 {
     @Size(min = 5, max = 20)
-    @NotNull
     private String  login;
     private boolean internal;
     @Size(min = 2, max = 50)
-    @NotNull
     private String  lastname;
-    @Size(min = 3, max = 20)
-    @NotNull
+    @Size(min = 3, max = 30)
     private String  firstname;
     private String  password;
     @Email
     private String  email;
     private boolean enabled;
     private boolean changePasswordOnNextLogin;
-    @NotNull
     private String  defaultClient;
     private String  groupIds;
 

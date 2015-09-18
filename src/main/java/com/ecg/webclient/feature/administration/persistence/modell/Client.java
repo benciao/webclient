@@ -30,7 +30,7 @@ public class Client
     private String         name;
     private boolean        enabled;
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "client_id")
     private List<Property> properties;
 
     public Client()
