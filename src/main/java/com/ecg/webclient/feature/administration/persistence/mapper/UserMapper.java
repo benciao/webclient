@@ -110,7 +110,10 @@ public class UserMapper
         entity.setEmail(dto.getEmail());
         entity.setPassword(dto.getPassword());
         entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
-        entity.setDefaultClient(clientRepo.findOne(Long.parseLong(dto.getDefaultClient())));
+        if (dto.getDefaultClient() != null && !dto.getDefaultClient().isEmpty())
+        {
+            entity.setDefaultClient(clientRepo.findOne(Long.parseLong(dto.getDefaultClient())));
+        }
 
         List<Group> groups = new ArrayList<Group>();
         groupRepo.findAll(dto.getGroupIdObjects()).forEach(e -> groups.add(e));

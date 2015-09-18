@@ -41,6 +41,7 @@ import com.ecg.webclient.feature.administration.viewmodell.UserConfig;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.ClientDtoValidator;
 import com.ecg.webclient.feature.administration.viewmodell.validator.PropertyDtoValidator;
+import com.ecg.webclient.feature.administration.viewmodell.validator.UserDtoValidator;
 
 /**
  * Controller zur Bearbeitung von Requests aus Administrationsdialogen.
@@ -83,6 +84,9 @@ public class AdministrationController
 
     @Autowired
     PropertyDtoValidator       propertyDtoValidator;
+
+    @Autowired
+    UserDtoValidator           userDtoValidator;
 
     /**
      * Behandelt GET-Requests vom Typ "/admin".
@@ -523,6 +527,12 @@ public class AdministrationController
     protected void initPropertyBinder(WebDataBinder binder)
     {
         binder.setValidator(propertyDtoValidator);
+    }
+
+    @InitBinder("userConfig")
+    protected void initUserBinder(WebDataBinder binder)
+    {
+        binder.setValidator(userDtoValidator);
     }
 
     private void updateSelectedClient(List<ClientDto> clientDtos)

@@ -2,6 +2,7 @@ package com.ecg.webclient.feature.administration.persistence.modell;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ public class User
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long        id;
+    @Column(unique = true)
     private String      login;
     private String      password;
     private String      firstname;

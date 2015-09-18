@@ -1,5 +1,6 @@
 package com.ecg.webclient.feature.administration.persistence.modell;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,6 +20,7 @@ public class Role
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long	id;
+    @Column(unique = true)
 	private String	name;
 	private boolean	enabled;
 
@@ -33,16 +35,6 @@ public class Role
 		setEnabled(newRole.isEnabled());
 
 		return this;
-	}
-
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
 	}
 
 	@Override
@@ -75,6 +67,16 @@ public class Role
 	public String getName()
 	{
 		return name;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
 	}
 
 	public boolean isEnabled()

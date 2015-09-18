@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-
 /**
  * Implementierung eines von der Persistenz detachten Benutzers.
  * 
@@ -15,15 +11,11 @@ import org.hibernate.validator.constraints.Email;
  */
 public class UserDto extends BaseObjectDto
 {
-    @Size(min = 5, max = 20)
     private String  login;
     private boolean internal;
-    @Size(min = 2, max = 50)
     private String  lastname;
-    @Size(min = 3, max = 30)
     private String  firstname;
     private String  password;
-    @Email
     private String  email;
     private boolean enabled;
     private boolean changePasswordOnNextLogin;

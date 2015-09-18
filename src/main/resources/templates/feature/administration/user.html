@@ -51,7 +51,7 @@
 																	+ "<input class='form-control' placeholder='[[#{usersTableLastName}]]' id='lastname-" + rowIndex + "' name='users[" + rowIndex + "].lastname' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='user-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='users[" + rowIndex + "].enabled' />"
+																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='user-state-switch' data-size='mini' data-checked='true' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='users[" + rowIndex + "].enabled' value='true' />"
 																	+ "</td>"
 																	+ "<td>"
 																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' value='false' />"

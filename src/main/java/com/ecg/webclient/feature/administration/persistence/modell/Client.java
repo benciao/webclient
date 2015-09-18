@@ -3,6 +3,7 @@ package com.ecg.webclient.feature.administration.persistence.modell;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,6 +28,7 @@ public class Client
     private long           id;
     private String         color;
     private String         description;
+    @Column(unique = true)
     private String         name;
     private boolean        enabled;
     @OneToMany(fetch = FetchType.EAGER)
