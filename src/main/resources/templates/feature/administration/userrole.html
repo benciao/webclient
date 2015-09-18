@@ -82,7 +82,8 @@ body {
 
 		<!-- {!begin navigation} -->
 		<div
-			th:include="feature/administration/adminmenu :: navigation('role', 'user')" id="navigation" class="navigation"></div>
+			th:include="feature/administration/adminmenu :: navigation('role', 'user')"
+			id="navigation" class="navigation"></div>
 		<!-- {!end navigation} -->
 
 		<div id="content" class="content">
@@ -134,11 +135,11 @@ body {
 						<tbody>
 							<tr th:each="item, stat : *{roles}">
 								<td><input th:id="${'name-'+stat.index}" type="text"
-									class="form-control" placeholder="Name"
+									readonly="true" class="form-control" placeholder="Name"
 									th:field="*{roles[__${stat.index}__].name}"
 									th:errorclass="field-tip" /> <span class="tip-content"
 									th:errors="*{roles[__${stat.index}__].name}"></span></td>
-								<td><input th:id="${'description-'+stat.index}" type="text"
+								<td><input th:id="${'description-'+stat.index}" readonly="true" type="text"
 									class="form-control" placeholder="Beschreibung"
 									th:value="#{*{'accessrole.' + roles[__${stat.index}__].name}}" />
 								</td>
