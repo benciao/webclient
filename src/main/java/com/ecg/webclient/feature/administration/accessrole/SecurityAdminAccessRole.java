@@ -1,19 +1,22 @@
 package com.ecg.webclient.feature.administration.accessrole;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.authentication.accessrole.WebClientAccessRole;
+import com.ecg.webclient.common.authentication.WebClientAccessRole;
 
 /**
- * Rolle, welche das Administrieren der Benutzer- und Berechtigungsverwaltung ermöglicht.
+ * Rolle, welche das Administrieren der Benutzer- und Berechtigungsverwaltung
+ * ermöglicht.
  * 
  * @author arndtmar
  */
 @Component
 public class SecurityAdminAccessRole extends WebClientAccessRole
 {
-    public SecurityAdminAccessRole()
-    {
-        super("SEC", "SEC_ADMIN");
-    }
+	@Autowired
+	public SecurityAdminAccessRole(AdministrationFeature feature)
+	{
+		super(feature, "ADMIN");
+	}
 }

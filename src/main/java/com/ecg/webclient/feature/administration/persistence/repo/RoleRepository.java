@@ -18,4 +18,10 @@ public interface RoleRepository extends CrudRepository<Role, Long>
 
 	@Query("select r from Role r where r.name = :name")
 	public Role findRoleByName(@Param("name") String name);
+	
+	@Query("select r from Role r where r.name = :name and r.feature.name = :feature_name")
+	public Role findRoleByNameAndFeature(@Param("name") String name, @Param("feature_name") String featureName);
+
+	@Query("select r from Role r where r.feature.id = :feature_id")
+	public Iterable<Role> findRolesForFeatureId(@Param("feature_id") long featureId);
 }

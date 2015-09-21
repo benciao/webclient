@@ -1,8 +1,9 @@
 package com.ecg.webclient.feature.administration.accessrole;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.authentication.accessrole.WebClientAccessRole;
+import com.ecg.webclient.common.authentication.WebClientAccessRole;
 
 /**
  * Rolle, welche Konfigurieren des Gesamtsystems ermöglicht.
@@ -12,8 +13,9 @@ import com.ecg.webclient.common.authentication.accessrole.WebClientAccessRole;
 @Component
 public class SetupSystemAccessRole extends WebClientAccessRole
 {
-	public SetupSystemAccessRole()
+	@Autowired
+	public SetupSystemAccessRole(AdministrationFeature feature)
 	{
-		super("SEC", "SETUP_SYSTEM");
+		super(feature, "SETUP_SYSTEM");
 	}
 }

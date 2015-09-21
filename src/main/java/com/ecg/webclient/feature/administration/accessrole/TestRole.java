@@ -1,8 +1,9 @@
 package com.ecg.webclient.feature.administration.accessrole;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.authentication.accessrole.WebClientAccessRole;
+import com.ecg.webclient.common.authentication.WebClientAccessRole;
 
 /**
  * @author arndtmar
@@ -10,8 +11,9 @@ import com.ecg.webclient.common.authentication.accessrole.WebClientAccessRole;
 @Component
 public class TestRole extends WebClientAccessRole
 {
-    public TestRole()
+	@Autowired
+    public TestRole(TestFeature feature)
     {
-        super("TEST", "DUMMY_ROLE");
+        super(feature, "DUMMY_ROLE");
     }
 }

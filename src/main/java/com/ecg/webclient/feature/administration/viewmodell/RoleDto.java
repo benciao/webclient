@@ -9,30 +9,47 @@ import javax.validation.constraints.Size;
  */
 public class RoleDto extends BaseObjectDto
 {
-    @Size(min = 4, max = 100)
-    private String  name;
-    private boolean enabled;
+	@Size(min = 4, max = 100)
+	private String		name;
+	private boolean		enabled;
+	private FeatureDto	feature;
 
-    public RoleDto()
-    {}
+	public FeatureDto getFeature()
+	{
+		return feature;
+	}
 
-    public String getName()
-    {
-        return name;
-    }
+	public void setFeature(FeatureDto feature)
+	{
+		this.feature = feature;
+	}
 
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
+	public RoleDto()
+	{
+	}
 
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
+	public String getName()
+	{
+		return name;
+	}
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+	public boolean isEnabled()
+	{
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled)
+	{
+		this.enabled = enabled;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	public String getCombinedName()
+	{
+		return this.getFeature().getName() + "_" + this.getName();
+	}
 }

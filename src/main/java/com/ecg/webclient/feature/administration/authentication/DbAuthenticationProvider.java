@@ -51,7 +51,7 @@ public class DbAuthenticationProvider implements AuthenticationProvider
 				{
 					for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
 					{
-						DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getName());
+						DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
 						grantedAuths.add(newAuth);
 					}
 				}

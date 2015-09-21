@@ -11,9 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.common.authentication.accessrole.WebClientAccessRole;
+import com.ecg.webclient.common.authentication.WebClientAccessRole;
 import com.ecg.webclient.feature.administration.persistence.mapper.RoleMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.Role;
+import com.ecg.webclient.feature.administration.persistence.repo.FeatureRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.RoleRepository;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 
@@ -28,14 +29,20 @@ public class RoleService
 	static final Logger logger = LogManager.getLogger(RoleService.class.getName());
 
 	RoleRepository				roleRepo;
+	FeatureRepository			featureRepo;
 	RoleMapper					roleMapper;
 	List<WebClientAccessRole>	rolesToRegister;
+	FeatureService				featureService;
 
 	@Autowired
-	public RoleService(RoleRepository roleRepo, RoleMapper roleMapper, List<WebClientAccessRole> rolesToRegister)
+	public RoleService(RoleRepository roleRepo, RoleMapper roleMapper, List<WebClientAccessRole> rolesToRegister,
+			FeatureRepository featureRepo, FeatureService featureService)
 	{
 		this.roleRepo = roleRepo;
 		this.roleMapper = roleMapper;
+		this.featureRepo = featureRepo;
+		// stellt sicher, dass Features vor den Rollen registriert und persistiert werden
+		this.featureService = featureService;
 
 		registerRoles(rolesToRegister);
 	}
@@ -49,14 +56,17 @@ public class RoleService
 	@Transactional
 	private void registerRoles(List<WebClientAccessRole> rolesToRegister)
 	{
+		this.rolesToRegister = rolesToRegister;
 		for (WebClientAccessRole accessRole : rolesToRegister)
 		{
-			Role lookupRole = roleRepo.findRoleByName(accessRole.getName());
+			Role lookupRole = roleRepo.findRoleByNameAndFeature(accessRole.getName(),
+					accessRole.getFeatureId().getFeatureId());
 
 			if (lookupRole == null)
 			{
 				Role newRole = new Role();
-				newRole.setName(accessRole.getName());
+				newRole.setName(accessRole.getRoleKey());
+				newRole.setFeature(featureRepo.findFeatureByName(accessRole.getFeatureId().getFeatureId()));
 				newRole.setEnabled(true);
 				roleRepo.save(newRole);
 			}

@@ -127,6 +127,7 @@ body {
 						<thead>
 							<tr>
 								<th><span th:text="#{rolesTableName}"></span></th>
+								<th><span th:text="#{rolesTableFeature}"></span></th>
 								<th><span th:text="#{rolesTableDescription}"></span></th>
 								<th><span th:text="#{rolesTableStatus}"></span></th>
 								<th><span th:text="#{rolesTableActions}"></span></th>
@@ -139,9 +140,13 @@ body {
 									th:field="*{roles[__${stat.index}__].name}"
 									th:errorclass="field-tip" /> <span class="tip-content"
 									th:errors="*{roles[__${stat.index}__].name}"></span></td>
+								<td><input th:id="${'feature'+stat.index}" readonly="true" type="text"
+									class="form-control" placeholder="Feature"
+									th:field="*{roles[__${stat.index}__].feature.name}" />
+								</td>
 								<td><input th:id="${'description-'+stat.index}" readonly="true" type="text"
 									class="form-control" placeholder="Beschreibung"
-									th:value="#{*{'accessrole.' + roles[__${stat.index}__].name}}" />
+									th:value="#{*{'accessrole.' + roles[__${stat.index}__].feature.name + '_' +roles[__${stat.index}__].name}}" />
 								</td>
 								<td><input th:id="${'switch-'+stat.index}" type="checkbox"
 									name="role-state-switch" data-size="mini"
