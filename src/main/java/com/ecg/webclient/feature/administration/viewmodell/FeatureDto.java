@@ -1,7 +1,5 @@
 package com.ecg.webclient.feature.administration.viewmodell;
 
-import java.io.Serializable;
-
 /**
  * Implementierung eines von der Persistenz detachten Features.
  * 
