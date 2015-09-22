@@ -15,6 +15,7 @@
 <link th:href="@{/css/bootstrap-select.css}" rel="stylesheet" />
 <link th:href="@{/css/bootstrap-switch.css}" rel="stylesheet" />
 <link th:href="@{/css/bootstrap-colorpicker.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-table.css}" rel="stylesheet" />
 
 <script th:src="@{/js/jquery.js}"></script>
 <script th:src="@{/js/bootstrap.js}"></script>
@@ -23,6 +24,8 @@
 <script th:src="@{/js/bootstrap-switch.js}"></script>
 <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
 <script th:src="@{/js/webclient.js}"></script>
+<script th:src="@{/js/bootstrap-table.js}"></script>
+<script th:src="@{/js/bootstrap-table-de-DE.js}"></script>
 
 <script type="text/javascript" th:inline="text">
 	/*<![CDATA[*/
@@ -60,7 +63,6 @@
 
 							row.hide();
 						});
-
 			});
 	/*]]>*/
 </script>
@@ -122,12 +124,17 @@ body {
 						</strong>
 					</div>
 
+					<div id="filter-bar"></div>
+
 					<table class="table table-hover table-striped table-condensed"
-						id="roleTable">
+						data-search="true" id="roleTable" data-click-to-select="true"
+						data-toggle="table" data-toolbar="#filter-bar" data-classes="table-no-bordered">
 						<thead>
 							<tr>
-								<th><span th:text="#{rolesTableName}"></span></th>
-								<th><span th:text="#{rolesTableFeature}"></span></th>
+								<th data-field="role" data-align="left" data-sortable="true"><span
+									th:text="#{rolesTableName}"></span></th>
+								<th data-field="feature" data-align="left" data-sortable="true"><span
+									th:text="#{rolesTableFeature}"></span></th>
 								<th><span th:text="#{rolesTableDescription}"></span></th>
 								<th><span th:text="#{rolesTableStatus}"></span></th>
 								<th><span th:text="#{rolesTableActions}"></span></th>
@@ -140,12 +147,12 @@ body {
 									th:field="*{roles[__${stat.index}__].name}"
 									th:errorclass="field-tip" /> <span class="tip-content"
 									th:errors="*{roles[__${stat.index}__].name}"></span></td>
-								<td><input th:id="${'feature'+stat.index}" readonly="true" type="text"
-									class="form-control" placeholder="Feature"
-									th:field="*{roles[__${stat.index}__].feature.name}" />
-								</td>
-								<td><input th:id="${'description-'+stat.index}" readonly="true" type="text"
-									class="form-control" placeholder="Beschreibung"
+								<td><input th:id="${'feature'+stat.index}" readonly="true"
+									type="text" class="form-control" placeholder="Feature"
+									th:field="*{roles[__${stat.index}__].feature.name}" /></td>
+								<td><input th:id="${'description-'+stat.index}"
+									readonly="true" type="text" class="form-control"
+									placeholder="Beschreibung"
 									th:value="#{*{'accessrole.' + roles[__${stat.index}__].feature.name + '_' +roles[__${stat.index}__].name}}" />
 								</td>
 								<td><input th:id="${'switch-'+stat.index}" type="checkbox"
