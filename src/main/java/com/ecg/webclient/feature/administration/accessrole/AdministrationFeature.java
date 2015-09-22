@@ -14,6 +14,6 @@ public class AdministrationFeature extends WebClientFeature
 {
 	public AdministrationFeature()
 	{
-		super("SEC");
+		super("SEC", false);
 	}
 }

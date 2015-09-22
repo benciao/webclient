@@ -41,7 +41,8 @@ public class RoleService
 		this.roleRepo = roleRepo;
 		this.roleMapper = roleMapper;
 		this.featureRepo = featureRepo;
-		// stellt sicher, dass Features vor den Rollen registriert und persistiert werden
+		// stellt sicher, dass Features vor den Rollen registriert und
+		// persistiert werden
 		this.featureService = featureService;
 
 		registerRoles(rolesToRegister);
@@ -59,7 +60,7 @@ public class RoleService
 		this.rolesToRegister = rolesToRegister;
 		for (WebClientAccessRole accessRole : rolesToRegister)
 		{
-			Role lookupRole = roleRepo.findRoleByNameAndFeature(accessRole.getName(),
+			Role lookupRole = roleRepo.findRoleByNameAndFeature(accessRole.getRoleKey(),
 					accessRole.getFeatureId().getFeatureId());
 
 			if (lookupRole == null)
@@ -113,11 +114,11 @@ public class RoleService
 		{
 			if (!onlyEnabledRoles)
 			{
-				roleRepo.findAll().forEach(e -> attachedRoles.add(e));
+				roleRepo.findAllRoles().forEach(e -> attachedRoles.add(e));
 			}
 			else
 			{
-				roleRepo.findAllEnabledRoles(true).forEach(e -> attachedRoles.add(e));
+				roleRepo.findAllEnabledRoles().forEach(e -> attachedRoles.add(e));
 			}
 		}
 		catch (final Exception e)
@@ -147,6 +148,33 @@ public class RoleService
 		try
 		{
 			Iterable<Role> persistentRoles = roleRepo.findAll(roleIds);
+			for (Role role : persistentRoles)
+			{
+				result.add(roleMapper.mapToDto(role));
+			}
+
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+
+		return result;
+	}
+
+	/**
+	 * @param roleIds
+	 *            Liste mit IDs von Rollen
+	 * @return Liste mit zu den IDs gehörenden Rollen, welche selbst aktiv sind
+	 *         und dessen zugeordnetes Feature aktiv ist
+	 */
+	public List<RoleDto> getEnabledRolesWithEnabledFeatureForIds(List<Long> roleIds)
+	{
+		List<RoleDto> result = new ArrayList<RoleDto>();
+
+		try
+		{
+			Iterable<Role> persistentRoles = roleRepo.findEnabledRolesWithEnabledFeatureForIds(roleIds);
 			for (Role role : persistentRoles)
 			{
 				result.add(roleMapper.mapToDto(role));

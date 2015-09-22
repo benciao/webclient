@@ -9,14 +9,21 @@ package com.ecg.webclient.common.authentication;
 public abstract class WebClientFeature
 {
 	String	featureId;
+	boolean deactivatable;
 	
-	protected WebClientFeature(String featureId)
+	protected WebClientFeature(String featureId, boolean deactivatable)
 	{
 		this.featureId = featureId;
+		this.deactivatable = deactivatable;
 	}
 
 	public String getFeatureId()
 	{
 		return featureId;
+	}
+
+	public boolean isDeactivatable()
+	{
+		return deactivatable;
 	}
 }

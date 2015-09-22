@@ -23,18 +23,30 @@ public class Feature
 	@Column(unique = true)
 	private String	name;
 	boolean			enabled;
+	boolean			deactivatable;
 
 	public Feature()
 	{
 	}
-	
+
 	@Transient
 	public Feature bind(Feature newFeature)
 	{
 		setName(newFeature.getName());
 		setEnabled(newFeature.isEnabled());
-		
+		setDeactivatable(newFeature.isDeactivatable());
+
 		return this;
+	}
+
+	public boolean isDeactivatable()
+	{
+		return deactivatable;
+	}
+
+	public void setDeactivatable(boolean deactivatable)
+	{
+		this.deactivatable = deactivatable;
 	}
 
 	public boolean isEnabled()

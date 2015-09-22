@@ -9,6 +9,6 @@ public class TestFeature extends WebClientFeature
 {
 	public TestFeature()
 	{
-		super("TEST");
+		super("TEST", true);
 	}
 }

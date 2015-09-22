@@ -44,12 +44,13 @@ public class DbAuthenticationProvider implements AuthenticationProvider
 			util.setSelectedClient(defaultClient);
 
 			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-			// zugeordnete Rollen für den Client setzen
-			for (GroupDto group : groupService.getGroupsForIds(user.getGroupIdObjects()))
+			// zugeordnete Rollen für den Mandanten setzen, welche selbst aktiv
+			// sind und deren Feature aktiv ist
+			for (GroupDto group : groupService.getEnabledGroupsForIds(user.getGroupIdObjects()))
 			{
 				if (groupService.getClientForGroupId(group.getId()).getId() == defaultClient.getId())
 				{
-					for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
+					for (RoleDto role : roleService.getEnabledRolesWithEnabledFeatureForIds(group.getRoleIdObjects()))
 					{
 						DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
 						grantedAuths.add(newAuth);

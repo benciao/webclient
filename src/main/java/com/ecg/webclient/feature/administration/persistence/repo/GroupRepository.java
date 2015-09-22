@@ -1,5 +1,7 @@
 package com.ecg.webclient.feature.administration.persistence.repo;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +23,7 @@ public interface GroupRepository extends CrudRepository<Group, Long>
 	
 	@Query("select g from Group g where g.name = :name")
 	public Iterable<Group> findGroupByName(@Param("name") String groupName);
+	
+	@Query("select g from Group g where g.enabled = true and g.id in :ids")
+	public Iterable<Group> findEnabledGroupsForId(@Param("ids") List<Long> groupIds);
 }

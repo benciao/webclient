@@ -1,5 +1,6 @@
 package com.ecg.webclient.feature.administration.persistence.modell;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -26,238 +27,255 @@ import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 @Table(name = "SEC_USER")
 public class User
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long        id;
-    @Column(unique = true)
-    private String      login;
-    private String      password;
-    private String      firstname;
-    private String      lastname;
-    private boolean     enabled;
-    private boolean     changePasswordOnNextLogin;
-    private boolean     internal;
-    private String      email;
-    @OneToOne
-    private Client      defaultClient;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "SEC_USER_SEC_GROUP", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "GROUP_ID"))
-    private List<Group> groups;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long		id;
+	@Column(unique = true)
+	private String		login;
+	private String		password;
+	private String		firstname;
+	private String		lastname;
+	private boolean		enabled;
+	private boolean		changePasswordOnNextLogin;
+	private boolean		internal;
+	private String		email;
+	@OneToOne
+	private Client		defaultClient;
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "SEC_USER_SEC_GROUP", joinColumns = @JoinColumn(name = "USER_ID") , inverseJoinColumns = @JoinColumn(name = "GROUP_ID") )
+	private List<Group>	groups;
 
-    public User()
-    {}
+	public User()
+	{
+	}
 
-    @Transient
-    public User bind(User newUser)
-    {
-        setLogin(newUser.getLogin());
-        setInternal(newUser.isInternal());
-        setFirstname(newUser.getFirstname());
-        setLastname(newUser.getLastname());
-        // wichtig, damit es nicht genullt wird in der DB bei Nichtänderung
-        if (newUser.getPassword() != null && !newUser.getPassword().isEmpty())
-        {
-            setPassword(PasswordEncoder.encodeComplex(newUser.getPassword(), Long.toString(getId())));
-        }
-        setDefaultClient(newUser.getDefaultClient());
-        setGroups(newUser.getGroups());
-        setEnabled(newUser.isEnabled());
-        setEmail(newUser.getEmail());
-        setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
+	@Transient
+	public User bind(User newUser)
+	{
+		setLogin(newUser.getLogin());
+		setInternal(newUser.isInternal());
+		setFirstname(newUser.getFirstname());
+		setLastname(newUser.getLastname());
+		// wichtig, damit es nicht genullt wird in der DB bei Nichtänderung
+		if (newUser.getPassword() != null && !newUser.getPassword().isEmpty())
+		{
+			setPassword(PasswordEncoder.encodeComplex(newUser.getPassword(), Long.toString(getId())));
+		}
+		setDefaultClient(newUser.getDefaultClient());
+		setGroups(newUser.getGroups());
+		setEnabled(newUser.isEnabled());
+		setEmail(newUser.getEmail());
+		setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
 
-        return this;
-    }
+		return this;
+	}
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (!(obj instanceof User))
-        {
-            return false;
-        }
-        User other = (User) obj;
-        if (email == null)
-        {
-            if (other.email != null)
-            {
-                return false;
-            }
-        }
-        else if (!email.equals(other.email))
-        {
-            return false;
-        }
-        if (firstname == null)
-        {
-            if (other.firstname != null)
-            {
-                return false;
-            }
-        }
-        else if (!firstname.equals(other.firstname))
-        {
-            return false;
-        }
-        if (id != other.id)
-        {
-            return false;
-        }
-        if (lastname == null)
-        {
-            if (other.lastname != null)
-            {
-                return false;
-            }
-        }
-        else if (!lastname.equals(other.lastname))
-        {
-            return false;
-        }
-        if (login == null)
-        {
-            if (other.login != null)
-            {
-                return false;
-            }
-        }
-        else if (!login.equals(other.login))
-        {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (!(obj instanceof User))
+		{
+			return false;
+		}
+		User other = (User) obj;
+		if (email == null)
+		{
+			if (other.email != null)
+			{
+				return false;
+			}
+		}
+		else if (!email.equals(other.email))
+		{
+			return false;
+		}
+		if (firstname == null)
+		{
+			if (other.firstname != null)
+			{
+				return false;
+			}
+		}
+		else if (!firstname.equals(other.firstname))
+		{
+			return false;
+		}
+		if (id != other.id)
+		{
+			return false;
+		}
+		if (lastname == null)
+		{
+			if (other.lastname != null)
+			{
+				return false;
+			}
+		}
+		else if (!lastname.equals(other.lastname))
+		{
+			return false;
+		}
+		if (login == null)
+		{
+			if (other.login != null)
+			{
+				return false;
+			}
+		}
+		else if (!login.equals(other.login))
+		{
+			return false;
+		}
+		return true;
+	}
 
-    public Client getDefaultClient()
-    {
-        return defaultClient;
-    }
+	public Client getDefaultClient()
+	{
+		return defaultClient;
+	}
 
-    public String getEmail()
-    {
-        return email;
-    }
+	public String getEmail()
+	{
+		return email;
+	}
 
-    public String getFirstname()
-    {
-        return firstname;
-    }
+	public String getFirstname()
+	{
+		return firstname;
+	}
 
-    public List<Group> getGroups()
-    {
-        return groups;
-    }
+	public List<Group> getGroups()
+	{
+		return groups;
+	}
 
-    public long getId()
-    {
-        return id;
-    }
+	public long getId()
+	{
+		return id;
+	}
 
-    public String getLastname()
-    {
-        return lastname;
-    }
+	public String getLastname()
+	{
+		return lastname;
+	}
 
-    public String getLogin()
-    {
-        return login;
-    }
+	public String getLogin()
+	{
+		return login;
+	}
 
-    public String getPassword()
-    {
-        return password;
-    }
+	public String getPassword()
+	{
+		return password;
+	}
 
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((email == null) ? 0 : email.hashCode());
-        result = prime * result + ((firstname == null) ? 0 : firstname.hashCode());
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((lastname == null) ? 0 : lastname.hashCode());
-        result = prime * result + ((login == null) ? 0 : login.hashCode());
-        return result;
-    }
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((firstname == null) ? 0 : firstname.hashCode());
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((lastname == null) ? 0 : lastname.hashCode());
+		result = prime * result + ((login == null) ? 0 : login.hashCode());
+		return result;
+	}
 
-    public boolean isChangePasswordOnNextLogin()
-    {
-        return changePasswordOnNextLogin;
-    }
+	public boolean isChangePasswordOnNextLogin()
+	{
+		return changePasswordOnNextLogin;
+	}
 
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
+	public boolean isEnabled()
+	{
+		return enabled;
+	}
 
-    public boolean isInternal()
-    {
-        return internal;
-    }
+	public boolean isInternal()
+	{
+		return internal;
+	}
 
-    public void setChangePasswordOnNextLogin(boolean changePasswordOnNextLogin)
-    {
-        this.changePasswordOnNextLogin = changePasswordOnNextLogin;
-    }
+	public void setChangePasswordOnNextLogin(boolean changePasswordOnNextLogin)
+	{
+		this.changePasswordOnNextLogin = changePasswordOnNextLogin;
+	}
 
-    public void setDefaultClient(Client defaultClient)
-    {
-        this.defaultClient = defaultClient;
-    }
+	public void setDefaultClient(Client defaultClient)
+	{
+		this.defaultClient = defaultClient;
+	}
 
-    public void setEmail(String email)
-    {
-        this.email = email;
-    }
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
 
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
+	public void setEnabled(boolean enabled)
+	{
+		this.enabled = enabled;
+	}
 
-    public void setFirstname(String firstname)
-    {
-        this.firstname = firstname;
-    }
+	public void setFirstname(String firstname)
+	{
+		this.firstname = firstname;
+	}
 
-    public void setGroups(List<Group> groups)
-    {
-        this.groups = groups;
-    }
+	public void setGroups(List<Group> groups)
+	{
+		this.groups = groups;
+	}
 
-    public void setId(long id)
-    {
-        if (id != -1)
-        {
-            this.id = id;
-        }
-    }
+	public void setId(long id)
+	{
+		if (id != -1)
+		{
+			this.id = id;
+		}
+	}
 
-    public void setInternal(boolean internal)
-    {
-        this.internal = internal;
-    }
+	public void setInternal(boolean internal)
+	{
+		this.internal = internal;
+	}
 
-    public void setLastname(String lastname)
-    {
-        this.lastname = lastname;
-    }
+	public void setLastname(String lastname)
+	{
+		this.lastname = lastname;
+	}
 
-    public void setLogin(String login)
-    {
-        this.login = login;
-    }
+	public void setLogin(String login)
+	{
+		this.login = login;
+	}
 
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
+
+	@Transient
+	public List<Group> getEnabledGroups()
+	{
+		List<Group> result = new ArrayList<Group>();
+
+		for (Group group : groups)
+		{
+			if (group.isEnabled())
+			{
+				result.add(group);
+			}
+		}
+
+		return result;
+	}
 }

@@ -36,6 +36,7 @@ public class FeatureMapper
 		detachedFeature.setName(attachedFeature.getName());
 		detachedFeature.setEnabled(attachedFeature.isEnabled());
 		detachedFeature.setId(attachedFeature.getId());
+		detachedFeature.setDeactivatable(attachedFeature.isDeactivatable());
 
 		return detachedFeature;
 	}
@@ -86,6 +87,7 @@ public class FeatureMapper
         entity.setId(detachedFeature.getId());
         entity.setName(detachedFeature.getName());
         entity.setEnabled(detachedFeature.isEnabled());
+        entity.setDeactivatable(detachedFeature.isDeactivatable());
         
         Feature persistentFeature = featureRepo.findOne(entity.getId());
         if (persistentFeature != null)

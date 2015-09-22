@@ -66,16 +66,22 @@ public class AuthenticationUtil
 		// nochmal verschlüsselt
 		String password = PasswordEncoder.encodeComplex(simpleEncodedPw, Long.toString(user.getId()));
 
+		assignRolesToUserSession(user, auth, login, password);
+	}
+	
+	private void assignRolesToUserSession(UserDto user, Authentication auth, String login, String password)
+	{
 		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-		// zugeordnete Rollen für den Client setzen
-		for (GroupDto group : groupService.getGroupsForIds(user.getGroupIdObjects()))
+		// zugeordnete Rollen für den Mandanten setzen, welche selbst aktiv
+		// sind und deren Feature aktiv ist
+		for (GroupDto group : groupService.getEnabledGroupsForIds(user.getGroupIdObjects()))
 		{
 			// Nutzer mit dieser Rolle erhält alle ihm zugeordneten Rollen über
 			// alle Mandanten
-			if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getName()))
-					|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getName())))
+			if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getCombinedName()))
+					|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getCombinedName())))
 			{
-				for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
+				for (RoleDto role : roleService.getEnabledRolesWithEnabledFeatureForIds(group.getRoleIdObjects()))
 				{
 					DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
 					grantedAuths.add(newAuth);
@@ -114,8 +120,8 @@ public class AuthenticationUtil
 
 		clients = new ArrayList<ClientDto>();
 
-		if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getName()))
-				|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getName())))
+		if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getCombinedName()))
+				|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getCombinedName())))
 		{
 			clients = clientService.getAllClients(true);
 		}
@@ -170,12 +176,12 @@ public class AuthenticationUtil
 		this.selectedClient = clientService.getClient(Long.parseLong(user.getDefaultClient()));
 
 		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-		// zugeordnete Rollen für den Client setzen
-		for (GroupDto group : groupService.getGroupsForIds(user.getGroupIdObjects()))
+		// zugeordnete Rollen für den Mandanten setzen
+		for (GroupDto group : groupService.getEnabledGroupsForIds(user.getGroupIdObjects()))
 		{
 			if (groupService.getClientForGroupId(group.getId()).getId() == selectedClient.getId())
 			{
-				for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
+				for (RoleDto role : roleService.getEnabledRolesWithEnabledFeatureForIds(group.getRoleIdObjects()))
 				{
 					DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
 					grantedAuths.add(newAuth);
@@ -203,38 +209,7 @@ public class AuthenticationUtil
 
 		UserDto user = userService.getUserByLogin(login);
 
-		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-		// zugeordnete Rollen für den Client setzen
-		for (GroupDto group : groupService.getGroupsForIds(user.getGroupIdObjects()))
-		{
-			// Nutzer mit dieser Rolle erhält alle ihm zugeordneten Rollen über
-			// alle Mandanten
-			if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getName()))
-					|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getName())))
-			{
-				for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
-				{
-					DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
-					grantedAuths.add(newAuth);
-				}
-			}
-			// jeder andere Nutzer erhält nur die ihm zugeordneten Rollen des
-			// gerade ausgewählten Mandanten
-			else
-			{
-				if (groupService.getClientForGroupId(group.getId()).getId() == selectedClient.getId())
-				{
-					for (RoleDto role : roleService.getRolesForIds(group.getRoleIdObjects()))
-					{
-						DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
-						grantedAuths.add(newAuth);
-					}
-				}
-			}
-		}
-
-		SecurityContextHolder.getContext()
-				.setAuthentication(new UsernamePasswordAuthenticationToken(login, password, grantedAuths));
+		assignRolesToUserSession(user, auth, login, password);
 	}
 
 	private void initSelectedClient()

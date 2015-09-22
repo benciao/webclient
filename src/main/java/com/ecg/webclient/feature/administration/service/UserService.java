@@ -213,7 +213,7 @@ public class UserService
 			String finalPw = PasswordEncoder.encodeComplex(password, Long.toString(persistentUser.getId()));
 			if (finalPw.equalsIgnoreCase(persistentUser.getPassword()))
 			{
-				if (persistentUser.isEnabled() && !persistentUser.getGroups().isEmpty()
+				if (persistentUser.isEnabled() && !persistentUser.getEnabledGroups().isEmpty()
 						&& persistentUser.getDefaultClient().isEnabled())
 				{
 					return true;

@@ -19,7 +19,10 @@ public abstract class WebClientAccessRole
 		this.roleKey = roleKey;
 	}
 
-	public String getName()
+	/**
+	 * @return Name der Rolle zusammengesetzt aus FeatureId und Rollenname
+	 */
+	public String getCombinedName()
 	{
 		return featureId.getFeatureId().toUpperCase() + "_" + roleKey.toUpperCase();
 	}

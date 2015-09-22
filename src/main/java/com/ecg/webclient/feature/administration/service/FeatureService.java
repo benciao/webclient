@@ -50,6 +50,7 @@ public class FeatureService
 			{
 				Feature newFeature = new Feature();
 				newFeature.setName(feature.getFeatureId());
+				newFeature.setDeactivatable(feature.isDeactivatable());
 				newFeature.setEnabled(true);
 				featureRepo.save(newFeature);
 			}
