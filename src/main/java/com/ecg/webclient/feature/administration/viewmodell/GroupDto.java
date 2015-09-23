@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.constraints.Size;
-
 /**
  * Implementierung einer von der Persistenz detachten Benutzergruppe.
  * 
@@ -13,9 +11,7 @@ import javax.validation.constraints.Size;
  */
 public class GroupDto extends BaseObjectDto
 {
-    @Size(min = 4, max = 100)
 	private String		name;
-    @Size(min = 1, max = 100)
 	private String		description;
 	private boolean		enabled;
 	private String		roleIds;

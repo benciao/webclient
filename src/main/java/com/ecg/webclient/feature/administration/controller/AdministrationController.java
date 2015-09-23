@@ -42,6 +42,7 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserConfig;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.ClientDtoValidator;
+import com.ecg.webclient.feature.administration.viewmodell.validator.GroupDtoValidator;
 import com.ecg.webclient.feature.administration.viewmodell.validator.PropertyDtoValidator;
 import com.ecg.webclient.feature.administration.viewmodell.validator.UserDtoValidator;
 
@@ -92,6 +93,9 @@ public class AdministrationController
 
     @Autowired
     UserDtoValidator           userDtoValidator;
+
+    @Autowired
+    GroupDtoValidator          groupDtoValidator;
 
     /**
      * Behandelt GET-Requests vom Typ "/admin".
@@ -559,6 +563,12 @@ public class AdministrationController
     protected void initClientBinder(WebDataBinder binder)
     {
         binder.setValidator(clientDtoValidator);
+    }
+
+    @InitBinder("groupConfig")
+    protected void initGroupBinder(WebDataBinder binder)
+    {
+        binder.setValidator(groupDtoValidator);
     }
 
     @InitBinder("clientProperties")
