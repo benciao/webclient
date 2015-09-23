@@ -26,12 +26,14 @@ import com.ecg.webclient.feature.administration.FeatureAdministration;
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.service.ClientService;
+import com.ecg.webclient.feature.administration.service.FeatureService;
 import com.ecg.webclient.feature.administration.service.GroupService;
 import com.ecg.webclient.feature.administration.service.RoleService;
 import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientConfig;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.ClientProperties;
+import com.ecg.webclient.feature.administration.viewmodell.FeatureConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
@@ -72,6 +74,9 @@ public class AdministrationController
 
     @Autowired
     private UserService        userService;
+
+    @Autowired
+    private FeatureService     featureService;
 
     @Autowired
     private AuthenticationUtil authUtil;
@@ -270,6 +275,24 @@ public class AdministrationController
     }
 
     /**
+     * Behandelt POST-Requests vom Typ "/admin/feature/save". Speichert Änderungen an Feature-Konfiguration.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/feature/save", method = RequestMethod.POST)
+    public String saveFeatures(@Valid FeatureConfig featureConfig, BindingResult bindingResult)
+    {
+        if (bindingResult.hasErrors())
+        {
+            return getLoadingRedirectTemplate() + "feature";
+        }
+
+        featureService.saveFeatures(featureConfig.getFeatures());
+
+        return "redirect:";
+    }
+
+    /**
      * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert Änderungen an Mandanteneigenschaften.
      * 
      * @return Template
@@ -463,6 +486,21 @@ public class AdministrationController
         clientProperties.setProperties(authUtil.getSelectedClient().getProperties());
         model.addAttribute("clientProperties", clientProperties);
         return getLoadingRedirectTemplate() + "clientproperties";
+    }
+
+    /**
+     * Behandelt GET-Requests vom Typ "/admin/feature". Lädt alle Features.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/feature", method = RequestMethod.GET)
+    public String showFeatureConfig(Model model)
+    {
+        FeatureConfig featureConfig = new FeatureConfig();
+        featureConfig.setFeatures(featureService.getAllFeatures());
+        model.addAttribute("featureConfig", featureConfig);
+
+        return getLoadingRedirectTemplate() + "feature";
     }
 
     /**
