@@ -2,6 +2,7 @@ package com.ecg.webclient.feature.administration.viewmodell;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,6 +22,7 @@ public class UserDto extends BaseObjectDto
     private boolean changePasswordOnNextLogin;
     private String  defaultClient;
     private String  groupIds;
+    private Date    passwortChangedTimeStamp;
 
     public UserDto()
     {}
@@ -75,6 +77,11 @@ public class UserDto extends BaseObjectDto
     public String getPassword()
     {
         return password;
+    }
+
+    public Date getPasswortChangedTimeStamp()
+    {
+        return passwortChangedTimeStamp;
     }
 
     public boolean isChangePasswordOnNextLogin()
@@ -140,5 +147,10 @@ public class UserDto extends BaseObjectDto
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    public void setPasswortChangedTimeStamp(Date passwortChangedTimeStamp)
+    {
+        this.passwortChangedTimeStamp = passwortChangedTimeStamp;
     }
 }

@@ -1,6 +1,7 @@
 package com.ecg.webclient.feature.administration.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -253,6 +254,7 @@ public class UserService
 				{
 					persistedUser.setPassword(PasswordEncoder.encodeComplex(detachedUser.getPassword(),
 							Long.toString(persistedUser.getId())));
+                    persistedUser.setPasswordChangedTimeStamp(new Date());
 				}
 			}
 			else
@@ -267,6 +269,7 @@ public class UserService
 					pw = PasswordEncoder.encodeSimple(env.getRequiredProperty(PROPERTY_NAME_INIT_USER_PASSWORD));
 				}
 				persistedUser.setPassword(PasswordEncoder.encodeComplex(pw, Long.toString(persistedUser.getId())));
+                persistedUser.setPasswordChangedTimeStamp(new Date());
 			}
 
 			userRepo.save(persistedUser);

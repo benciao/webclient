@@ -49,6 +49,7 @@ public class UserMapper
         dto.setId(user.getId());
         dto.setEmail(user.getEmail());
         dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
+        dto.setPasswortChangedTimeStamp(user.getPasswordChangedTimeStamp());
 
         if (user.getDefaultClient() != null)
         {
