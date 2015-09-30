@@ -385,6 +385,11 @@
 		var emailValue = $("#hiddenEmail-" + collectionIndex[1]).val();
 		$("#email").val(emailValue);
 
+		// Passwortänderungsdatum setzen
+		var pwChangedValue = $("#hiddenPwChangedValue-" + collectionIndex[1])
+				.val();
+		$("#pwChangedDate").val(pwChangedValue);
+
 		// Passwort setzen
 		var pw = $("#hiddenPassword-" + collectionIndex[1]).val();
 
@@ -599,7 +604,10 @@ body {
 									th:field="*{users[__${stat.index}__].groupIds}" /> <input
 									type="hidden" th:id="${'hiddenEmail-'+stat.index}"
 									th:field="*{users[__${stat.index}__].email}" /> <input
-									type="hidden" th:id="${'hiddenDefaultClient-'+stat.index}"
+									type="hidden" th:id="${'hiddenPwChangedValue-'+stat.index}"
+									th:field="*{{users[__${stat.index}__].passwortChangedTimeStamp}}" />
+									<input type="hidden"
+									th:id="${'hiddenDefaultClient-'+stat.index}"
 									th:field="*{users[__${stat.index}__].defaultClient}" /> <input
 									type="hidden"
 									th:id="${'hiddenChangePasswordOnNextLogin-'+stat.index}"
@@ -628,6 +636,14 @@ body {
 													<div>
 														<input type="email" class="form-control" id="email"
 															th:placeholder="#{userEmailLabel}" />
+													</div>
+												</div></li>
+											<li class="list-group-item"><div>
+													<label class="control-label"><span
+														th:text="#{pwChangedLabel}"></span></label>
+													<div>
+														<input type="text" class="form-control" id="pwChangedDate"
+															th:placeholder="#{pwChangedLabel}" readonly="true" />
 													</div>
 												</div></li>
 											<li class="list-group-item"><div>

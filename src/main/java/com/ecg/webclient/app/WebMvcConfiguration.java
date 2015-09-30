@@ -2,11 +2,13 @@ package com.ecg.webclient.app;
 
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.Ordered;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -16,6 +18,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import com.ecg.webclient.feature.administration.viewmodell.formatter.CustomDateFormatter;
+
 @Configuration
 @EnableWebMvc
 @Import(
@@ -23,6 +27,14 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 @PropertySource("classpath:application.properties")
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter
 {
+    @Autowired
+    private CustomDateFormatter dateFormatter;
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addFormatter(dateFormatter);
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry)
     {
