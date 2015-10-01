@@ -51,7 +51,7 @@ body {
 			</div>
 			<div class="panel-body">
 				<form class="form-signin" role="form" action="#"
-					th:action="@{/login}" method="post">
+					th:action="@{/login}" method="post" authentication-failure-url="/login/error">
 					<label for="inputName" class="sr-only" th:text="#{username}" /><input
 						type="text" name="username" id="inputName" class="form-control"
 						th:placeholder="#{username}" required="true" autofocus="true" />
@@ -62,8 +62,8 @@ body {
 					<button class="btn btn-lg btn-primary btn-block" id="submitButton"
 						th:text="#{login}"></button>
 				</form>
-				<div th:if="${param.error}" class="alert alert-error">
-					<label th:text="#{invalid_login}" />
+				<div th:if="${loginFailed}" class="alert alert-error">
+					<label th:text="#{errorCause}" />
 				</div>
 			</div>
 		</div>
