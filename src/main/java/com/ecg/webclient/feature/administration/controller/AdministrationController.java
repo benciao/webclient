@@ -26,6 +26,7 @@ import com.ecg.webclient.feature.administration.FeatureAdministration;
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.service.ClientService;
+import com.ecg.webclient.feature.administration.service.EnvironmentService;
 import com.ecg.webclient.feature.administration.service.FeatureService;
 import com.ecg.webclient.feature.administration.service.GroupService;
 import com.ecg.webclient.feature.administration.service.RoleService;
@@ -33,6 +34,7 @@ import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientConfig;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.ClientProperties;
+import com.ecg.webclient.feature.administration.viewmodell.EnvironmentDto;
 import com.ecg.webclient.feature.administration.viewmodell.FeatureConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
@@ -78,6 +80,9 @@ public class AdministrationController
 
     @Autowired
     private FeatureService     featureService;
+
+    @Autowired
+    private EnvironmentService environmentService;
 
     @Autowired
     private AuthenticationUtil authUtil;
@@ -279,6 +284,24 @@ public class AdministrationController
     }
 
     /**
+     * Behandelt POST-Requests vom Typ "/admin/environment/save". Speichert Änderungen an der Systemumgebung.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/environment/save", method = RequestMethod.POST)
+    public String saveEnvironment(@Valid EnvironmentDto environment, BindingResult bindingResult)
+    {
+        if (bindingResult.hasErrors())
+        {
+            return getLoadingRedirectTemplate() + "environment";
+        }
+
+        environmentService.saveEnvironment(environment);
+
+        return "redirect:";
+    }
+
+    /**
      * Behandelt POST-Requests vom Typ "/admin/feature/save". Speichert Änderungen an Feature-Konfiguration.
      * 
      * @return Template
@@ -417,6 +440,15 @@ public class AdministrationController
         setupUser.setDefaultClient(Long.toString(savedClient.getId()));
         userService.saveUser(setupUser);
 
+        // Umgebung mit Eigenschaften erstellen
+        EnvironmentDto detachedEnvironment = environmentService.getEnvironment();
+        if (detachedEnvironment == null)
+        {
+            EnvironmentDto newEnvironment = new EnvironmentDto();
+            newEnvironment.setPasswordChangeInterval(30);
+            environmentService.saveEnvironment(newEnvironment);
+        }
+
         return "login";
     }
 
@@ -490,6 +522,20 @@ public class AdministrationController
         clientProperties.setProperties(authUtil.getSelectedClient().getProperties());
         model.addAttribute("clientProperties", clientProperties);
         return getLoadingRedirectTemplate() + "clientproperties";
+    }
+
+    /**
+     * Behandelt GET-Requests vom Typ "/admin/environment". Lädt alle Umgebungseigenschaften.
+     * 
+     * @return Template
+     */
+    @RequestMapping(value = "/environment", method = RequestMethod.GET)
+    public String showEnvironment(Model model)
+    {
+        EnvironmentDto environment = environmentService.getEnvironment();
+        model.addAttribute("environmentDto", environment);
+
+        return getLoadingRedirectTemplate() + "environment";
     }
 
     /**

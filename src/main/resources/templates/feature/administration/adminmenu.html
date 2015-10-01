@@ -197,7 +197,7 @@
 					<div class="panel-heading">
 						<h4 class="panel-title">
 							<a data-toggle="collapse" data-parent="#accordion"
-								href="#collapseThree"><span class="glyphicon glyphicon-user">
+								href="#collapseThree"><span class="glyphicon glyphicon-globe">
 							</span><span th:text="#{menuTreeSystem}"></span></a>
 						</h4>
 					</div>
@@ -216,6 +216,16 @@
 												th:text="#{menuTreeFeatureConfig}"></span></a></td>
 									</tr>
 								</div>
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'environment'}" class="warning">
+										<td><a href="/admin/environment"><span
+												th:text="#{menuTreeEnvironmentConfig}"></span></a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'environment'}">
+										<td><a href="/admin/environment"><span
+												th:text="#{menuTreeEnvironmentConfig}"></span></a></td>
+									</tr>
+								</div>
 							</table>
 						</div>
 					</div>
@@ -232,6 +242,16 @@
 									<tr th:if="${selectedItem != 'feature'}">
 										<td><a href="/admin/feature"><span
 												th:text="#{menuTreeFeatureConfig}"></span></a></td>
+									</tr>
+								</div>
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'environment'}" class="warning">
+										<td><a href="/admin/environment"><span
+												th:text="#{menuTreeEnvironmentConfig}"></span></a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'environment'}">
+										<td><a href="/admin/environment"><span
+												th:text="#{menuTreeEnvironmentConfig}"></span></a></td>
 									</tr>
 								</div>
 							</table>
