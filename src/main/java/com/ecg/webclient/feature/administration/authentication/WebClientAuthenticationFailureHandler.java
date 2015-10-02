@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
@@ -24,8 +26,20 @@ public class WebClientAuthenticationFailureHandler implements AuthenticationFail
 	{
 		if (exception instanceof BadCredentialsException)
 		{
-			redirectStrategy.sendRedirect(request, response, "/login/error");
+            redirectStrategy.sendRedirect(request, response, "/login/error/loginFailureBc");
 		}
+        else if (exception instanceof DisabledException)
+        {
+            redirectStrategy.sendRedirect(request, response, "/login/error/loginFailureD");
+        }
+        else if (exception instanceof LockedException)
+        {
+            redirectStrategy.sendRedirect(request, response, "/login/error/loginFailureL");
+        }
+        else
+        {
+            redirectStrategy.sendRedirect(request, response, "/error");
+        }
 	}
 
 }

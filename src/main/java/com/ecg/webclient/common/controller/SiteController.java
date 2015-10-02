@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class SiteController
 {
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String login()
-	{
-		return "login";
-	}
-	
-	@RequestMapping(value = "/login/error", method = RequestMethod.POST)
-	public String loginError(Model model)
-	{
-		model.addAttribute("loginFailed", true);
-		model.addAttribute("errorCause", "bla");
-		return "login";
-	}
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String login()
+    {
+        return "login";
+    }
+
+    @RequestMapping(value = "/login/error/{errorCause}", method = RequestMethod.GET)
+    public String loginError(Model model, @PathVariable("errorCause") String errorCause)
+    {
+        model.addAttribute("loginFailed", true);
+        model.addAttribute("errorCause", errorCause);
+        return "login";
+    }
 }

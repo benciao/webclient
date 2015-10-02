@@ -63,7 +63,7 @@ body {
 						th:text="#{login}"></button>
 				</form>
 				<div th:if="${loginFailed}" class="alert alert-error">
-					<label th:text="#{errorCause}" />
+					<label th:text="#{${errorCause}}" />
 				</div>
 			</div>
 		</div>
