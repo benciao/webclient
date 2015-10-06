@@ -99,17 +99,24 @@ body {
 						</thead>
 						<tbody>
 							<tr>
+								<td><span th:text="#{allowedLoginAttemptsLabel}"></span></td>
+								<td><input type="text" class="form-control"
+									th:field="*{allowedLoginAttempts}" th:errorclass="field-tip" /><span
+									class="tip-content" th:errors="*{allowedLoginAttempts}"></span></td>
+								<td><input type="hidden" th:field="*{id}" /></td>
+							</tr>
+							<tr>
 								<td><span th:text="#{pwChangeIntervalLabel}"></span></td>
 								<td><input type="text" class="form-control"
 									th:field="*{passwordChangeInterval}" th:errorclass="field-tip" /><span
 									class="tip-content" th:errors="*{passwordChangeInterval}"></span></td>
 								<td><input type="hidden" th:field="*{id}" /></td>
 							</tr>
-							<tr>
-								<td><span th:text="#{allowedLoginAttemptsLabel}"></span></td>
+<tr>
+								<td><span th:text="#{systemIdentifierLabel}"></span></td>
 								<td><input type="text" class="form-control"
-									th:field="*{allowedLoginAttempts}" th:errorclass="field-tip" /><span
-									class="tip-content" th:errors="*{allowedLoginAttempts}"></span></td>
+									th:field="*{systemIdentifier}" th:errorclass="field-tip" /><span
+									class="tip-content" th:errors="*{systemIdentifier}"></span></td>
 								<td><input type="hidden" th:field="*{id}" /></td>
 							</tr>
 						</tbody>

@@ -15,7 +15,11 @@
 							<div class="navbar-brand">
 								<img alt="MTS Web Client" th:src="@{/icons/logo_32_white.png}" />
 							</div>
-							<p class="navbar-text">MTS Web Client</p>
+							<p class="navbar-text">
+								MTS Web Client<span
+									th:if="${beans.applicationUtil.getSystemIdentifier()  != null}"
+									th:text="' - ' + ${beans.applicationUtil.getSystemIdentifier()}"></span>
+							</p>
 						</div>
 					</a>
 
@@ -28,8 +32,9 @@
 									th:action="@{${beans.authenticationUtil.getClientChangePath()}}"
 									method="POST">
 									<select id="clientSelect" class="selectpicker select-xs"
-										th:name="selectedClient">
-										<option th:each="client : ${beans.authenticationUtil.getClients()}"
+										th:name="selectedClient" style="background-color: #ff0000">
+										<option
+											th:each="client : ${beans.authenticationUtil.getClients()}"
 											th:value="${client.id}" th:text="${client.name}"
 											th:selected="${client.id == beans.authenticationUtil.getSelectedClient().getId()}"><p
 												th:text="${client.name}" />
@@ -68,8 +73,9 @@
 									role="presentation"
 									th:attr="class=${feature.isActive() ? 'active' : 'inactive' }">
 									<form th:attr="id=${feature.getId()}"
-										th:action="@{${feature.getLink()}}" method="POST"><input
-											type="hidden" th:name="currentFeature" th:value="${feature}" />
+										th:action="@{${feature.getLink()}}" method="POST">
+										<input type="hidden" th:name="currentFeature"
+											th:value="${feature}" />
 									</form> <a
 									th:href="'javascript:document.getElementById(' + '\'' + ${feature.getId()} + '\'' + ').submit();'"><img
 										th:src="@{${feature.getIconPath()}}"></img><br></br>
@@ -91,8 +97,9 @@
 									th:attr="class=${feature.isActive() ? 'text-color-active' : 'text-color-inactive' }"
 									th:each="feature : ${beans.featureRegistry.getRegisteredFeatures()}"
 									role="presentation"><form th:attr="id=${feature.getId()}"
-										th:action="@{${feature.getLink()}}" method="POST"><input
-											type="hidden" th:name="currentFeature" th:value="${feature}" />
+										th:action="@{${feature.getLink()}}" method="POST">
+										<input type="hidden" th:name="currentFeature"
+											th:value="${feature}" />
 									</form> <a
 									th:href="'javascript:document.getElementById(' + '\'' + ${feature.getId()} + '\'' + ').submit();'"><div
 											th:text="#{${feature.getText()}}" /></a></li>

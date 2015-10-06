@@ -9,6 +9,7 @@ public class EnvironmentDto extends BaseObjectDto
 {
     private int passwordChangeInterval;
     private int allowedLoginAttempts;
+    private String systemIdentifier;
 
     public EnvironmentDto()
     {}
@@ -23,6 +24,11 @@ public class EnvironmentDto extends BaseObjectDto
         return passwordChangeInterval;
     }
 
+    public String getSystemIdentifier()
+    {
+        return systemIdentifier;
+    }
+
     public void setAllowedLoginAttempts(int allowedLoginAttempts)
     {
         this.allowedLoginAttempts = allowedLoginAttempts;
@@ -31,5 +37,10 @@ public class EnvironmentDto extends BaseObjectDto
     public void setPasswordChangeInterval(int passwordChangeInterval)
     {
         this.passwordChangeInterval = passwordChangeInterval;
+    }
+
+    public void setSystemIdentifier(String systemIdentifier)
+    {
+        this.systemIdentifier = systemIdentifier;
     }
 }

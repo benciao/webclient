@@ -18,9 +18,10 @@ public class Environment
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-    private int  passwordChangeInterval;
-    private int  allowedLoginAttempts;
+    private long   id;
+    private int    passwordChangeInterval;
+    private int    allowedLoginAttempts;
+    private String systemIdentifier;
 
     public Environment()
     {}
@@ -30,6 +31,7 @@ public class Environment
     {
         setPasswordChangeInterval(newSystem.getPasswordChangeInterval());
         setAllowedLoginAttempts(newSystem.getAllowedLoginAttempts());
+        setSystemIdentifier(newSystem.getSystemIdentifier());
         return this;
     }
 
@@ -71,6 +73,11 @@ public class Environment
         return passwordChangeInterval;
     }
 
+    public String getSystemIdentifier()
+    {
+        return systemIdentifier;
+    }
+
     @Override
     public int hashCode()
     {
@@ -93,5 +100,10 @@ public class Environment
     public void setPasswordChangeInterval(int passwordChangeInterval)
     {
         this.passwordChangeInterval = passwordChangeInterval;
+    }
+
+    public void setSystemIdentifier(String systemIdentifier)
+    {
+        this.systemIdentifier = systemIdentifier;
     }
 }
