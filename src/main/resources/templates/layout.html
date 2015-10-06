@@ -27,12 +27,15 @@
 					<div class="collapse navbar-collapse"
 						id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav navbar-right">
+							<li><span class="label label-default"
+								th:style="'background-color: ' + ${beans.authenticationUtil.getSelectedClient().getColor()} + ' !important;'"><label
+									th:text="#{client}" /></span></li>
 							<li class="space_right">
 								<form id="clientSelectForm"
 									th:action="@{${beans.authenticationUtil.getClientChangePath()}}"
 									method="POST">
 									<select id="clientSelect" class="selectpicker select-xs"
-										th:name="selectedClient" style="background-color: #ff0000">
+										th:name="selectedClient">
 										<option
 											th:each="client : ${beans.authenticationUtil.getClients()}"
 											th:value="${client.id}" th:text="${client.name}"
