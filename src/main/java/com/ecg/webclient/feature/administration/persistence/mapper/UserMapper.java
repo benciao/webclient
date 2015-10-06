@@ -50,6 +50,8 @@ public class UserMapper
         dto.setEmail(user.getEmail());
         dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
         dto.setPasswortChangedTimeStamp(user.getPasswordChangedTimeStamp());
+        dto.setLoginAttempts(user.getLoginAttempts());
+        dto.setAccoutLocked(user.isAccoutLocked());
 
         if (user.getDefaultClient() != null)
         {
@@ -108,6 +110,7 @@ public class UserMapper
         entity.setLastname(dto.getLastname());
         entity.setFirstname(dto.getFirstname());
         entity.setEnabled(dto.isEnabled());
+        entity.setAccoutLocked(dto.isAccoutLocked());
         entity.setEmail(dto.getEmail());
         entity.setPassword(dto.getPassword());
         entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());

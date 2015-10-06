@@ -20,6 +20,7 @@ public class Environment
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private int  passwordChangeInterval;
+    private int  allowedLoginAttempts;
 
     public Environment()
     {}
@@ -28,6 +29,7 @@ public class Environment
     public Environment bind(Environment newSystem)
     {
         setPasswordChangeInterval(newSystem.getPasswordChangeInterval());
+        setAllowedLoginAttempts(newSystem.getAllowedLoginAttempts());
         return this;
     }
 
@@ -54,6 +56,11 @@ public class Environment
         return true;
     }
 
+    public int getAllowedLoginAttempts()
+    {
+        return allowedLoginAttempts;
+    }
+
     public long getId()
     {
         return id;
@@ -71,6 +78,11 @@ public class Environment
         int result = 1;
         result = prime * result + (int) (id ^ (id >>> 32));
         return result;
+    }
+
+    public void setAllowedLoginAttempts(int allowedLoginAttempts)
+    {
+        this.allowedLoginAttempts = allowedLoginAttempts;
     }
 
     public void setId(long id)

@@ -193,7 +193,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="panel panel-default">
+				<div class="panel panel-default" sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
 					<div class="panel-heading">
 						<h4 class="panel-title">
 							<a data-toggle="collapse" data-parent="#accordion"
@@ -206,7 +206,7 @@
 						<div class="panel-body">
 							<table class="table">
 								<!-- Feature-Knoten -->
-								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+								<div>
 									<tr th:if="${selectedItem == 'feature'}" class="warning">
 										<td><a href="/admin/feature"><span
 												th:text="#{menuTreeFeatureConfig}"></span></a></td>
@@ -216,7 +216,7 @@
 												th:text="#{menuTreeFeatureConfig}"></span></a></td>
 									</tr>
 								</div>
-								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+								<div>
 									<tr th:if="${selectedItem == 'environment'}" class="warning">
 										<td><a href="/admin/environment"><span
 												th:text="#{menuTreeEnvironmentConfig}"></span></a></td>
@@ -234,7 +234,7 @@
 						<div class="panel-body">
 							<table class="table">
 								<!-- Feature-Knoten -->
-								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+								<div>
 									<tr th:if="${selectedItem == 'feature'}" class="warning">
 										<td><a href="/admin/feature"><span
 												th:text="#{menuTreeFeatureConfig}"></span></a></td>
@@ -244,7 +244,7 @@
 												th:text="#{menuTreeFeatureConfig}"></span></a></td>
 									</tr>
 								</div>
-								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+								<div>
 									<tr th:if="${selectedItem == 'environment'}" class="warning">
 										<td><a href="/admin/environment"><span
 												th:text="#{menuTreeEnvironmentConfig}"></span></a></td>

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
@@ -43,10 +44,12 @@ public class UserService
     ClientMapper        clientMapper;
     UserMapper          userMapper;
     Environment         env;
+    EnvironmentService  environmentService;
 
     @Autowired
     public UserService(UserRepository userRepo, GroupRepository groupRepo, ClientRepository clientRepo,
-            ClientMapper clientMapper, UserMapper userMapper, Environment env)
+            ClientMapper clientMapper, UserMapper userMapper, Environment env,
+            EnvironmentService environmentService)
     {
         this.userRepo = userRepo;
         this.groupRepo = groupRepo;
@@ -54,6 +57,7 @@ public class UserService
         this.clientMapper = clientMapper;
         this.userMapper = userMapper;
         this.env = env;
+        this.environmentService = environmentService;
     }
 
     /**
@@ -214,21 +218,42 @@ public class UserService
         else
         {
             String finalPw = PasswordEncoder.encodeComplex(password, Long.toString(persistentUser.getId()));
-            if (persistentUser.isEnabled() && !persistentUser.getEnabledGroups().isEmpty()
-                    && persistentUser.getDefaultClient().isEnabled())
+            if (!persistentUser.isAccoutLocked())
             {
-                if (finalPw.equalsIgnoreCase(persistentUser.getPassword()))
+                if (persistentUser.isEnabled() && !persistentUser.getEnabledGroups().isEmpty()
+                        && persistentUser.getDefaultClient().isEnabled())
                 {
-                    return true;
+                    if (finalPw.equalsIgnoreCase(persistentUser.getPassword()))
+                    {
+                        // Anzahl der Fehlversuche zurücksetzen
+
+                        persistentUser.setLoginAttempts(0);
+                        userRepo.save(persistentUser);
+                        return true;
+                    }
+                    else
+                    {
+                        // Anzahl der Fehlversuche registrieren
+                        boolean locked = checkLoginAttempts(persistentUser);
+
+                        if (locked)
+                        {
+                            throw new LockedException("");
+                        }
+                        else
+                        {
+                            throw new BadCredentialsException("");
+                        }
+                    }
                 }
                 else
                 {
-                    throw new BadCredentialsException("");
+                    throw new DisabledException("");
                 }
             }
             else
             {
-                throw new DisabledException("");
+                throw new LockedException("");
             }
         }
     }
@@ -274,6 +299,9 @@ public class UserService
                 persistedUser.setPassword(PasswordEncoder.encodeComplex(pw,
                         Long.toString(persistedUser.getId())));
                 persistedUser.setPasswordChangedTimeStamp(new Date());
+
+                // Loginversuche bei neuem Nutzer auf 0 setzen
+                persistedUser.setLoginAttempts(0);
             }
 
             userRepo.save(persistedUser);
@@ -301,5 +329,20 @@ public class UserService
         {
             logger.error(e);
         }
+    }
+
+    private boolean checkLoginAttempts(User persistentUser)
+    {
+        persistentUser.setLoginAttempts(persistentUser.getLoginAttempts() + 1);
+
+        if (environmentService.getEnvironment().getAllowedLoginAttempts() <= persistentUser
+                .getLoginAttempts())
+        {
+            persistentUser.setAccoutLocked(true);
+        }
+
+        userRepo.save(persistentUser);
+
+        return persistentUser.isAccoutLocked();
     }
 }

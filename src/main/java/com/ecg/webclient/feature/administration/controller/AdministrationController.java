@@ -446,6 +446,7 @@ public class AdministrationController
         {
             EnvironmentDto newEnvironment = new EnvironmentDto();
             newEnvironment.setPasswordChangeInterval(30);
+            newEnvironment.setAllowedLoginAttempts(10);
             environmentService.saveEnvironment(newEnvironment);
         }
 

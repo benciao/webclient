@@ -35,9 +35,11 @@ public class User
     private String      login;
     private String      password;
     private Date        passwordChangedTimeStamp;
+    private int         loginAttempts;
     private String      firstname;
     private String      lastname;
     private boolean     enabled;
+    private boolean     accoutLocked;
     private boolean     changePasswordOnNextLogin;
     private boolean     internal;
     private String      email;
@@ -66,6 +68,7 @@ public class User
         setGroups(newUser.getGroups());
         setEnabled(newUser.isEnabled());
         setEmail(newUser.getEmail());
+        setAccoutLocked(newUser.isAccoutLocked());
         setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
 
         return this;
@@ -189,6 +192,11 @@ public class User
         return login;
     }
 
+    public int getLoginAttempts()
+    {
+        return loginAttempts;
+    }
+
     public String getPassword()
     {
         return password;
@@ -212,6 +220,11 @@ public class User
         return result;
     }
 
+    public boolean isAccoutLocked()
+    {
+        return accoutLocked;
+    }
+
     public boolean isChangePasswordOnNextLogin()
     {
         return changePasswordOnNextLogin;
@@ -225,6 +238,11 @@ public class User
     public boolean isInternal()
     {
         return internal;
+    }
+
+    public void setAccoutLocked(boolean accoutLocked)
+    {
+        this.accoutLocked = accoutLocked;
     }
 
     public void setChangePasswordOnNextLogin(boolean changePasswordOnNextLogin)
@@ -278,6 +296,11 @@ public class User
     public void setLogin(String login)
     {
         this.login = login;
+    }
+
+    public void setLoginAttempts(int loginAttempts)
+    {
+        this.loginAttempts = loginAttempts;
     }
 
     public void setPassword(String password)

@@ -35,6 +35,7 @@ public class EnvironmentMapper
         dto.setPasswordChangeInterval(environment.getPasswordChangeInterval());
         dto.setId(environment.getId());
         dto.setDelete(false);
+        dto.setAllowedLoginAttempts(environment.getAllowedLoginAttempts());
 
         return dto;
     }
@@ -83,6 +84,7 @@ public class EnvironmentMapper
         Environment environment = new Environment();
         environment.setId(dto.getId());
         environment.setPasswordChangeInterval(dto.getPasswordChangeInterval());
+        environment.setAllowedLoginAttempts(dto.getAllowedLoginAttempts());
 
         Environment persistentEnvironment = environmentRepo.findOne(environment.getId());
         if (persistentEnvironment != null)
