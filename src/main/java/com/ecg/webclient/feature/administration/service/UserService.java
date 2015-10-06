@@ -218,7 +218,7 @@ public class UserService
         else
         {
             String finalPw = PasswordEncoder.encodeComplex(password, Long.toString(persistentUser.getId()));
-            if (!persistentUser.isAccoutLocked())
+            if (!persistentUser.isAccountLocked())
             {
                 if (persistentUser.isEnabled() && !persistentUser.getEnabledGroups().isEmpty()
                         && persistentUser.getDefaultClient().isEnabled())
@@ -299,9 +299,6 @@ public class UserService
                 persistedUser.setPassword(PasswordEncoder.encodeComplex(pw,
                         Long.toString(persistedUser.getId())));
                 persistedUser.setPasswordChangedTimeStamp(new Date());
-
-                // Loginversuche bei neuem Nutzer auf 0 setzen
-                persistedUser.setLoginAttempts(0);
             }
 
             userRepo.save(persistedUser);
@@ -338,11 +335,11 @@ public class UserService
         if (environmentService.getEnvironment().getAllowedLoginAttempts() <= persistentUser
                 .getLoginAttempts())
         {
-            persistentUser.setAccoutLocked(true);
+            persistentUser.setAccountLocked(true);
         }
 
         userRepo.save(persistentUser);
 
-        return persistentUser.isAccoutLocked();
+        return persistentUser.isAccountLocked();
     }
 }

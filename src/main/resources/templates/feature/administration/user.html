@@ -60,6 +60,7 @@
 																	+ "<input type='hidden' id='hiddenDefaultClient-"+ rowIndex +"' name='users["+ rowIndex +"].defaultClient' />"
 																	+ "<input type='hidden' id='hiddenChangePasswordOnNextLogin-"+ rowIndex +"' name='users["+ rowIndex +"].changePasswordOnNextLogin' />"
 																	+ "<input type='hidden' id='hiddenPassword-"+ rowIndex +"' name='users["+ rowIndex +"].password' />"
+																	+ "<input type='hidden' id='hiddenLoginAttempts-"+ rowIndex +"' name='users["+ rowIndex +"].loginAttempts' value='0' />"
 																	+ "</td>"
 																	+ "</tr>");
 
@@ -150,6 +151,10 @@
 
 						$('.a_delete').click(function(event) {
 							onDeleteClick(event);
+						});
+
+						$('.a_unlock').click(function(event) {
+							onUnlockClick(event);
 						});
 
 						$('.a_edit').click(function(event) {
@@ -429,6 +434,18 @@
 		row.hide();
 	}
 
+	function onUnlockClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var row = $(event.target).parent().parent().parent();
+
+		$("#hiddenAccountLocked-" + collectionIndex[1]).val(false);
+		$("#hiddenLoginAttempts-" + collectionIndex[1]).val(0);
+		$("#usersSave").removeClass("disabled");
+
+		$(event.target).hide();
+	}
+
 	function setAssignedGroups(userIndex) {
 		var assignedGroupRids = $("#hiddenGroupRids-" + userIndex).val();
 
@@ -595,8 +612,13 @@ body {
 									class="a_login-as" th:id="${'a_login-as-'+stat.index}"
 									th:href="'/admin/user/loginas/' + *{users[__${stat.index}__].id}"
 									th:title="#{usersActionLoginAs}"><span
-										class="glyphicon glyphicon-random"> </span></a> <input
-									type="hidden" th:id="${'hiddenRid-'+stat.index}"
+										class="glyphicon glyphicon-random"> </span></a> <a
+									sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')"
+									th:if="*{users[__${stat.index}__].accountLocked}"
+									class="a_unlock" th:id="${'a_unlock-'+stat.index}" href="#"
+									th:title="#{usersActionUnlock}"><span
+										class="glyphicon glyphicon-lock"> </span></a> <input type="hidden"
+									th:id="${'hiddenRid-'+stat.index}"
 									th:field="*{users[__${stat.index}__].id}" /><input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
 									th:field="*{users[__${stat.index}__].delete}" /><input
@@ -613,7 +635,11 @@ body {
 									th:id="${'hiddenChangePasswordOnNextLogin-'+stat.index}"
 									th:field="*{users[__${stat.index}__].changePasswordOnNextLogin}" /><input
 									type="hidden" th:id="${'hiddenPassword-'+stat.index}"
-									th:field="*{users[__${stat.index}__].password}" /></td>
+									th:field="*{users[__${stat.index}__].password}" /> <input
+									type="hidden" th:id="${'hiddenAccountLocked-'+stat.index}"
+									th:field="*{users[__${stat.index}__].accountLocked}" /> <input
+									type="hidden" th:id="${'hiddenLoginAttempts-'+stat.index}"
+									th:field="*{users[__${stat.index}__].loginAttempts}" /></td>
 							</tr>
 						</tbody>
 					</table>

@@ -19,7 +19,7 @@ public class UserDto extends BaseObjectDto
     private String  password;
     private String  email;
     private boolean enabled;
-    private boolean accoutLocked;
+    private boolean accountLocked;
     private boolean changePasswordOnNextLogin;
     private String  defaultClient;
     private String  groupIds;
@@ -91,9 +91,9 @@ public class UserDto extends BaseObjectDto
         return passwortChangedTimeStamp;
     }
 
-    public boolean isAccoutLocked()
+    public boolean isAccountLocked()
     {
-        return accoutLocked;
+        return accountLocked;
     }
 
     public boolean isChangePasswordOnNextLogin()
@@ -111,9 +111,9 @@ public class UserDto extends BaseObjectDto
         return internal;
     }
 
-    public void setAccoutLocked(boolean accoutLocked)
+    public void setAccountLocked(boolean accoutLocked)
     {
-        this.accoutLocked = accoutLocked;
+        this.accountLocked = accoutLocked;
     }
 
     public void setChangePasswordOnNextLogin(boolean changePasswordOnNextLogin)
