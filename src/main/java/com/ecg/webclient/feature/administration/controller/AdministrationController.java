@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -44,6 +45,7 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserConfig;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.ClientDtoValidator;
+import com.ecg.webclient.feature.administration.viewmodell.validator.EnvironmentDtoValidator;
 import com.ecg.webclient.feature.administration.viewmodell.validator.GroupDtoValidator;
 import com.ecg.webclient.feature.administration.viewmodell.validator.PropertyDtoValidator;
 import com.ecg.webclient.feature.administration.viewmodell.validator.UserDtoValidator;
@@ -58,49 +60,52 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.UserDtoVali
 @RequestMapping(value = "/admin")
 public class AdministrationController
 {
-    static final Logger        logger                            = LogManager
-                                                                         .getLogger(AdministrationController.class
-                                                                                 .getName());
-    static final String        PROPERTY_NAME_SETUP_USER_PASSWORD = "sec.setup.user.pw";
+    static final Logger           logger                            = LogManager
+                                                                            .getLogger(AdministrationController.class
+                                                                                    .getName());
+    static final String           PROPERTY_NAME_SETUP_USER_PASSWORD = "sec.setup.user.pw";
 
     @Autowired
-    private FeatureRegistry    featureRegistry;
+    private FeatureRegistry       featureRegistry;
 
     @Autowired
-    private ClientService      clientService;
+    private ClientService         clientService;
 
     @Autowired
-    private RoleService        roleService;
+    private RoleService           roleService;
 
     @Autowired
-    private GroupService       groupService;
+    private GroupService          groupService;
 
     @Autowired
-    private UserService        userService;
+    private UserService           userService;
 
     @Autowired
-    private FeatureService     featureService;
+    private FeatureService        featureService;
 
     @Autowired
-    private EnvironmentService environmentService;
+    private EnvironmentService    environmentService;
 
     @Autowired
-    private AuthenticationUtil authUtil;
+    private AuthenticationUtil    authUtil;
 
     @Autowired
-    private Environment        env;
+    private Environment           env;
 
     @Autowired
-    ClientDtoValidator         clientDtoValidator;
+    ClientDtoValidator            clientDtoValidator;
 
     @Autowired
-    PropertyDtoValidator       propertyDtoValidator;
+    PropertyDtoValidator          propertyDtoValidator;
 
     @Autowired
-    UserDtoValidator           userDtoValidator;
+    UserDtoValidator              userDtoValidator;
 
     @Autowired
-    GroupDtoValidator          groupDtoValidator;
+    GroupDtoValidator             groupDtoValidator;
+
+    @Autowired
+    EnvironmentDtoValidator       environmentDtoValidator;
 
     /**
      * Behandelt GET-Requests vom Typ "/admin".
@@ -125,6 +130,7 @@ public class AdministrationController
         return getLoadingRedirectTemplate() + "administration";
     }
 
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/user/loginas/{userId}", method = RequestMethod.GET)
     public String loginAsUser(Model model, @PathVariable("userId") String userId)
     {
@@ -138,6 +144,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/usergroup/save", method = RequestMethod.POST)
     public String save(@Valid GroupConfig groupConfig, BindingResult bindingResult)
     {
@@ -175,6 +182,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/userrole/save", method = RequestMethod.POST)
     public String save(@Valid RoleConfig roleConfig, BindingResult bindingResult)
     {
@@ -212,6 +220,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/user/save", method = RequestMethod.POST)
     public String save(@Valid UserConfig userConfig, BindingResult bindingResult)
     {
@@ -249,6 +258,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/client/save", method = RequestMethod.POST)
     public String saveClient(@Valid ClientConfig clientConfig, BindingResult bindingResult)
     {
@@ -288,6 +298,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/environment/save", method = RequestMethod.POST)
     public String saveEnvironment(@Valid EnvironmentDto environment, BindingResult bindingResult)
     {
@@ -306,6 +317,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/feature/save", method = RequestMethod.POST)
     public String saveFeatures(@Valid FeatureConfig featureConfig, BindingResult bindingResult)
     {
@@ -454,11 +466,12 @@ public class AdministrationController
     }
 
     /**
-     * Behandelt einen Ajax Request zum Anzeigen von außschließlich Mandanten, welchen die zugeordneten
+     * Behandelt einen Ajax Request zum Anzeigen von ausschließlich Mandanten, welchen die zugeordneten
      * Gruppen angehören.
      * 
      * @return
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/user/availableClients/{groupIds}/{userId}", method = RequestMethod.GET)
     public String showAvailableClients(Model model, @PathVariable("groupIds") String groupIds,
             @PathVariable("userId") String userId)
@@ -486,6 +499,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/client", method = RequestMethod.GET)
     public String showClientConfig(Model model)
     {
@@ -500,6 +514,7 @@ public class AdministrationController
      * 
      * @return
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/user/clientgroups/{clientId}", method = RequestMethod.GET)
     public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
     {
@@ -530,6 +545,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/environment", method = RequestMethod.GET)
     public String showEnvironment(Model model)
     {
@@ -544,6 +560,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/feature", method = RequestMethod.GET)
     public String showFeatureConfig(Model model)
     {
@@ -560,6 +577,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/usergroup", method = RequestMethod.GET)
     public String showGroupConfig(Model model)
     {
@@ -576,6 +594,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/userrole", method = RequestMethod.GET)
     public String showRoleConfig(Model model)
     {
@@ -591,6 +610,7 @@ public class AdministrationController
      * 
      * @return Template
      */
+    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public String showUserConfig(Model model)
     {
@@ -610,6 +630,12 @@ public class AdministrationController
     protected void initClientBinder(WebDataBinder binder)
     {
         binder.setValidator(clientDtoValidator);
+    }
+
+    @InitBinder("environmentDto")
+    protected void initEnvironmentBinder(WebDataBinder binder)
+    {
+        binder.setValidator(environmentDtoValidator);
     }
 
     @InitBinder("groupConfig")

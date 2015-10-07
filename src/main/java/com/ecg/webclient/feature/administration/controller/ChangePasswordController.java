@@ -3,7 +3,7 @@ package com.ecg.webclient.feature.administration.controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,7 +33,7 @@ public class ChangePasswordController
      * 
      * @return Template
      */
-    @Secured("SEC_FORCE_CHANGE_PASSWORD")
+    @PreAuthorize("hasRole('SEC_FORCE_CHANGE_PASSWORD')")
     @RequestMapping(method = RequestMethod.POST)
     public String changePassword(@ModelAttribute NewPassword newPassword, Model model)
     {

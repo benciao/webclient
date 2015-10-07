@@ -7,19 +7,19 @@ package com.ecg.webclient.feature.administration.viewmodell;
  */
 public class EnvironmentDto extends BaseObjectDto
 {
-    private int passwordChangeInterval;
-    private int allowedLoginAttempts;
-    private String systemIdentifier;
+    private Integer passwordChangeInterval;
+    private Integer allowedLoginAttempts;
+    private String  systemIdentifier;
 
     public EnvironmentDto()
     {}
 
-    public int getAllowedLoginAttempts()
+    public Integer getAllowedLoginAttempts()
     {
         return allowedLoginAttempts;
     }
 
-    public int getPasswordChangeInterval()
+    public Integer getPasswordChangeInterval()
     {
         return passwordChangeInterval;
     }
@@ -29,12 +29,12 @@ public class EnvironmentDto extends BaseObjectDto
         return systemIdentifier;
     }
 
-    public void setAllowedLoginAttempts(int allowedLoginAttempts)
+    public void setAllowedLoginAttempts(Integer allowedLoginAttempts)
     {
         this.allowedLoginAttempts = allowedLoginAttempts;
     }
 
-    public void setPasswordChangeInterval(int passwordChangeInterval)
+    public void setPasswordChangeInterval(Integer passwordChangeInterval)
     {
         this.passwordChangeInterval = passwordChangeInterval;
     }
