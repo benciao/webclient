@@ -18,33 +18,33 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 {
-    @Autowired
-    @Qualifier("dbAuthenticationProvider")
-    AuthenticationProvider       authenticationProvider;
+	@Autowired
+	@Qualifier("dbAuthenticationProvider")
+	AuthenticationProvider authenticationProvider;
 
-    @Autowired
-    @Qualifier("webClientAuthenticationSuccessHandler")
-    AuthenticationSuccessHandler successHandler;
-    
-    @Autowired
-    @Qualifier("webClientAuthenticationFailureHandler")
-    AuthenticationFailureHandler failureHandler;
+	@Autowired
+	@Qualifier("webClientAuthenticationSuccessHandler")
+	AuthenticationSuccessHandler successHandler;
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
-    {
-        auth.authenticationProvider(authenticationProvider);
-        auth.eraseCredentials(false);
-    }
+	@Autowired
+	@Qualifier("webClientAuthenticationFailureHandler")
+	AuthenticationFailureHandler failureHandler;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception
-    {
-        http.authorizeRequests()
-                .antMatchers("/resources/**", "/css/**", "/icons/**", "/js/**", "/fonts/**",
-                        "/img/bootstrap-colorpicker/**", "/admin/setup/system", "/login/**").permitAll()
-                .anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll()
-                .successHandler(successHandler).failureHandler(failureHandler).and().logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login");
-    }
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
+	{
+		auth.authenticationProvider(authenticationProvider);
+		auth.eraseCredentials(false);
+	}
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception
+	{
+		http.authorizeRequests()
+				.antMatchers("/resources/**", "/css/**", "/icons/**", "/js/**", "/fonts/**",
+						"/img/bootstrap-colorpicker/**", "/admin/setup/system", "/login/**")
+				.permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll()
+				.successHandler(successHandler).failureHandler(failureHandler).and().logout()
+				.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login");
+	}
 }

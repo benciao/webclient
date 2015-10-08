@@ -35,311 +35,302 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 @Component
 public class UserService
 {
-    static final Logger logger                           = LogManager.getLogger(UserService.class.getName());
-    static final String PROPERTY_NAME_INIT_USER_PASSWORD = "sec.init.user.pw";
+	static final Logger	logger								= LogManager.getLogger(UserService.class.getName());
+	static final String	PROPERTY_NAME_INIT_USER_PASSWORD	= "sec.init.user.pw";
 
-    UserRepository      userRepo;
-    GroupRepository     groupRepo;
-    ClientRepository    clientRepo;
-    ClientMapper        clientMapper;
-    UserMapper          userMapper;
-    Environment         env;
-    EnvironmentService  environmentService;
+	UserRepository		userRepo;
+	GroupRepository		groupRepo;
+	ClientRepository	clientRepo;
+	ClientMapper		clientMapper;
+	UserMapper			userMapper;
+	Environment			env;
+	EnvironmentService	environmentService;
 
-    @Autowired
-    public UserService(UserRepository userRepo, GroupRepository groupRepo, ClientRepository clientRepo,
-            ClientMapper clientMapper, UserMapper userMapper, Environment env,
-            EnvironmentService environmentService)
-    {
-        this.userRepo = userRepo;
-        this.groupRepo = groupRepo;
-        this.clientRepo = clientRepo;
-        this.clientMapper = clientMapper;
-        this.userMapper = userMapper;
-        this.env = env;
-        this.environmentService = environmentService;
-    }
+	@Autowired
+	public UserService(UserRepository userRepo, GroupRepository groupRepo, ClientRepository clientRepo,
+			ClientMapper clientMapper, UserMapper userMapper, Environment env, EnvironmentService environmentService)
+	{
+		this.userRepo = userRepo;
+		this.groupRepo = groupRepo;
+		this.clientRepo = clientRepo;
+		this.clientMapper = clientMapper;
+		this.userMapper = userMapper;
+		this.env = env;
+		this.environmentService = environmentService;
+	}
 
-    /**
-     * Löscht die in der Liste enthaltenen Benutzer.
-     * 
-     * @param detachedUsers
-     *            Liste von zu löschenden Benutzern
-     */
-    public void deleteUsers(List<UserDto> detachedUsers)
-    {
-        try
-        {
-            for (UserDto user : detachedUsers)
-            {
-                User persistentUser = userRepo.findOne(user.getId());
+	/**
+	 * Löscht die in der Liste enthaltenen Benutzer.
+	 * 
+	 * @param detachedUsers
+	 *            Liste von zu löschenden Benutzern
+	 */
+	public void deleteUsers(List<UserDto> detachedUsers)
+	{
+		try
+		{
+			for (UserDto user : detachedUsers)
+			{
+				User persistentUser = userRepo.findOne(user.getId());
 
-                if (persistentUser != null)
-                {
-                    userRepo.delete(persistentUser);
-                }
-            }
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
-    }
+				if (persistentUser != null)
+				{
+					userRepo.delete(persistentUser);
+				}
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+	}
 
-    /**
-     * @param onlyEnabledUsers
-     *            true, wenn nur die aktiven Benutzer geladen werden sollen, sonst false
-     * @return Alle Benutzer, wenn false, sonst nur die aktivierten Benutzer
-     */
-    public List<UserDto> getAllUsers(boolean onlyEnabledUsers)
-    {
-        List<User> attachedUsers = new ArrayList<User>();
+	/**
+	 * @param onlyEnabledUsers
+	 *            true, wenn nur die aktiven Benutzer geladen werden sollen,
+	 *            sonst false
+	 * @return Alle Benutzer, wenn false, sonst nur die aktivierten Benutzer
+	 */
+	public List<UserDto> getAllUsers(boolean onlyEnabledUsers)
+	{
+		List<User> attachedUsers = new ArrayList<User>();
 
-        try
-        {
-            if (!onlyEnabledUsers)
-            {
-                userRepo.findAll().forEach(e -> attachedUsers.add(e));
-            }
-            else
-            {
-                userRepo.findAllEnabledUsers(true).forEach(e -> attachedUsers.add(e));
-            }
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
+		try
+		{
+			if (!onlyEnabledUsers)
+			{
+				userRepo.findAll().forEach(e -> attachedUsers.add(e));
+			}
+			else
+			{
+				userRepo.findAllEnabledUsers(true).forEach(e -> attachedUsers.add(e));
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        AutoPopulatingList<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
+		AutoPopulatingList<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
 
-        for (User attachedUser : attachedUsers)
-        {
-            result.add(userMapper.mapToDto(attachedUser));
-        }
+		for (User attachedUser : attachedUsers)
+		{
+			result.add(userMapper.mapToDto(attachedUser));
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    /**
-     * @param user
-     *            Benutzer
-     * @return Den dem Benutzer zugeordneten Standardmandanten
-     */
-    public ClientDto getDefaultClientForUser(UserDto user)
-    {
-        try
-        {
-            User persistentUser = userRepo.findOne(user.getId());
+	/**
+	 * @param user
+	 *            Benutzer
+	 * @return Den dem Benutzer zugeordneten Standardmandanten
+	 */
+	public ClientDto getDefaultClientForUser(UserDto user)
+	{
+		try
+		{
+			User persistentUser = userRepo.findOne(user.getId());
 
-            if (persistentUser != null)
-            {
-                return clientMapper.mapToDto(persistentUser.getDefaultClient());
-            }
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
+			if (persistentUser != null)
+			{
+				return clientMapper.mapToDto(persistentUser.getDefaultClient());
+			}
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * @param userId
-     *            Id des Benutzers
-     * @return das Passwort des Benutzers
-     */
-    public String getPassword(Long userId)
-    {
-        return userRepo.getPassword(userId);
-    }
+	/**
+	 * @param userId
+	 *            Id des Benutzers
+	 * @return das Passwort des Benutzers
+	 */
+	public String getPassword(Long userId)
+	{
+		return userRepo.getPassword(userId);
+	}
 
-    /**
-     * @param id
-     *            Benutzer-ID
-     * @return Den zur ID gehördenen Benutzer
-     */
-    public UserDto getUserById(Long id)
-    {
-        try
-        {
-            User user = userRepo.findOne(id);
+	/**
+	 * @param id
+	 *            Benutzer-ID
+	 * @return Den zur ID gehördenen Benutzer
+	 */
+	public UserDto getUserById(Long id)
+	{
+		try
+		{
+			User user = userRepo.findOne(id);
 
-            return (user != null) ? userMapper.mapToDto(user) : null;
+			return (user != null) ? userMapper.mapToDto(user) : null;
 
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * @param login
-     *            Login des Benutzers
-     * @return Den zum Login gehörenden Benutzer
-     */
-    public UserDto getUserByLogin(String login)
-    {
-        try
-        {
-            User user = userRepo.findUserByLogin(login);
+	/**
+	 * @param login
+	 *            Login des Benutzers
+	 * @return Den zum Login gehörenden Benutzer
+	 */
+	public UserDto getUserByLogin(String login)
+	{
+		try
+		{
+			User user = userRepo.findUserByLogin(login);
 
-            return (user != null) ? userMapper.mapToDto(user) : null;
+			return (user != null) ? userMapper.mapToDto(user) : null;
 
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * @param login
-     *            Benutzer-Login
-     * @param password
-     *            Durch Javascript einfach codiertes Passwort
-     * @return true, wenn Benutzer bekannt, Passwort stimmt, Benutzer aktiviert ist, Benutzer mindestens einer
-     *         Gruppe zugeordnet ist, der Standardmandant des Benutzers aktiviert ist... sonst false
-     */
-    public boolean isUserAuthenticated(String login, String password) throws AuthenticationException
-    {
-        User persistentUser = userRepo.findUserByLogin(login);
+	/**
+	 * @param login
+	 *            Benutzer-Login
+	 * @param password
+	 *            Durch Javascript einfach codiertes Passwort
+	 * @return true, wenn Benutzer bekannt, Passwort stimmt, Benutzer aktiviert
+	 *         ist, Benutzer mindestens einer Gruppe zugeordnet ist, der
+	 *         Standardmandant des Benutzers aktiviert ist... sonst false
+	 */
+	public boolean isUserAuthenticated(String login, String password) throws AuthenticationException
+	{
+		User persistentUser = userRepo.findUserByLogin(login);
 
-        if (persistentUser == null)
-        {
-            throw new BadCredentialsException("");
-        }
-        else
-        {
-            String finalPw = PasswordEncoder.encodeComplex(password, Long.toString(persistentUser.getId()));
-            if (!persistentUser.isAccountLocked())
-            {
-                if (persistentUser.isEnabled() && !persistentUser.getEnabledGroups().isEmpty()
-                        && persistentUser.getDefaultClient().isEnabled())
-                {
-                    if (finalPw.equalsIgnoreCase(persistentUser.getPassword()))
-                    {
-                        // Anzahl der Fehlversuche zurücksetzen
+		String finalPw = PasswordEncoder.encodeComplex(password, Long.toString(persistentUser.getId()));
+		if (!persistentUser.isAccountLocked())
+		{
+			if (persistentUser.isEnabled() && !persistentUser.getEnabledGroups().isEmpty()
+					&& persistentUser.getDefaultClient().isEnabled())
+			{
+				if (finalPw.equalsIgnoreCase(persistentUser.getPassword()))
+				{
+					// Anzahl der Fehlversuche zurücksetzen
 
-                        persistentUser.setLoginAttempts(0);
-                        userRepo.save(persistentUser);
-                        return true;
-                    }
-                    else
-                    {
-                        // Anzahl der Fehlversuche registrieren
-                        boolean locked = checkLoginAttempts(persistentUser);
+					persistentUser.setLoginAttempts(0);
+					userRepo.save(persistentUser);
+					return true;
+				}
+				else
+				{
+					// Anzahl der Fehlversuche registrieren
+					boolean locked = checkLoginAttempts(persistentUser);
 
-                        if (locked)
-                        {
-                            throw new LockedException("");
-                        }
-                        else
-                        {
-                            throw new BadCredentialsException("");
-                        }
-                    }
-                }
-                else
-                {
-                    throw new DisabledException("");
-                }
-            }
-            else
-            {
-                throw new LockedException("");
-            }
-        }
-    }
+					if (locked)
+					{
+						throw new LockedException("");
+					}
+					else
+					{
+						throw new BadCredentialsException("");
+					}
+				}
+			}
+			else
+			{
+				throw new DisabledException("");
+			}
+		}
+		else
+		{
+			throw new LockedException("");
+		}
+	}
 
-    /**
-     * Speichert einen Benutzer.
-     * 
-     * @param detachedUser
-     *            Zu speichernder Benutzer
-     */
-    @Transactional
-    public void saveUser(UserDto detachedUser)
-    {
-        try
-        {
-            User draftUser = userMapper.mapToEntity(detachedUser);
-            User persistedUser = userRepo.save(draftUser);
+	/**
+	 * Speichert einen Benutzer.
+	 * 
+	 * @param detachedUser
+	 *            Zu speichernder Benutzer
+	 */
+	@Transactional
+	public void saveUser(UserDto detachedUser)
+	{
+		try
+		{
+			User draftUser = userMapper.mapToEntity(detachedUser);
+			User persistedUser = userRepo.save(draftUser);
 
-            if (detachedUser.getId() > -1)
-            {
-                // Passwort wurde bei einem schon persistenten Benutzer
-                // geändert; Erste Verschlüsselung fand vor der Übertragung zum
-                // Service statt
-                if (detachedUser.getPassword() != null && !detachedUser.getPassword().isEmpty())
-                {
-                    persistedUser.setPassword(PasswordEncoder.encodeComplex(detachedUser.getPassword(),
-                            Long.toString(persistedUser.getId())));
-                    persistedUser.setPasswordChangedTimeStamp(new Date());
-                }
-            }
-            else
-            {
-                // Passwort wurde bei einem neuen Benutzer
-                // vor der Übertragung zum Service gesetzt und einmal
-                // verschlüsselt. Wurde kein Passwort vor der ersten Übertragung
-                // gesetzt, wird es hier generiert.
-                String pw = detachedUser.getPassword();
-                if (pw == null || pw.isEmpty())
-                {
-                    pw = PasswordEncoder.encodeSimple(env
-                            .getRequiredProperty(PROPERTY_NAME_INIT_USER_PASSWORD));
-                }
-                persistedUser.setPassword(PasswordEncoder.encodeComplex(pw,
-                        Long.toString(persistedUser.getId())));
-                persistedUser.setPasswordChangedTimeStamp(new Date());
-            }
+			if (detachedUser.getId() > -1)
+			{
+				// Passwort wurde bei einem schon persistenten Benutzer
+				// geändert; Erste Verschlüsselung fand vor der Übertragung zum
+				// Service statt
+				if (detachedUser.getPassword() != null && !detachedUser.getPassword().isEmpty())
+				{
+					persistedUser.setPassword(PasswordEncoder.encodeComplex(detachedUser.getPassword(),
+							Long.toString(persistedUser.getId())));
+					persistedUser.setPasswordChangedTimeStamp(new Date());
+				}
+			}
+			else
+			{
+				// Passwort wurde bei einem neuen Benutzer
+				// vor der Übertragung zum Service gesetzt und einmal
+				// verschlüsselt. Wurde kein Passwort vor der ersten Übertragung
+				// gesetzt, wird es hier generiert.
+				String pw = detachedUser.getPassword();
+				if (pw == null || pw.isEmpty())
+				{
+					pw = PasswordEncoder.encodeSimple(env.getRequiredProperty(PROPERTY_NAME_INIT_USER_PASSWORD));
+				}
+				persistedUser.setPassword(PasswordEncoder.encodeComplex(pw, Long.toString(persistedUser.getId())));
+				persistedUser.setPasswordChangedTimeStamp(new Date());
+			}
 
-            userRepo.save(persistedUser);
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
+			userRepo.save(persistedUser);
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
 
-    }
+	}
 
-    /**
-     * Speichert eine Liste von Benutzern.
-     * 
-     * @param detachedUsers
-     *            Zu speichernde Benutzer
-     */
-    public void saveUsers(List<UserDto> detachedUsers)
-    {
-        try
-        {
-            detachedUsers.forEach(e -> saveUser(e));
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
-    }
+	/**
+	 * Speichert eine Liste von Benutzern.
+	 * 
+	 * @param detachedUsers
+	 *            Zu speichernde Benutzer
+	 */
+	public void saveUsers(List<UserDto> detachedUsers)
+	{
+		try
+		{
+			detachedUsers.forEach(e -> saveUser(e));
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+	}
 
-    private boolean checkLoginAttempts(User persistentUser)
-    {
-        persistentUser.setLoginAttempts(persistentUser.getLoginAttempts() + 1);
+	private boolean checkLoginAttempts(User persistentUser)
+	{
+		persistentUser.setLoginAttempts(persistentUser.getLoginAttempts() + 1);
 
-        if (environmentService.getEnvironment().getAllowedLoginAttempts() <= persistentUser
-                .getLoginAttempts())
-        {
-            persistentUser.setAccountLocked(true);
-        }
+		if (environmentService.getEnvironment().getAllowedLoginAttempts() <= persistentUser.getLoginAttempts())
+		{
+			persistentUser.setAccountLocked(true);
+		}
 
-        userRepo.save(persistentUser);
+		userRepo.save(persistentUser);
 
-        return persistentUser.isAccountLocked();
-    }
+		return persistentUser.isAccountLocked();
+	}
 }

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,13 +25,16 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 public class DbAuthenticationProvider implements AuthenticationProvider
 {
 	@Autowired
-	UserService			userService;
+	UserService				userService;
 	@Autowired
-	GroupService		groupService;
+	GroupService			groupService;
 	@Autowired
-	RoleService			roleService;
+	RoleService				roleService;
 	@Autowired
-	AuthenticationUtil	util;
+	AuthenticationUtil		util;
+	@Autowired
+	@Qualifier("ldapAuthenticationProvider")
+	AuthenticationProvider	ldapAuthenticationProvider;
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException
@@ -37,32 +42,54 @@ public class DbAuthenticationProvider implements AuthenticationProvider
 		String login = authentication.getName();
 		String password = authentication.getCredentials().toString();
 
-		if (userService.isUserAuthenticated(login, password))
-		{
-			UserDto user = userService.getUserByLogin(login);
-			ClientDto defaultClient = userService.getDefaultClientForUser(user);
-			util.setSelectedClient(defaultClient);
+		UserDto persistentUser = userService.getUserByLogin(login);
 
-			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-			// zugeordnete Rollen für den Mandanten setzen, welche selbst aktiv
-			// sind und deren Feature aktiv ist
-			for (GroupDto group : groupService.getEnabledGroupsForIds(user.getGroupIdObjects()))
+		if (persistentUser == null)
+		{
+			throw new BadCredentialsException("");
+		}
+		else
+		{
+			// Ldap Authentifizierung
+			if (!persistentUser.isInternal())
 			{
-				if (groupService.getClientForGroupId(group.getId()).getId() == defaultClient.getId())
+				// TODO prüfen, ob LDAP konfiguriert ist, wenn nicht, entsprechende Fehlermeldung
+				return ldapAuthenticationProvider.authenticate(authentication);
+			}
+			// DB Authentifizierung
+			else
+			{
+				if (userService.isUserAuthenticated(login, password))
 				{
-					for (RoleDto role : roleService.getEnabledRolesWithEnabledFeatureForIds(group.getRoleIdObjects()))
+					UserDto user = userService.getUserByLogin(login);
+					ClientDto defaultClient = userService.getDefaultClientForUser(user);
+					util.setSelectedClient(defaultClient);
+
+					List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+					// zugeordnete Rollen für den Mandanten setzen, welche
+					// selbst aktiv
+					// sind und deren Feature aktiv ist
+					for (GroupDto group : groupService.getEnabledGroupsForIds(user.getGroupIdObjects()))
 					{
-						DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
-						grantedAuths.add(newAuth);
+						if (groupService.getClientForGroupId(group.getId()).getId() == defaultClient.getId())
+						{
+							for (RoleDto role : roleService
+									.getEnabledRolesWithEnabledFeatureForIds(group.getRoleIdObjects()))
+							{
+								DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
+								grantedAuths.add(newAuth);
+							}
+						}
 					}
+
+					Authentication auth = new UsernamePasswordAuthenticationToken(login, password, grantedAuths);
+
+					return auth;
 				}
 			}
-			
-			Authentication auth = new UsernamePasswordAuthenticationToken(login, password, grantedAuths);
-
-			return auth;
 		}
-        return null;
+
+		return null;
 	}
 
 	@Override
