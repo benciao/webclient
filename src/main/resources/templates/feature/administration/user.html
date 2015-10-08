@@ -42,7 +42,7 @@
 																	+ "<input class='form-control' placeholder='[[#{usersTableLogin}]]' id='login-" + rowIndex + "' name='users[" + rowIndex + "].login' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<select class='form-control' id='type-" + rowIndex + "' name='users[" + rowIndex + "].internal'><option value='true' text='[[#{usersTypeSelectAtlas}]]'>[[#{usersTypeSelectAtlas}]]</option><option value='false' text='[[#{usersTypeSelectLdap}]]'>[[#{usersTypeSelectLdap}]]</option></select>"
+																	+ "<select class='form-control' id='type-" + rowIndex + "' name='users[" + rowIndex + "].internal'><option value='true' text='[[#{usersTypeSelectDb}]]'>[[#{usersTypeSelectDb}]]</option><option value='false' text='[[#{usersTypeSelectLdap}]]'>[[#{usersTypeSelectLdap}]]</option></select>"
 																	+ "</td>"
 																	+ "<td>"
 																	+ "<input class='form-control' placeholder='[[#{usersTableFirstName}]]' id='firstname-" + rowIndex + "' name='users[" + rowIndex + "].firstname' />"
@@ -581,7 +581,7 @@ body {
 								<td><select class="form-control"
 									th:id="${'type-'+stat.index}"
 									th:field="*{users[__${stat.index}__].internal}">
-										<option th:value="true" th:text="#{usersTypeSelectAtlas}"
+										<option th:value="true" th:text="#{usersTypeSelectDb}"
 											th:selected="*{users[__${stat.index}__].internal}"></option>
 										<option th:value="false" th:text="#{usersTypeSelectLdap}"
 											th:selected="*{users[__${stat.index}__].internal}"></option>

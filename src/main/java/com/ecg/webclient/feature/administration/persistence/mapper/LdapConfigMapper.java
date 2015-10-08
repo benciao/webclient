@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
+import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.persistence.modell.LdapConfig;
 import com.ecg.webclient.feature.administration.persistence.repo.LdapConfigRepository;
 import com.ecg.webclient.feature.administration.viewmodell.LdapConfigDto;
@@ -38,7 +39,7 @@ public class LdapConfigMapper
 		dto.setEnabled(ldapConfig.isEnabled());
 		dto.setUrl(ldapConfig.getUrl());
 		dto.setUsername(ldapConfig.getUsername());
-		dto.setPassword(ldapConfig.getPassword());
+		dto.setPassword(PasswordEncoder.decode2Way(ldapConfig.getPassword()));
 		dto.setBase(ldapConfig.getBase());
 		dto.setFilter(ldapConfig.getFilter());
 
@@ -93,7 +94,7 @@ public class LdapConfigMapper
 		ldapConfig.setEnabled(dto.isEnabled());
 		ldapConfig.setUrl(dto.getUrl());
 		ldapConfig.setUsername(dto.getUsername());
-		ldapConfig.setPassword(dto.getPassword());
+		ldapConfig.setPassword(PasswordEncoder.encode2Way(dto.getPassword()));
 		ldapConfig.setBase(dto.getBase());
 		ldapConfig.setFilter(dto.getFilter());
 
