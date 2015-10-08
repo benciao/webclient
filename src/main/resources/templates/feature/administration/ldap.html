@@ -39,6 +39,9 @@
 											.val(state);
 									$("#ldapConfigSave").removeClass("disabled");
 								});
+							
+		$("#password").attr("type", "password");
+
 	});
 	/*]]>*/
 		</script>
@@ -123,7 +126,7 @@
 										<input id="ldapSwitch" type="checkbox" data-size="mini"
 											th:checked="*{enabled}" data-on-color="success"
 											data-off-color="warning"></input>
-										<input type="hidden" id="hiddenSwitch" th:field="*enabled}" />
+										<input type="hidden" id="hiddenSwitch" th:field="*{enabled}" />
 										<input type="hidden" th:field="*{id}" />
 									</td>
 								</tr>
@@ -152,8 +155,8 @@
 										<span th:text="#{ldapConfigPasswordLabel}"></span>
 									</td>
 									<td>
-										<input type="password" class="form-control" th:field="*{password}"
-											th:errorclass="field-tip" />
+										<input id="password" type="text" class="form-control"
+											th:field="*{password}" th:errorclass="field-tip" />
 										<span class="tip-content" th:errors="*{password}"></span>
 									</td>
 								</tr>
@@ -162,7 +165,7 @@
 										<span th:text="#{ldapConfigBaseLabel}"></span>
 									</td>
 									<td>
-										<input type="password" class="form-control" th:field="*{base}"
+										<input type="text" class="form-control" th:field="*{base}"
 											th:errorclass="field-tip" placeholder="dc=user" />
 										<span class="tip-content" th:errors="*{base}"></span>
 									</td>
@@ -172,8 +175,8 @@
 										<span th:text="#{ldapConfigFilterLabel}"></span>
 									</td>
 									<td>
-										<input type="password" class="form-control" th:field="*{filter}"
-											th:errorclass="field-tip" placeholder="(&(objectClass=*)(uid={0}))" />
+										<input type="text" class="form-control" th:field="*{filter}"
+											th:errorclass="field-tip" placeholder="(objectClass=*)(uid={0})" />
 										<span class="tip-content" th:errors="*{filter}"></span>
 									</td>
 								</tr>

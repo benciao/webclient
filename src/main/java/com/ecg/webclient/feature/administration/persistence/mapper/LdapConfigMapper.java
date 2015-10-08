@@ -104,6 +104,6 @@ public class LdapConfigMapper
 			return persistentLdapConfig.bind(ldapConfig);
 		}
 
-		return persistentLdapConfig;
+		return ldapConfig;
 	}
 }

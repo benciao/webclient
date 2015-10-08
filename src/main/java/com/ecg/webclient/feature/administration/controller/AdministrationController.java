@@ -330,10 +330,10 @@ public class AdministrationController
 
 		return "redirect:";
 	}
-	
+
 	/**
-	 * Behandelt POST-Requests vom Typ "/admin/ldap/save". Speichert
-	 * Änderungen an der LDAP-konfiguration.
+	 * Behandelt POST-Requests vom Typ "/admin/ldap/save". Speichert Änderungen
+	 * an der LDAP-konfiguration.
 	 * 
 	 * @return Template
 	 */
@@ -616,6 +616,10 @@ public class AdministrationController
 	public String showLdapConfig(Model model)
 	{
 		LdapConfigDto ldapConfig = ldapConfigService.getLdapConfig();
+		if (ldapConfig == null)
+		{
+			ldapConfig = new LdapConfigDto();
+		}
 		model.addAttribute("ldapConfigDto", ldapConfig);
 
 		return getLoadingRedirectTemplate() + "ldap";
