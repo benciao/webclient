@@ -1,5 +1,7 @@
 package com.ecg.webclient.common.authentication;
 
+import com.ecg.webclient.feature.administration.service.FeatureService;
+
 /**
  * Basisklasse für ein zu registrierendes Feature. Registriert wird ein Feature
  * ausschließlich bei Anwendungsstart über {@link FeatureService}
@@ -17,7 +19,7 @@ public abstract class WebClientFeature
 		this.deactivatable = deactivatable;
 	}
 
-	public String getFeatureId()
+    public String getFeatureKey()
 	{
 		return featureId;
 	}

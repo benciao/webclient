@@ -49,32 +49,6 @@ public class RoleService
 	}
 
 	/**
-	 * Registriert implementierte Rollen in der Persistenz.
-	 * 
-	 * @param rolesToRegister
-	 *            Implementierte Rollen, welche persistiert werden müssen.
-	 */
-	@Transactional
-	private void registerRoles(List<WebClientAccessRole> rolesToRegister)
-	{
-		this.rolesToRegister = rolesToRegister;
-		for (WebClientAccessRole accessRole : rolesToRegister)
-		{
-			Role lookupRole = roleRepo.findRoleByNameAndFeature(accessRole.getRoleKey(),
-					accessRole.getFeatureId().getFeatureId());
-
-			if (lookupRole == null)
-			{
-				Role newRole = new Role();
-				newRole.setName(accessRole.getRoleKey());
-				newRole.setFeature(featureRepo.findFeatureByName(accessRole.getFeatureId().getFeatureId()));
-				newRole.setEnabled(true);
-				roleRepo.save(newRole);
-			}
-		}
-	}
-
-	/**
 	 * Löscht die in der Liste enthaltenen Rollen.
 	 * 
 	 * @param detachedRoles
@@ -139,15 +113,16 @@ public class RoleService
 	/**
 	 * @param roleIds
 	 *            Liste mit IDs von Rollen
-	 * @return Liste mit zu den IDs gehörenden Rollen
+	 * @return Liste mit zu den IDs gehörenden Rollen, welche selbst aktiv sind
+	 *         und dessen zugeordnetes Feature aktiv ist
 	 */
-	public List<RoleDto> getRolesForIds(List<Long> roleIds)
+	public List<RoleDto> getEnabledRolesWithEnabledFeatureForIds(List<Long> roleIds)
 	{
 		List<RoleDto> result = new ArrayList<RoleDto>();
 
 		try
 		{
-			Iterable<Role> persistentRoles = roleRepo.findAll(roleIds);
+			Iterable<Role> persistentRoles = roleRepo.findEnabledRolesWithEnabledFeatureForIds(roleIds);
 			for (Role role : persistentRoles)
 			{
 				result.add(roleMapper.mapToDto(role));
@@ -165,16 +140,15 @@ public class RoleService
 	/**
 	 * @param roleIds
 	 *            Liste mit IDs von Rollen
-	 * @return Liste mit zu den IDs gehörenden Rollen, welche selbst aktiv sind
-	 *         und dessen zugeordnetes Feature aktiv ist
+	 * @return Liste mit zu den IDs gehörenden Rollen
 	 */
-	public List<RoleDto> getEnabledRolesWithEnabledFeatureForIds(List<Long> roleIds)
+	public List<RoleDto> getRolesForIds(List<Long> roleIds)
 	{
 		List<RoleDto> result = new ArrayList<RoleDto>();
 
 		try
 		{
-			Iterable<Role> persistentRoles = roleRepo.findEnabledRolesWithEnabledFeatureForIds(roleIds);
+			Iterable<Role> persistentRoles = roleRepo.findAll(roleIds);
 			for (Role role : persistentRoles)
 			{
 				result.add(roleMapper.mapToDto(role));
@@ -235,6 +209,32 @@ public class RoleService
 		catch (final Exception e)
 		{
 			logger.error(e);
+		}
+	}
+
+	/**
+	 * Registriert implementierte Rollen in der Persistenz.
+	 * 
+	 * @param rolesToRegister
+	 *            Implementierte Rollen, welche persistiert werden müssen.
+	 */
+	@Transactional
+	private void registerRoles(List<WebClientAccessRole> rolesToRegister)
+	{
+		this.rolesToRegister = rolesToRegister;
+		for (WebClientAccessRole accessRole : rolesToRegister)
+		{
+			Role lookupRole = roleRepo.findRoleByNameAndFeature(accessRole.getRoleKey(),
+					accessRole.getFeature().getFeatureKey());
+
+			if (lookupRole == null)
+			{
+				Role newRole = new Role();
+				newRole.setName(accessRole.getRoleKey());
+				newRole.setFeature(featureRepo.findFeatureByName(accessRole.getFeature().getFeatureKey()));
+				newRole.setEnabled(true);
+				roleRepo.save(newRole);
+			}
 		}
 	}
 }

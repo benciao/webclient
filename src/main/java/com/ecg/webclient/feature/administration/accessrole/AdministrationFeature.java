@@ -12,8 +12,10 @@ import com.ecg.webclient.common.authentication.WebClientFeature;
 @Component
 public class AdministrationFeature extends WebClientFeature
 {
-	public AdministrationFeature()
-	{
-		super("SEC", false);
-	}
+    public static final String KEY = "SEC";
+
+    public AdministrationFeature()
+    {
+        super(KEY, false);
+    }
 }

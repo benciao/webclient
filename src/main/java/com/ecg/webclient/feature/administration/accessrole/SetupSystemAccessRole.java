@@ -13,9 +13,11 @@ import com.ecg.webclient.common.authentication.WebClientAccessRole;
 @Component
 public class SetupSystemAccessRole extends WebClientAccessRole
 {
+    public static final String KEY = "SETUP_SYSTEM";
+
 	@Autowired
 	public SetupSystemAccessRole(AdministrationFeature feature)
 	{
-		super(feature, "SETUP_SYSTEM");
+        super(feature, KEY);
 	}
 }

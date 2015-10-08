@@ -24,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ecg.webclient.common.feature.FeatureRegistry;
 import com.ecg.webclient.feature.administration.FeatureAdministration;
+import com.ecg.webclient.feature.administration.accessrole.AdministrationFeature;
+import com.ecg.webclient.feature.administration.accessrole.SecurityAdminAccessRole;
+import com.ecg.webclient.feature.administration.accessrole.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 import com.ecg.webclient.feature.administration.service.ClientService;
@@ -60,52 +63,52 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.UserDtoVali
 @RequestMapping(value = "/admin")
 public class AdministrationController
 {
-    static final Logger           logger                            = LogManager
-                                                                            .getLogger(AdministrationController.class
-                                                                                    .getName());
-    static final String           PROPERTY_NAME_SETUP_USER_PASSWORD = "sec.setup.user.pw";
+    static final Logger        logger                            = LogManager
+                                                                         .getLogger(AdministrationController.class
+                                                                                 .getName());
+    static final String        PROPERTY_NAME_SETUP_USER_PASSWORD = "sec.setup.user.pw";
 
     @Autowired
-    private FeatureRegistry       featureRegistry;
+    private FeatureRegistry    featureRegistry;
 
     @Autowired
-    private ClientService         clientService;
+    private ClientService      clientService;
 
     @Autowired
-    private RoleService           roleService;
+    private RoleService        roleService;
 
     @Autowired
-    private GroupService          groupService;
+    private GroupService       groupService;
 
     @Autowired
-    private UserService           userService;
+    private UserService        userService;
 
     @Autowired
-    private FeatureService        featureService;
+    private FeatureService     featureService;
 
     @Autowired
-    private EnvironmentService    environmentService;
+    private EnvironmentService environmentService;
 
     @Autowired
-    private AuthenticationUtil    authUtil;
+    private AuthenticationUtil authUtil;
 
     @Autowired
-    private Environment           env;
+    private Environment        env;
 
     @Autowired
-    ClientDtoValidator            clientDtoValidator;
+    ClientDtoValidator         clientDtoValidator;
 
     @Autowired
-    PropertyDtoValidator          propertyDtoValidator;
+    PropertyDtoValidator       propertyDtoValidator;
 
     @Autowired
-    UserDtoValidator              userDtoValidator;
+    UserDtoValidator           userDtoValidator;
 
     @Autowired
-    GroupDtoValidator             groupDtoValidator;
+    GroupDtoValidator          groupDtoValidator;
 
     @Autowired
-    EnvironmentDtoValidator       environmentDtoValidator;
+    EnvironmentDtoValidator    environmentDtoValidator;
 
     /**
      * Behandelt GET-Requests vom Typ "/admin".
@@ -130,7 +133,8 @@ public class AdministrationController
         return getLoadingRedirectTemplate() + "administration";
     }
 
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/user/loginas/{userId}", method = RequestMethod.GET)
     public String loginAsUser(Model model, @PathVariable("userId") String userId)
     {
@@ -144,7 +148,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/usergroup/save", method = RequestMethod.POST)
     public String save(@Valid GroupConfig groupConfig, BindingResult bindingResult)
     {
@@ -182,7 +187,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/userrole/save", method = RequestMethod.POST)
     public String save(@Valid RoleConfig roleConfig, BindingResult bindingResult)
     {
@@ -220,7 +226,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/user/save", method = RequestMethod.POST)
     public String save(@Valid UserConfig userConfig, BindingResult bindingResult)
     {
@@ -258,7 +265,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/client/save", method = RequestMethod.POST)
     public String saveClient(@Valid ClientConfig clientConfig, BindingResult bindingResult)
     {
@@ -298,7 +306,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/environment/save", method = RequestMethod.POST)
     public String saveEnvironment(@Valid EnvironmentDto environment, BindingResult bindingResult)
     {
@@ -317,7 +326,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/feature/save", method = RequestMethod.POST)
     public String saveFeatures(@Valid FeatureConfig featureConfig, BindingResult bindingResult)
     {
@@ -471,7 +481,8 @@ public class AdministrationController
      * 
      * @return
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/user/availableClients/{groupIds}/{userId}", method = RequestMethod.GET)
     public String showAvailableClients(Model model, @PathVariable("groupIds") String groupIds,
             @PathVariable("userId") String userId)
@@ -499,7 +510,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/client", method = RequestMethod.GET)
     public String showClientConfig(Model model)
     {
@@ -514,7 +526,8 @@ public class AdministrationController
      * 
      * @return
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/user/clientgroups/{clientId}", method = RequestMethod.GET)
     public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
     {
@@ -545,7 +558,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/environment", method = RequestMethod.GET)
     public String showEnvironment(Model model)
     {
@@ -560,7 +574,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/feature", method = RequestMethod.GET)
     public String showFeatureConfig(Model model)
     {
@@ -577,7 +592,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/usergroup", method = RequestMethod.GET)
     public String showGroupConfig(Model model)
     {
@@ -594,7 +610,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/userrole", method = RequestMethod.GET)
     public String showRoleConfig(Model model)
     {
@@ -610,7 +627,8 @@ public class AdministrationController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_ADMIN') OR hasRole('SEC_SETUP_SYSTEM')")
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public String showUserConfig(Model model)
     {

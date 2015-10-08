@@ -10,12 +10,12 @@ import com.ecg.webclient.feature.administration.service.RoleService;
  */
 public abstract class WebClientAccessRole
 {
-	WebClientFeature	featureId;
+	WebClientFeature	feature;
 	String				roleKey;
 
-	protected WebClientAccessRole(WebClientFeature featureId, String roleKey)
+    protected WebClientAccessRole(WebClientFeature feature, String roleKey)
 	{
-		this.featureId = featureId;
+        this.feature = feature;
 		this.roleKey = roleKey;
 	}
 
@@ -24,12 +24,12 @@ public abstract class WebClientAccessRole
 	 */
 	public String getCombinedName()
 	{
-		return featureId.getFeatureId().toUpperCase() + "_" + roleKey.toUpperCase();
+        return feature.getFeatureKey().toUpperCase() + "_" + roleKey.toUpperCase();
 	}
 
-	public WebClientFeature getFeatureId()
+    public WebClientFeature getFeature()
 	{
-		return featureId;
+		return feature;
 	}
 
 	public String getRoleKey()

@@ -7,8 +7,10 @@ import com.ecg.webclient.common.authentication.WebClientFeature;
 @Component
 public class TestFeature extends WebClientFeature
 {
+    public static final String KEY = "TEST";
+
 	public TestFeature()
 	{
-		super("TEST", true);
+        super(KEY, true);
 	}
 }

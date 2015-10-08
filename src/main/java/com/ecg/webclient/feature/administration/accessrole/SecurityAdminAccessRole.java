@@ -6,17 +6,18 @@ import org.springframework.stereotype.Component;
 import com.ecg.webclient.common.authentication.WebClientAccessRole;
 
 /**
- * Rolle, welche das Administrieren der Benutzer- und Berechtigungsverwaltung
- * ermöglicht.
+ * Rolle, welche das Administrieren der Benutzer- und Berechtigungsverwaltung ermöglicht.
  * 
  * @author arndtmar
  */
 @Component
 public class SecurityAdminAccessRole extends WebClientAccessRole
 {
-	@Autowired
-	public SecurityAdminAccessRole(AdministrationFeature feature)
-	{
-		super(feature, "ADMIN");
-	}
+    public static final String KEY = "ADMIN";
+
+    @Autowired
+    public SecurityAdminAccessRole(AdministrationFeature feature)
+    {
+        super(feature, KEY);
+    }
 }

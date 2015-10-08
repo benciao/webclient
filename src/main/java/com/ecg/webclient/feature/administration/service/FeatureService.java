@@ -126,12 +126,12 @@ public class FeatureService
         this.featuresToRegister = featuresToRegister;
         for (WebClientFeature feature : featuresToRegister)
         {
-            Feature lookupFeature = featureRepo.findFeatureByName(feature.getFeatureId());
+            Feature lookupFeature = featureRepo.findFeatureByName(feature.getFeatureKey());
 
             if (lookupFeature == null)
             {
                 Feature newFeature = new Feature();
-                newFeature.setName(feature.getFeatureId());
+                newFeature.setName(feature.getFeatureKey());
                 newFeature.setDeactivatable(feature.isDeactivatable());
                 newFeature.setEnabled(true);
                 featureRepo.save(newFeature);
