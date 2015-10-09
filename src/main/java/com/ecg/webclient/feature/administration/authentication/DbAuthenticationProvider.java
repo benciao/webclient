@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -13,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.ecg.webclient.feature.administration.service.GroupService;
+import com.ecg.webclient.feature.administration.service.LdapConfigService;
 import com.ecg.webclient.feature.administration.service.RoleService;
 import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
@@ -24,13 +26,15 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 public class DbAuthenticationProvider implements AuthenticationProvider
 {
     @Autowired
-    UserService                userService;
+    UserService        userService;
     @Autowired
-    GroupService               groupService;
+    GroupService       groupService;
     @Autowired
-    RoleService                roleService;
+    RoleService        roleService;
     @Autowired
-    AuthenticationUtil         util;
+    AuthenticationUtil util;
+    @Autowired
+    LdapConfigService  ldapConfigService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
@@ -50,8 +54,14 @@ public class DbAuthenticationProvider implements AuthenticationProvider
             // Ldap Authentifizierung
             if (!persistentUser.isInternal())
             {
-                // TODO prüfen, ob LDAP konfiguriert ist, wenn nicht, entsprechende Fehlermeldung
-                isAuthenticated = userService.isUserAuthenticated(login, password, true);
+                if (ldapConfigService.getLdapConfig().isEnabled())
+                {
+                    isAuthenticated = userService.isUserAuthenticated(login, password, true);
+                }
+                else
+                {
+                    throw new InsufficientAuthenticationException("");
+                }
             }
             // DB Authentifizierung
             else

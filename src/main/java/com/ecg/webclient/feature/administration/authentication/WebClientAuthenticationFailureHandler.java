@@ -39,7 +39,7 @@ public class WebClientAuthenticationFailureHandler implements AuthenticationFail
         }
         else if (exception instanceof InsufficientAuthenticationException)
         {
-            redirectStrategy.sendRedirect(request, response, "/login/error/loginFailureLdapBc");
+            redirectStrategy.sendRedirect(request, response, "/login/error/loginFailureLdapDisabled");
         }
         else
         {
