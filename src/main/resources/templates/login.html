@@ -14,13 +14,10 @@
 
 <script th:src="@{/js/jquery.js}"></script>
 <script th:src="@{/js/bootstrap.js}"></script>
-<script th:src="@{/js/jquery.md5.js}"></script>
 
 <script type="text/javascript" th:inline="text">
 	$(document).ready(function() {
 		$('#submitButton').click(function() {
-			var encodedPw = $.md5($('#inputPassword').val());
-			$('#inputPassword').val(encodedPw);
 			$(".form-signin").submit();
 		});
 	});

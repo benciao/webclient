@@ -23,6 +23,41 @@ public class PasswordEncoder
 	private static final byte[]	SALT		= { (byte) 0xde, (byte) 0x33, (byte) 0x10, (byte) 0x12, (byte) 0xde,
 			(byte) 0x33, (byte) 0x10, (byte) 0x12, };
 
+	public static String decode2Way(String property)
+	{
+		try
+		{
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+			SecretKey key = keyFactory.generateSecret(new PBEKeySpec(PASSWORD));
+			Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
+			pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
+			return new String(pbeCipher.doFinal(base64Decode(property)), "UTF-8");
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+			return null;
+		}
+	}
+
+	public static String encode2Way(String property)
+	{
+		try
+		{
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+			SecretKey key = keyFactory.generateSecret(new PBEKeySpec(PASSWORD));
+			Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
+			pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
+
+			return base64Encode(pbeCipher.doFinal(property.getBytes("UTF-8")));
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+			return null;
+		}
+	}
+
 	public static String encodeComplex(String simpleEncodedPassword, String rid)
 	{
 		try
@@ -51,69 +86,13 @@ public class PasswordEncoder
 		return null;
 	}
 
-	public static String encodeSimple(String valueToEncode)
+	private static byte[] base64Decode(String property) throws IOException
 	{
-		try
-		{
-			MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-
-			messageDigest.reset();
-			messageDigest.update(valueToEncode.getBytes(Charset.forName("UTF8")));
-			final byte[] resultByte = messageDigest.digest();
-			final String result = new String(Hex.encode(resultByte));
-
-			return result;
-		}
-		catch (NoSuchAlgorithmException e)
-		{
-			logger.error(e);
-		}
-
-		return null;
-	}
-
-	public static String encode2Way(String property)
-	{
-		try
-		{
-			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
-			SecretKey key = keyFactory.generateSecret(new PBEKeySpec(PASSWORD));
-			Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
-			pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
-
-			return base64Encode(pbeCipher.doFinal(property.getBytes("UTF-8")));
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-			return null;
-		}
-	}
-
-	public static String decode2Way(String property)
-	{
-		try
-		{
-			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
-			SecretKey key = keyFactory.generateSecret(new PBEKeySpec(PASSWORD));
-			Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
-			pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
-			return new String(pbeCipher.doFinal(base64Decode(property)), "UTF-8");
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-			return null;
-		}
+		return Hex.decode(property);
 	}
 
 	private static String base64Encode(byte[] bytes)
 	{
 		return new String(Hex.encode(bytes));
-	}
-
-	private static byte[] base64Decode(String property) throws IOException
-	{
-		return Hex.decode(property);
 	}
 }

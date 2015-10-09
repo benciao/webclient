@@ -23,7 +23,6 @@
 <script th:src="@{/js/bootstrap-switch.js}"></script>
 <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
 <script th:src="@{/js/webclient.js}"></script>
-<script th:src="@{/js/jquery.md5.js}"></script>
 
 <script type="text/javascript" th:inline="text">
 	/*<![CDATA[*/
@@ -122,7 +121,8 @@
 													"#hiddenChangePasswordOnNextLogin-"
 															+ userIndex).val(
 													state);
-											$("#usersSave").removeClass("disabled");
+											$("#usersSave").removeClass(
+													"disabled");
 										});
 
 						$("#pw-change-switch").bootstrapSwitch().on(
@@ -205,9 +205,9 @@
 															"#hiddenPassword-"
 																	+ userIndex)
 															.val(
-																	encode($(
+																	$(
 																			"#password-confirm")
-																			.val()),
+																			.val(),
 																	userRid);
 													$("#password-confirm")
 															.removeClass(
