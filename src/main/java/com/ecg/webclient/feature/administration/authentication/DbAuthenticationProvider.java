@@ -31,8 +31,6 @@ public class DbAuthenticationProvider implements AuthenticationProvider
     RoleService                roleService;
     @Autowired
     AuthenticationUtil         util;
-    @Autowired
-    LdapAuthenticationProvider ldapAuthenticationProvider;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
@@ -53,12 +51,12 @@ public class DbAuthenticationProvider implements AuthenticationProvider
             if (!persistentUser.isInternal())
             {
                 // TODO prüfen, ob LDAP konfiguriert ist, wenn nicht, entsprechende Fehlermeldung
-                isAuthenticated = ldapAuthenticationProvider.isAuthenticated(authentication);
+                isAuthenticated = userService.isUserAuthenticated(login, password, true);
             }
             // DB Authentifizierung
             else
             {
-                isAuthenticated = userService.isUserAuthenticated(login, password);
+                isAuthenticated = userService.isUserAuthenticated(login, password, false);
             }
 
             if (isAuthenticated)

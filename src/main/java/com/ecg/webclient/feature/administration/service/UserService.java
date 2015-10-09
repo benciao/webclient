@@ -4,12 +4,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.ldap.LdapName;
 import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.ldap.filter.Filter;
+import org.springframework.ldap.query.LdapQueryBuilder;
+import org.springframework.ldap.support.LdapUtils;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -25,6 +31,7 @@ import com.ecg.webclient.feature.administration.persistence.repo.ClientRepositor
 import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.UserRepository;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.LdapConfigDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
 /**
@@ -45,11 +52,14 @@ public class UserService
     UserMapper          userMapper;
     Environment         env;
     EnvironmentService  environmentService;
+    LdapTemplate        ldapTemplate;
+    LdapConfigService   ldapConfigService;
 
     @Autowired
     public UserService(UserRepository userRepo, GroupRepository groupRepo, ClientRepository clientRepo,
             ClientMapper clientMapper, UserMapper userMapper, Environment env,
-            EnvironmentService environmentService)
+            EnvironmentService environmentService, LdapTemplate ldapTemplate,
+            LdapConfigService ldapConfigService)
     {
         this.userRepo = userRepo;
         this.groupRepo = groupRepo;
@@ -58,6 +68,8 @@ public class UserService
         this.userMapper = userMapper;
         this.env = env;
         this.environmentService = environmentService;
+        this.ldapTemplate = ldapTemplate;
+        this.ldapConfigService = ldapConfigService;
     }
 
     /**
@@ -207,7 +219,8 @@ public class UserService
      * @return true, wenn Benutzer bekannt, Passwort stimmt, Benutzer aktiviert ist, Benutzer mindestens einer
      *         Gruppe zugeordnet ist, der Standardmandant des Benutzers aktiviert ist... sonst false
      */
-    public boolean isUserAuthenticated(String login, String password) throws AuthenticationException
+    public boolean isUserAuthenticated(String login, String password, boolean checkLdap)
+            throws AuthenticationException
     {
         User persistentUser = userRepo.findUserByLogin(login);
 
@@ -217,26 +230,66 @@ public class UserService
             if (persistentUser.isEnabled() && !persistentUser.getEnabledGroups().isEmpty()
                     && persistentUser.getDefaultClient().isEnabled())
             {
-                if (finalPw.equalsIgnoreCase(persistentUser.getPassword()))
+                if (!checkLdap)
                 {
-                    // Anzahl der Fehlversuche zurücksetzen
-
-                    persistentUser.setLoginAttempts(0);
-                    userRepo.save(persistentUser);
-                    return true;
-                }
-                else
-                {
-                    // Anzahl der Fehlversuche registrieren
-                    boolean locked = checkLoginAttempts(persistentUser);
-
-                    if (locked)
+                    if (finalPw.equalsIgnoreCase(persistentUser.getPassword()))
                     {
-                        throw new LockedException("");
+                        // Anzahl der Fehlversuche zurücksetzen
+
+                        persistentUser.setLoginAttempts(0);
+                        userRepo.save(persistentUser);
+                        return true;
                     }
                     else
                     {
-                        throw new BadCredentialsException("");
+                        // Anzahl der Fehlversuche registrieren
+                        boolean locked = checkLoginAttempts(persistentUser);
+
+                        if (locked)
+                        {
+                            throw new LockedException("");
+                        }
+                        else
+                        {
+                            throw new BadCredentialsException("");
+                        }
+                    }
+                }
+                else
+                {
+                    LdapConfigDto ldapConfig = ldapConfigService.getLdapConfig();
+                    setupLdapConnection(ldapConfig);
+
+                    Object[] filterParams =
+                    { login };
+                    Filter filter = LdapQueryBuilder.query().filter(ldapConfig.getFilter(), filterParams)
+                            .filter();
+
+                    LdapName
+
+                    base = LdapUtils.newLdapName(ldapConfig.getBase());
+
+                    if (ldapTemplate.authenticate(base, filter.encode(), password))
+                    {
+                        // Anzahl der Fehlversuche zurücksetzen
+
+                        persistentUser.setLoginAttempts(0);
+                        userRepo.save(persistentUser);
+                        return true;
+                    }
+                    else
+                    {
+                        // Anzahl der Fehlversuche registrieren
+                        boolean locked = checkLoginAttempts(persistentUser);
+
+                        if (locked)
+                        {
+                            throw new LockedException("");
+                        }
+                        else
+                        {
+                            throw new BadCredentialsException("");
+                        }
                     }
                 }
             }
@@ -258,45 +311,46 @@ public class UserService
      *            Zu speichernder Benutzer
      */
     @Transactional
-	public void saveUser(UserDto detachedUser)
-	{
-		try
-		{
-			User draftUser = userMapper.mapToEntity(detachedUser);
-			User persistedUser = userRepo.save(draftUser);
+    public void saveUser(UserDto detachedUser)
+    {
+        try
+        {
+            User draftUser = userMapper.mapToEntity(detachedUser);
+            User persistedUser = userRepo.save(draftUser);
 
-			if (detachedUser.getId() > -1)
-			{
-				// Passwort wurde bei einem schon persistenten Benutzer
+            if (detachedUser.getId() > -1)
+            {
+                // Passwort wurde bei einem schon persistenten Benutzer
                 // geändert.
-				if (detachedUser.getPassword() != null && !detachedUser.getPassword().isEmpty())
-				{
-					persistedUser.setPassword(PasswordEncoder.encodeComplex(detachedUser.getPassword(),
-							Long.toString(persistedUser.getId())));
-					persistedUser.setPasswordChangedTimeStamp(new Date());
-				}
-			}
-			else
-			{
-				// Wurde kein Passwort vor der ersten Übertragung
-				// gesetzt, wird es hier generiert.
-				String pw = detachedUser.getPassword();
-				if (pw == null || pw.isEmpty())
-				{
+                if (detachedUser.getPassword() != null && !detachedUser.getPassword().isEmpty())
+                {
+                    persistedUser.setPassword(PasswordEncoder.encodeComplex(detachedUser.getPassword(),
+                            Long.toString(persistedUser.getId())));
+                    persistedUser.setPasswordChangedTimeStamp(new Date());
+                }
+            }
+            else
+            {
+                // Wurde kein Passwort vor der ersten Übertragung
+                // gesetzt, wird es hier generiert.
+                String pw = detachedUser.getPassword();
+                if (pw == null || pw.isEmpty())
+                {
                     pw = PROPERTY_NAME_INIT_USER_PASSWORD;
-				}
-				persistedUser.setPassword(PasswordEncoder.encodeComplex(pw, Long.toString(persistedUser.getId())));
-				persistedUser.setPasswordChangedTimeStamp(new Date());
-			}
+                }
+                persistedUser.setPassword(PasswordEncoder.encodeComplex(pw,
+                        Long.toString(persistedUser.getId())));
+                persistedUser.setPasswordChangedTimeStamp(new Date());
+            }
 
-			userRepo.save(persistedUser);
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+            userRepo.save(persistedUser);
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-	}
+    }
 
     /**
      * Speichert eine Liste von Benutzern.
@@ -329,5 +383,16 @@ public class UserService
         userRepo.save(persistentUser);
 
         return persistentUser.isAccountLocked();
+    }
+
+    private void setupLdapConnection(LdapConfigDto ldapConfig)
+    {
+        LdapContextSource ctxSrc = new LdapContextSource();
+        ctxSrc.setUrl(ldapConfig.getUrl());
+        ctxSrc.setUserDn(ldapConfig.getUsername());
+        ctxSrc.setPassword(ldapConfig.getPassword());
+        ctxSrc.afterPropertiesSet();
+
+        ldapTemplate = new LdapTemplate(ctxSrc);
     }
 }
