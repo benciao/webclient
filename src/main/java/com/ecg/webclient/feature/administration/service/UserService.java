@@ -238,6 +238,7 @@ public class UserService
 
                         persistentUser.setLoginAttempts(0);
                         userRepo.save(persistentUser);
+                        logger.info("DB-LOGIN: user=" + login);
                         return true;
                     }
                     else
@@ -247,6 +248,7 @@ public class UserService
 
                         if (locked)
                         {
+                            logger.info("DB-ACCOUNT-LOCKED: to many retries for user=" + login);
                             throw new LockedException("");
                         }
                         else
@@ -275,6 +277,7 @@ public class UserService
 
                         persistentUser.setLoginAttempts(0);
                         userRepo.save(persistentUser);
+                        logger.info("LDAP-LOGIN: user=" + login);
                         return true;
                     }
                     else
@@ -284,6 +287,7 @@ public class UserService
 
                         if (locked)
                         {
+                            logger.info("LDAP-ACCOUNT-LOCKED: to many retries for user=" + login);
                             throw new LockedException("");
                         }
                         else
