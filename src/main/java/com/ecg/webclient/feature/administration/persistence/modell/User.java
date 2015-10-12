@@ -30,24 +30,27 @@ public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long        id;
+    private long               id;
     @Column(unique = true)
-    private String      login;
-    private String      password;
-    private Date        passwordChangedTimeStamp;
-    private int         loginAttempts;
-    private String      firstname;
-    private String      lastname;
-    private boolean     enabled;
-    private boolean     accountLocked;
-    private boolean     changePasswordOnNextLogin;
-    private boolean     internal;
-    private String      email;
+    private String             login;
+    private String             password;
+    private Date               passwordChangedTimeStamp;
+    private int                loginAttempts;
+    private String             firstname;
+    private String             lastname;
+    private boolean            enabled;
+    private boolean            accountLocked;
+    private boolean            changePasswordOnNextLogin;
+    private boolean            internal;
+    private String             email;
     @OneToOne
-    private Client      defaultClient;
+    private Client             defaultClient;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "SEC_USER_SEC_GROUP", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "GROUP_ID"))
-    private List<Group> groups;
+    private List<Group>        groups;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "SEC_USER_SEC_REMOTE_SYSTEM", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "REMOTE_SYSTEM_ID"))
+    private List<RemoteSystem> remotesSystems;
 
     public User()
     {}
@@ -71,6 +74,7 @@ public class User
         setAccountLocked(newUser.isAccountLocked());
         setLoginAttempts(newUser.getLoginAttempts());
         setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
+        setRemotesSystems(newUser.getRemotesSystems());
 
         return this;
     }
@@ -168,6 +172,22 @@ public class User
         return result;
     }
 
+    @Transient
+    public List<RemoteSystem> getEnabledRemoteSystems()
+    {
+        List<RemoteSystem> result = new ArrayList<RemoteSystem>();
+
+        for (RemoteSystem rm : remotesSystems)
+        {
+            if (rm.isEnabled())
+            {
+                result.add(rm);
+            }
+        }
+
+        return result;
+    }
+
     public String getFirstname()
     {
         return firstname;
@@ -206,6 +226,11 @@ public class User
     public Date getPasswordChangedTimeStamp()
     {
         return passwordChangedTimeStamp;
+    }
+
+    public List<RemoteSystem> getRemotesSystems()
+    {
+        return remotesSystems;
     }
 
     @Override
@@ -312,5 +337,10 @@ public class User
     public void setPasswordChangedTimeStamp(Date passwordChangedTimeStamp)
     {
         this.passwordChangedTimeStamp = passwordChangedTimeStamp;
+    }
+
+    public void setRemotesSystems(List<RemoteSystem> remotesSystems)
+    {
+        this.remotesSystems = remotesSystems;
     }
 }

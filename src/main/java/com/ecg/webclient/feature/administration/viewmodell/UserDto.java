@@ -25,6 +25,7 @@ public class UserDto extends BaseObjectDto
     private String  groupIds;
     private Date    passwortChangedTimeStamp;
     private int     loginAttempts;
+    private String  remoteSystemIds;
 
     public UserDto()
     {}
@@ -89,6 +90,28 @@ public class UserDto extends BaseObjectDto
     public Date getPasswortChangedTimeStamp()
     {
         return passwortChangedTimeStamp;
+    }
+
+    public List<Long> getRemoteSystemIdObjects()
+    {
+        List<Long> result = new ArrayList<Long>();
+
+        if (remoteSystemIds != null && !remoteSystemIds.isEmpty())
+        {
+            List<String> ids = Arrays.asList(remoteSystemIds.split(","));
+
+            for (String id : ids)
+            {
+                result.add(Long.parseLong(id));
+            }
+        }
+
+        return result.size() != 0 ? result : null;
+    }
+
+    public String getRemoteSystemIds()
+    {
+        return remoteSystemIds;
     }
 
     public boolean isAccountLocked()
@@ -174,5 +197,10 @@ public class UserDto extends BaseObjectDto
     public void setPasswortChangedTimeStamp(Date passwortChangedTimeStamp)
     {
         this.passwortChangedTimeStamp = passwortChangedTimeStamp;
+    }
+
+    public void setRemoteSystemIds(String remoteSystemIds)
+    {
+        this.remoteSystemIds = remoteSystemIds;
     }
 }

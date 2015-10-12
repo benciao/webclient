@@ -8,9 +8,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
+import com.ecg.webclient.feature.administration.persistence.modell.RemoteSystem;
 import com.ecg.webclient.feature.administration.persistence.modell.User;
 import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
+import com.ecg.webclient.feature.administration.persistence.repo.RemoteSystemRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.UserRepository;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
@@ -24,11 +26,13 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 public class UserMapper
 {
     @Autowired
-    ClientRepository clientRepo;
+    ClientRepository       clientRepo;
     @Autowired
-    GroupRepository  groupRepo;
+    GroupRepository        groupRepo;
     @Autowired
-    UserRepository   userRepo;
+    UserRepository         userRepo;
+    @Autowired
+    RemoteSystemRepository remoteSystemRepo;
 
     /**
      * Wandelt einen attachten Benutzer in einen detachten um.
@@ -73,6 +77,23 @@ public class UserMapper
                 }
             }
             dto.setGroupIds(groups);
+        }
+
+        if (user.getRemotesSystems() != null)
+        {
+            String remoteSystems = "";
+            for (RemoteSystem remoteSystem : user.getRemotesSystems())
+            {
+                if (remoteSystems.length() == 0)
+                {
+                    remoteSystems = Long.toString(remoteSystem.getId());
+                }
+                else
+                {
+                    remoteSystems = remoteSystems + "," + remoteSystem.getId();
+                }
+            }
+            dto.setRemoteSystemIds(remoteSystems);
         }
 
         return dto;
@@ -122,6 +143,11 @@ public class UserMapper
 
         List<Group> groups = new ArrayList<Group>();
         groupRepo.findAll(dto.getGroupIdObjects()).forEach(e -> groups.add(e));
+
+        entity.setGroups(groups);
+
+        List<RemoteSystem> remoteSystems = new ArrayList<RemoteSystem>();
+        remoteSystemRepo.findAll(dto.getRemoteSystemIdObjects()).forEach(e -> remoteSystems.add(e));
 
         entity.setGroups(groups);
 
