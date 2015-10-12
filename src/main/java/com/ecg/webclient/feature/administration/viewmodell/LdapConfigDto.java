@@ -7,74 +7,84 @@ package com.ecg.webclient.feature.administration.viewmodell;
  */
 public class LdapConfigDto extends BaseObjectDto
 {
-	private boolean	enabled;
-	private String	url;
-	private String	username;
-	private String	password;
-	private String	base;
-	private String	filter;
-	
-	public LdapConfigDto()
-	{
-	}
+    private boolean enabled;
+    private String  url;
+    private String  username;
+    private String  password;
+    private String  base;
+    private String  filter;
+    private Boolean connectionSuccessful;
 
-	public boolean isEnabled()
-	{
-		return enabled;
-	}
+    public LdapConfigDto()
+    {}
 
-	public void setEnabled(boolean enabled)
-	{
-		this.enabled = enabled;
-	}
+    public String getBase()
+    {
+        return base;
+    }
 
-	public String getUrl()
-	{
-		return url;
-	}
+    public String getFilter()
+    {
+        return filter;
+    }
 
-	public void setUrl(String url)
-	{
-		this.url = url;
-	}
+    public String getPassword()
+    {
+        return password;
+    }
 
-	public String getUsername()
-	{
-		return username;
-	}
+    public String getUrl()
+    {
+        return url;
+    }
 
-	public void setUsername(String username)
-	{
-		this.username = username;
-	}
+    public String getUsername()
+    {
+        return username;
+    }
 
-	public String getPassword()
-	{
-		return password;
-	}
+    public Boolean isConnectionSuccessful()
+    {
+        return connectionSuccessful;
+    }
 
-	public void setPassword(String password)
-	{
-		this.password = password;
-	}
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
 
-	public String getBase()
-	{
-		return base;
-	}
+    public void setBase(String base)
+    {
+        this.base = base;
+    }
 
-	public void setBase(String base)
-	{
-		this.base = base;
-	}
+    public void setConnectionSuccessful(Boolean connectionSuccessful)
+    {
+        this.connectionSuccessful = connectionSuccessful;
+    }
 
-	public String getFilter()
-	{
-		return filter;
-	}
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
+    }
 
-	public void setFilter(String filter)
-	{
-		this.filter = filter;
-	}
+    public void setFilter(String filter)
+    {
+        this.filter = filter;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+
+    public void setUrl(String url)
+    {
+        this.url = url;
+    }
+
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
 }

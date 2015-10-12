@@ -682,6 +682,27 @@ public class AdministrationController
         return getLoadingRedirectTemplate() + "user";
     }
 
+    /**
+     * Behandelt POST-Requests vom Typ "/admin/ldap/test". Testet die LDAP-konfiguration.
+     * 
+     * @return Template
+     */
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+    @RequestMapping(value = "/ldap/test", method = RequestMethod.POST)
+    public String testLdapConfig(@Valid LdapConfigDto ldapConfig, BindingResult bindingResult)
+    {
+        if (ldapConfigService.isLdapConfigOk(ldapConfig))
+        {
+            ldapConfig.setConnectionSuccessful(true);
+        }
+        else
+        {
+            ldapConfig.setConnectionSuccessful(false);
+        }
+        return getLoadingRedirectTemplate() + "ldap";
+    }
+
     protected String getLoadingRedirectTemplate()
     {
         return "feature/administration/";

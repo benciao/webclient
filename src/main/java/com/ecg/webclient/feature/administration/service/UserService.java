@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.Filter;
 import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.ldap.support.LdapUtils;
@@ -52,14 +51,12 @@ public class UserService
     UserMapper          userMapper;
     Environment         env;
     EnvironmentService  environmentService;
-    LdapTemplate        ldapTemplate;
     LdapConfigService   ldapConfigService;
 
     @Autowired
     public UserService(UserRepository userRepo, GroupRepository groupRepo, ClientRepository clientRepo,
             ClientMapper clientMapper, UserMapper userMapper, Environment env,
-            EnvironmentService environmentService, LdapTemplate ldapTemplate,
-            LdapConfigService ldapConfigService)
+            EnvironmentService environmentService, LdapConfigService ldapConfigService)
     {
         this.userRepo = userRepo;
         this.groupRepo = groupRepo;
@@ -68,7 +65,6 @@ public class UserService
         this.userMapper = userMapper;
         this.env = env;
         this.environmentService = environmentService;
-        this.ldapTemplate = ldapTemplate;
         this.ldapConfigService = ldapConfigService;
     }
 
@@ -259,8 +255,9 @@ public class UserService
                 }
                 else
                 {
+                    LdapTemplate ldapTemplate = ldapConfigService.setupLdapConnection(ldapConfigService
+                            .getLdapConfig());
                     LdapConfigDto ldapConfig = ldapConfigService.getLdapConfig();
-                    setupLdapConnection(ldapConfig);
 
                     Object[] filterParams =
                     { login };
@@ -387,16 +384,5 @@ public class UserService
         userRepo.save(persistentUser);
 
         return persistentUser.isAccountLocked();
-    }
-
-    private void setupLdapConnection(LdapConfigDto ldapConfig)
-    {
-        LdapContextSource ctxSrc = new LdapContextSource();
-        ctxSrc.setUrl(ldapConfig.getUrl());
-        ctxSrc.setUserDn(ldapConfig.getUsername());
-        ctxSrc.setPassword(ldapConfig.getPassword());
-        ctxSrc.afterPropertiesSet();
-
-        ldapTemplate = new LdapTemplate(ctxSrc);
     }
 }

@@ -31,6 +31,11 @@
 			$("#ldapConfigForm").submit();
 		});
 		
+		$("#ldapConnectionTest").click(function(e) {
+			e.preventDefault();
+		    $('#ldapConfigForm').attr('action', "/admin/ldap/test").submit();
+		});
+		
 		$("#ldapSwitch").bootstrapSwitch()
 						.on(
 								'switchChange.bootstrapSwitch',
@@ -77,6 +82,10 @@
 						</div>
 						<div class="collapse navbar-collapse">
 							<ul class="nav navbar-right">
+								<button type="button" class="btn btn-default navbar-btn"
+									id="ldapConnectionTest">
+									<span th:text="#{ldapConnectionActionTest}"></span>
+								</button>
 								<button type="button" class="btn btn-default navbar-btn disabled"
 									id="ldapConfigSave">
 									<span th:text="#{ldapConfigActionSave}"></span>
@@ -102,6 +111,30 @@
 							</button>
 							<strong>
 								<span th:text="#{ldapConfigTableErrorMessage}"></span>
+							</strong>
+						</div>
+						
+						<div th:if="*{connectionSuccessful != null} and !*{connectionSuccessful}" class="alert alert-danger alert-dismissible fade in"
+							role="alert">
+							<button type="button" class="close" data-dismiss="alert"
+								aria-label="Close">
+								<span aria-hidden="true">&times;
+								</span>
+							</button>
+							<strong>
+								<span th:text="#{ldapConnectionErrorMessage}"></span>
+							</strong>
+						</div>
+						
+						<div th:if="*{connectionSuccessful != null} and *{connectionSuccessful}" class="alert alert-success alert-dismissible fade in"
+							role="alert">
+							<button type="button" class="close" data-dismiss="alert"
+								aria-label="Close">
+								<span aria-hidden="true">&times;
+								</span>
+							</button>
+							<strong>
+								<span th:text="#{ldapConnectionOkMessage}"></span>
 							</strong>
 						</div>
 
