@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -86,23 +85,6 @@ public class GroupController
         groupService.saveGroups(updateDtos);
 
         return "redirect:";
-    }
-
-    /**
-     * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten gehörende Gruppen.
-     * 
-     * @return
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/user/clientgroups/{clientId}", method = RequestMethod.GET)
-    public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
-    {
-        List<GroupDto> groups = groupService.getAllGroupsForClient(Long.parseLong(clientId));
-
-        model.addAttribute("groups", groups);
-
-        return "feature/administration/user :: clientGroups";
     }
 
     /**

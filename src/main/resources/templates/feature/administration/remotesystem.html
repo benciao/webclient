@@ -29,12 +29,12 @@
 	$(document)
 			.ready(
 					function() {
-						$('#usersAddRow')
+						$('#remoteSystemsAddRow')
 								.click(
 										function() {
-											var rowIndex = $('#userTable tbody')
+											var rowIndex = $('#remoteSystemTable tbody')
 													.children().length;
-											$('#userTable tbody')
+											$('#remoteSystemTable tbody')
 													.append(
 															"<tr>"
 																	+ "<td>"
@@ -81,12 +81,12 @@
 																				+ collectionIndex[1])
 																		.val(
 																				state);
-																$("#usersSave")
+																$("#remoteSystemsSave")
 																		.removeClass(
 																				"disabled");
 															});
 
-											$("#usersSave").removeClass(
+											$("#remoteSystemsSave").removeClass(
 													"disabled");
 
 											$("#hiddenSwitch-" + rowIndex).val(
@@ -98,55 +98,23 @@
 
 										});
 
-						$("#userEditPanel").hide();
-						$("#pwChangeArea").hide();
+						$("#remoteSystemEditPanel").hide();
 
-						$("[name='user-state-switch']").bootstrapSwitch().on(
+						$("[name='remoteSystem-state-switch']").bootstrapSwitch().on(
 								'switchChange.bootstrapSwitch',
 								function(event, state) {
 									var collectionIndex = event.target.id
 											.split("-");
 									$("#hiddenSwitch-" + collectionIndex[1])
 											.val(state);
-									$("#usersSave").removeClass("disabled");
+									$("#remoteSystemsSave").removeClass("disabled");
 								});
-
-						$("#pw-change-on-next-login-switch").bootstrapSwitch()
-								.on(
-										'switchChange.bootstrapSwitch',
-										function(event, state) {
-											var userIndex = $(
-													"#hiddenUserIndex").val();
-											$(
-													"#hiddenChangePasswordOnNextLogin-"
-															+ userIndex).val(
-													state);
-											$("#usersSave").removeClass(
-													"disabled");
-										});
-
-						$("#pw-change-switch").bootstrapSwitch().on(
-								'switchChange.bootstrapSwitch',
-								function(event, state) {
-									if (state) {
-										$("#pwChangeArea").show();
-									} else {
-										$("#pwChangeArea").hide();
-									}
-								});
-
-						$("#email").change(function(event, state) {
-							var userIndex = $("#hiddenUserIndex").val();
-							var value = $("#email").val();
-
-							$("#hiddenEmail-" + userIndex).val(value);
-						});
 
 						$('.form-control').change(function() {
-							$("#usersSave").removeClass("disabled");
+							$("#remoteSystemsSave").removeClass("disabled");
 						});
 
-						$("#usersSave").click(function() {
+						$("#remoteSystemsSave").click(function() {
 							$("#usersForm").submit();
 						});
 
@@ -154,208 +122,15 @@
 							onDeleteClick(event);
 						});
 
-						$('.a_unlock').click(function(event) {
-							onUnlockClick(event);
-						});
-
 						$('.a_edit').click(function(event) {
 							editOnClick(event);
 						});
 
-						$('#buttonUserEditDone').click(function(event) {
+						$('#buttonRemoteSystemEditDone').click(function(event) {
 
-							$("#userEditPanel").hide();
+							$("#remoteSystemEditPanel").hide();
 							$("table tbody tr").removeClass('highlight');
 						});
-
-						$("#password").on("keyup", function() {
-							var pass = $(this).val();
-							updateProgressBar(scorePassword(pass));
-						});
-
-						$("#clientGroupSelect").change(function() {
-							var clientId = $(this).val();
-							retrieveClientGroups(clientId);
-						});
-
-						$("#clientGroupSelect").ready(
-								function() {
-									var clientId = $(
-											"#clientGroupSelect option:first")
-											.val();
-									retrieveClientGroups(clientId);
-								});
-
-						$("#password-confirm")
-								.keyup(
-										function(event) {
-											var userIndex = $(
-													"#hiddenUserIndex").val();
-
-											if (validatePassword()) {
-												if ($("#pw-change-switch")
-														.bootstrapSwitch(
-																'state')) {
-													var userRid = $(
-															"#hiddenRid-"
-																	+ userIndex)
-															.val();
-
-													$(
-															"#hiddenPassword-"
-																	+ userIndex)
-															.val(
-																	$(
-																			"#password-confirm")
-																			.val(),
-																	userRid);
-													$("#password-confirm")
-															.removeClass(
-																	'invalidPassword');
-
-												} else {
-													$(
-															"#hiddenPassword-"
-																	+ userIndex)
-															.val(null);
-												}
-											} else {
-												$(
-														"#hiddenPassword-"
-																+ userIndex)
-														.val(null);
-												$("#password-confirm")
-														.addClass(
-																'invalidPassword');
-											}
-										});
-					});
-
-	function determinAvailableClients() {
-		var url = '/admin/user/availableClients';
-		var userIndex = $("#hiddenUserIndex").val();
-		var assignedGroupRids = $("#hiddenGroupRids-" + userIndex).val();
-		var uRid = $("#hiddenRid-" + userIndex).val();
-
-		url = url + '/' + assignedGroupRids + "/" + uRid;
-
-		$("#availableClientsResult").load(
-				url,
-				function() {
-					$("#defaultClientGroupSelect").change(
-							function(event, state) {
-								var userIndex = $("#hiddenUserIndex").val();
-								var selected = $("#defaultClientGroupSelect")
-										.val();
-								$("#hiddenDefaultClient-" + userIndex).val(
-										selected);
-							});
-
-					var userIndex = $("#hiddenUserIndex").val();
-
-					var hiddenSelectedClient = $(
-							"#hiddenDefaultClient-" + userIndex).val();
-
-					if (!hiddenSelectedClient) {
-						$("#hiddenDefaultClient-" + userIndex).val(
-								$("#defaultClientGroupSelect").val());
-					}
-				});
-
-	}
-
-	function retrieveClientGroups(clientId) {
-		var url = '/admin/user/clientgroups';
-
-		url = url + '/' + clientId;
-
-		$("#clientGroupsResult")
-				.load(
-						url,
-						function() {
-							$("[name='group-assignment-switch']")
-									.bootstrapSwitch()
-									.on(
-											'switchChange.bootstrapSwitch',
-											function(event, state) {
-												var collectionIndex = event.target.id
-														.split("-");
-
-												$(
-														"#hiddenGroupSwitchValue-"
-																+ collectionIndex[1])
-														.val(state);
-
-												var userIndex = $(
-														"#hiddenUserIndex")
-														.val();
-
-												var assignedGroupRids = $(
-														"#hiddenGroupRids-"
-																+ userIndex)
-														.val();
-
-												// Status der Switches auslesen und zugeordnete Gruppen speichern
-												$("tr.groupItem")
-														.each(
-																function() {
-																	var groupRid = $(
-																			this)
-																			.find(
-																					"input.hiddenGroupRid")
-																			.val();
-
-																	var switchOn = $(
-																			this)
-																			.find(
-																					"input.groupSwitch")
-																			.bootstrapSwitch(
-																					'state');
-
-																	if (switchOn) {
-																		if (assignedGroupRids.length == 0) {
-																			assignedGroupRids = assignedGroupRids
-																					+ groupRid;
-																		} else {
-																			if (!isGroupAssigned(
-																					groupRid,
-																					assignedGroupRids)) {
-																				assignedGroupRids = assignedGroupRids
-																						+ ","
-																						+ groupRid;
-																			}
-																		}
-																	} else {
-																		if (isGroupAssigned(
-																				groupRid,
-																				assignedGroupRids)) {
-																			assignedGroupRids = removeGroupRid(
-																					assignedGroupRids,
-																					groupRid);
-																		}
-																	}
-																});
-
-												$(
-														"#hiddenGroupRids-"
-																+ userIndex)
-														.val(assignedGroupRids);
-
-												$("#usersSave").removeClass(
-														"disabled");
-
-												// Auswahl für Standardmandant aktualisieren
-												determinAvailableClients();
-											});
-
-							var userIndex = $("#hiddenUserIndex").val();
-
-							if (userIndex) {
-								// bereits zugeordnete Gruppen initialisieren
-								setAssignedGroups(userIndex);
-							}
-						});
-	}
 
 	function editOnClick(event) {
 		var collectionIndex = $(event.target).parent().attr('id').split("-");
@@ -376,44 +151,8 @@
 		var row = $(event.target).parent().parent().parent();
 		row.addClass('highlight').siblings().removeClass('highlight');
 
-		// PW Change Switch setzen
-		var state = $("#hiddenChangePasswordOnNextLogin-" + collectionIndex[1])
-				.val();
-		$("#pw-change-on-next-login-switch").bootstrapSwitch('state',
-				(state == 'false') ? false : true);
-
-		// DefaultClient setzen
-		var currentSelectedClient = $(
-				"#hiddenDefaultClient-" + collectionIndex[1]).val();
-		$("#defaultClientGroupSelect").val(currentSelectedClient);
-
-		// Email setzen
-		var emailValue = $("#hiddenEmail-" + collectionIndex[1]).val();
-		$("#email").val(emailValue);
-
-		// Passwortänderungsdatum setzen
-		var pwChangedValue = $("#hiddenPwChangedValue-" + collectionIndex[1])
-				.val();
-		$("#pwChangedDate").val(pwChangedValue);
-
-		// Passwort setzen
-		var pw = $("#hiddenPassword-" + collectionIndex[1]).val();
-
-		if (pw) {
-			$("#password").val(pw);
-			$("#password-confirm").val(pw);
-			$("#pw-change-switch").bootstrapSwitch('state', true);
-		} else {
-			$("#password").val(null);
-			$("#password-confirm").val(null);
-			$("#pw-change-switch").bootstrapSwitch('state', false);
-		}
-
 		// bereits zugeordnete Gruppen initialisieren
 		setAssignedGroups(collectionIndex[1]);
-
-		// Auswahl für Standardmandant aktualisieren
-		determinAvailableClients();
 	}
 
 	function onDeleteClick(event) {
@@ -433,44 +172,6 @@
 		}
 
 		row.hide();
-	}
-
-	function onUnlockClick(event) {
-		var collectionIndex = $(event.target).parent().attr('id').split("-");
-
-		var row = $(event.target).parent().parent().parent();
-
-		$("#hiddenAccountLocked-" + collectionIndex[1]).val(false);
-		$("#hiddenLoginAttempts-" + collectionIndex[1]).val(0);
-		$("#usersSave").removeClass("disabled");
-
-		$(event.target).hide();
-	}
-
-	function setAssignedGroups(userIndex) {
-		var assignedGroupRids = $("#hiddenGroupRids-" + userIndex).val();
-
-		$("tr.groupItem").each(
-				function() {
-					var groupRid = $(this).find("input.hiddenGroupRid").val();
-
-					$(this).find("input.groupSwitch").bootstrapSwitch('state',
-							isGroupAssigned(groupRid, assignedGroupRids));
-
-				});
-	}
-
-	function isGroupAssigned(rid, assignedRids) {
-
-		var ridsArray = assignedRids.split(",");
-
-		for (var i = 0; i < ridsArray.length; i++) {
-			if (ridsArray[i] == rid) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	function removeGroupRid(groupRids, ridToRemove) {
@@ -517,7 +218,7 @@ body {
 
 		<!-- {!begin navigation} -->
 		<div
-			th:include="feature/administration/adminmenu :: navigation('user', 'user')"
+			th:include="feature/administration/adminmenu :: navigation('remotesystem', 'system')"
 			id="navigation" class="navigation"></div>
 		<!-- {!end navigation} -->
 
@@ -526,20 +227,20 @@ body {
 				<div class="container-fluid">
 					<div class="navbar-header">
 						<div class="navbar-brand navbar-text-submenu">
-							<span th:text="#{userTitle}"></span>
+							<span th:text="#{remoteSystemTitle}"></span>
 						</div>
 					</div>
 					<div class="collapse navbar-collapse">
 						<ul class="nav navbar-right">
 							<button type="button" class="btn btn-default navbar-btn"
-								id="usersAddRow">
-								<span th:text="#{usersActionNew}"></span>
+								id="remoteSystemsAddRow">
+								<span th:text="#{remoteSystemsActionNew}"></span>
 							</button>
 							<button type="button" class="btn btn-default navbar-btn disabled"
-								id="usersSave">
-								<span th:text="#{usersActionSave}"></span>
+								id="remoteSystemsSave">
+								<span th:text="#{remoteSystemsActionSave}"></span>
 							</button>
-							<a class="glyph-link" href="/admin/user"><span
+							<a class="glyph-link" href="/admin/remotesystem"><span
 								class="glyphicon glyphicon-refresh"></span></a>
 						</ul>
 					</div>
@@ -547,8 +248,8 @@ body {
 			</nav>
 			<div class="container-fluid">
 
-				<form id="usersForm" role="form" th:action="@{/admin/user/save}"
-					method="post" th:object="${userConfig}">
+				<form id="usersForm" role="form" th:action="@{/admin/remotesystem/save}"
+					method="post" th:object="${remoteSystemConfig}">
 
 					<div th:if="${#fields.hasErrors('*')}"
 						class="alert alert-danger alert-dismissible fade in" role="alert">
@@ -556,243 +257,107 @@ body {
 							aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
-						<strong><span th:text="#{usersTableErrorMessage}"></span></strong>
+						<strong><span th:text="#{remoteSystemsTableErrorMessage}"></span></strong>
 					</div>
 
 					<table class="table table-hover table-striped table-condensed"
-						id="userTable">
+						id="remoteSystemTable">
 						<thead>
 							<tr>
-								<th><span th:text="#{usersTableLogin}"></span></th>
-								<th><span th:text="#{usersTableType}"></span></th>
-								<th><span th:text="#{usersTableFirstName}"></span></th>
-								<th><span th:text="#{usersTableLastName}"></span></th>
-								<th><span th:text="#{usersTableStatus}"></span></th>
-								<th><span th:text="#{usersTableActions}"></span></th>
+								<th><span th:text="#{remoteSystemsTableName}"></span></th>
+								<th><span th:text="#{remoteSystemsTableDescription}"></span></th>
+								<th><span th:text="#{remoteSystemsTableStatus}"></span></th>
+								<th><span th:text="#{remoteSystemsTableActions}"></span></th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr th:each="item, stat : *{users}">
-								<td><input th:id="${'login-'+stat.index}" type="text"
-									class="form-control" placeholder="Login"
-									th:field="*{users[__${stat.index}__].login}"
+							<tr th:each="item, stat : *{remoteSystems}">
+								<td><input th:id="${'name-'+stat.index}" type="text"
+									class="form-control" placeholder="Name"
+									th:field="*{remoteSystems[__${stat.index}__].name}"
 									th:errorclass="field-tip" /><span class="tip-content"
-									th:errors="*{users[__${stat.index}__].login}"></span></td>
-								<td><select class="form-control"
-									th:id="${'type-'+stat.index}"
-									th:field="*{users[__${stat.index}__].internal}">
-										<option th:value="true" th:text="#{usersTypeSelectDb}"
-											th:selected="*{users[__${stat.index}__].internal}"></option>
-										<option th:value="false" th:text="#{usersTypeSelectLdap}"
-											th:selected="*{users[__${stat.index}__].internal}"></option>
-								</select></td>
-								<td><input th:id="${'firstname-'+stat.index}" type="text"
-									class="form-control" placeholder="Vorname"
-									th:field="*{users[__${stat.index}__].firstname}"
+									th:errors="*{remoteSystems[__${stat.index}__].name}"></span></td>
+								<td><input th:id="${'description-'+stat.index}" type="text"
+									class="form-control" placeholder="Beschreibung"
+									th:field="*{remoteSystems[__${stat.index}__].description}"
 									th:errorclass="field-tip" /><span class="tip-content"
-									th:errors="*{users[__${stat.index}__].firstname}"></span></td>
-								<td><input th:id="${'lastname-'+stat.index}" type="text"
-									class="form-control" placeholder="Nachname"
-									th:field="*{users[__${stat.index}__].lastname}"
-									th:errorclass="field-tip" /><span class="tip-content"
-									th:errors="*{users[__${stat.index}__].lastname}"></span></td>
+									th:errors="*{remoteSystems[__${stat.index}__].description}"></span></td>
 								<td><input th:id="${'switch-'+stat.index}" type="checkbox"
-									name="user-state-switch" data-size="mini"
-									th:checked="*{users[__${stat.index}__].enabled}"
+									name="remoteSystem-state-switch" data-size="mini"
+									th:checked="*{remoteSystems[__${stat.index}__].enabled}"
 									data-on-color="success" data-off-color="warning"></input> <input
 									type="hidden" th:id="${'hiddenSwitch-'+stat.index}"
-									th:field="*{users[__${stat.index}__].enabled}" /></td>
+									th:field="*{remoteSystems[__${stat.index}__].enabled}" /></td>
 								<td><a class="a_delete" th:id="${'a_delete-'+stat.index}"
-									href="#" th:title="#{usersActionDelete}"><span
+									href="#" th:title="#{remoteSystemsActionDelete}"><span
 										class="glyphicon glyphicon-remove"> </span></a> <a class="a_edit"
 									th:id="${'a_edit-'+stat.index}" href="#"
-									th:title="#{usersActionEdit}"><span
-										class="glyphicon glyphicon-edit"> </span></a> <a
-									sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')"
-									th:if="*{users[__${stat.index}__].login} != ${#authentication.name}"
-									class="a_login-as" th:id="${'a_login-as-'+stat.index}"
-									th:href="'/admin/user/loginas/' + *{users[__${stat.index}__].id}"
-									th:title="#{usersActionLoginAs}"><span
-										class="glyphicon glyphicon-random"> </span></a> <a
-									sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')"
-									th:if="*{users[__${stat.index}__].accountLocked}"
-									class="a_unlock" th:id="${'a_unlock-'+stat.index}" href="#"
-									th:title="#{usersActionUnlock}"><span
-										class="glyphicon glyphicon-lock"> </span></a> <input type="hidden"
+									th:title="#{remoteSystemsActionEdit}"><span
+										class="glyphicon glyphicon-edit"> </span></a><input type="hidden"
 									th:id="${'hiddenRid-'+stat.index}"
-									th:field="*{users[__${stat.index}__].id}" /><input
+									th:field="*{remoteSystems[__${stat.index}__].id}" /><input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
-									th:field="*{users[__${stat.index}__].delete}" /><input
-									type="hidden" th:id="${'hiddenGroupRids-'+stat.index}"
-									th:field="*{users[__${stat.index}__].groupIds}" /> <input
-									type="hidden" th:id="${'hiddenEmail-'+stat.index}"
-									th:field="*{users[__${stat.index}__].email}" /> <input
-									type="hidden" th:id="${'hiddenPwChangedValue-'+stat.index}"
-									th:field="*{{users[__${stat.index}__].passwortChangedTimeStamp}}" />
-									<input type="hidden"
-									th:id="${'hiddenDefaultClient-'+stat.index}"
-									th:field="*{users[__${stat.index}__].defaultClient}" /> <input
-									type="hidden"
-									th:id="${'hiddenChangePasswordOnNextLogin-'+stat.index}"
-									th:field="*{users[__${stat.index}__].changePasswordOnNextLogin}" /><input
-									type="hidden" th:id="${'hiddenPassword-'+stat.index}"
-									th:field="*{users[__${stat.index}__].password}" /> <input
-									type="hidden" th:id="${'hiddenAccountLocked-'+stat.index}"
-									th:field="*{users[__${stat.index}__].accountLocked}" /> <input
-									type="hidden" th:id="${'hiddenLoginAttempts-'+stat.index}"
-									th:field="*{users[__${stat.index}__].loginAttempts}" /></td>
+									th:field="*{remoteSystems[__${stat.index}__].delete}" /></td>
 							</tr>
 						</tbody>
 					</table>
-					<div id="userEditPanel" class="panel panel-info">
+					<div id="remoteSystemEditPanel" class="panel panel-info">
 						<div class="panel-heading">
-							<span th:text="#{userEditPanelHeader}"></span><span
-								id="userEditPanelHeadingName"></span>
+							<span th:text="#{remoteSystemEditPanelHeader}"></span><span
+								id="remoteSystemEditPanelHeadingName"></span>
 						</div>
 						<div class="panel-body">
 							<div class="container-fluid">
 								<div class="row margin-content">
 
-									<div class="col-md-6">
+									<div class="col-md-12">
 										<ul class="list-group">
-											<li class="list-group-item"><div
-													id="availableClientsResult"></div></li>
 											<li class="list-group-item"><div>
 													<label class="control-label"><span
-														th:text="#{userEmailLabel}"></span></label>
+														th:text="#{remoteSystemLoginUrlLabel}"></span></label>
 													<div>
-														<input type="email" class="form-control" id="email"
-															th:placeholder="#{userEmailLabel}" />
+														<input type="text" class="form-control" id="loginUrl"
+															th:placeholder="#{remoteSystemLoginUrlLabel}" />
 													</div>
 												</div></li>
 											<li class="list-group-item"><div>
 													<label class="control-label"><span
-														th:text="#{pwChangedLabel}"></span></label>
+														th:text="#{remoteSystemLoginParameterLabel}"></span></label>
 													<div>
-														<input type="text" class="form-control" id="pwChangedDate"
-															th:placeholder="#{pwChangedLabel}" readonly="true" />
+														<input type="text" class="form-control" id="remoteSystemLoginParameter"
+															th:placeholder="#{remoteSystemLoginParameterLabel}" />
 													</div>
 												</div></li>
 											<li class="list-group-item"><div>
 													<label class="control-label"><span
-														th:text="#{userChangePwOnNextLogonLabel}"></span></label>
+														th:text="#{remoteSystemPasswordParameterLabel}"></span></label>
 													<div>
-														<input class="changePwOnNextLogonSwitch form-control"
-															name="pw-change-on-next-login-switch"
-															id="pw-change-on-next-login-switch" type="checkbox"
-															data-size="mini" data-on-color="success"
-															data-off-color="warning"></input>
+														<input type="text" class="form-control" id="remoteSystemPasswordParameter"
+															th:placeholder="#{remoteSystemPasswordParameterLabel}" />
 													</div>
 												</div></li>
 											<li class="list-group-item"><div>
 													<label class="control-label"><span
-														th:text="#{userChangePw}"></span></label>
+														th:text="#{remoteSystemLogoutUrlLabel}"></span></label>
 													<div>
-														<input class="changePwSwitch form-control"
-															id="pw-change-switch" type="checkbox" data-size="mini"
-															data-on-color="success" data-off-color="warning"></input>
-													</div>
-													<div id="pwChangeArea">
-														<div>
-															<label class="control-label"><span
-																th:text="#{userPwLabel}"></span></label> <input type="password"
-																class="form-control" id="password"
-																th:placeholder="#{userPwLabel}" />
-														</div>
-														<div>
-															<label class="control-label"><span
-																th:text="#{userPasswordConfirmLabel}"></span></label> <input
-																type="password" class="form-control"
-																id="password-confirm"
-																th:placeholder="#{userPasswordConfirmLabel}" />
-														</div>
-														<div>
-															<label class="control-label"><span
-																th:text="#{userPasswordScore}"></span></label>
-															<div class="progress">
-																<div class="progress-bar" role="progressbar"
-																	id="password_progress_bar" aria-valuemin="0"
-																	aria-valuemax="100" style="width: 0%;"
-																	aria-valuenow="0"></div>
-															</div>
-														</div>
+														<input type="text" class="form-control" id="remoteSystemLogoutUrl"
+															th:placeholder="#{remoteSystemLogoutUrlLabel}" />
 													</div>
 												</div></li>
 										</ul>
 									</div>
-
-
-									<div class="col-md-6">
-										<label class="control-label"><span
-											th:text="#{userEditGroupAssignmentHeader}"></span></label>
-										<div class="panel panel-default">
-											<div class="row margin-content">
-												<label class="control-label"><span
-													th:text="#{clientSelection}"></span></label> <select
-													id="clientGroupSelect" class="form-control">
-													<option
-														th:each="client : ${beans.authenticationUtil.getClients()}"
-														th:value="${client.id}" th:text="${client.name}">
-													</option>
-												</select>
-
-												<!-- Results block -->
-												<div id="clientGroupsResult"></div>
-											</div>
-										</div>
-
-									</div>
 								</div>
-								<button id="buttonUserEditDone" class="btn btn-primary btn-done"
+								<button id="buttonRemoteSystemEditDone" class="btn btn-primary btn-done"
 									type="button">
 									<span th:text="#{buttonDone}"></span>
 								</button>
 							</div>
 						</div>
 					</div>
-					<input id="hiddenUserIndex" type="hidden" value="" />
+					<input id="hiddenRemoteSystemIndex" type="hidden" value="" />
 				</form>
 			</div>
 		</div>
-	</div>
-
-	<div th:fragment="clientGroups" th:unless="${#lists.isEmpty(groups)}"
-		class="userEditClientGroups">
-		<table class="table table-hover table-striped table-condensed"
-			id="groupAssignmentTable">
-			<thead>
-				<tr>
-					<th><span th:text="#{groupsTableName}"></span></th>
-					<th><span th:text="#{groupsTableDescription}"></span></th>
-					<th><span th:text="#{groupAssigned}"></span></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="groupItem" th:each="group, stat : ${groups}">
-					<td th:text="${group.name}"></td>
-					<td th:text="${group.description}"></td>
-					<td><input class="groupSwitch"
-						th:id="${'group-switch-'+stat.index}" type="checkbox"
-						name="group-assignment-switch" data-size="mini"
-						data-on-color="success" data-off-color="warning"></input> <input
-						type="hidden" th:id="${'hiddenGroupSwitchValue-'+stat.index}"
-						value="false" /><input class="hiddenGroupRid"
-						th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
-						th:value="${group.id}" /></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-
-	<div th:fragment="availableClients"
-		th:unless="${#lists.isEmpty(availableClients)}"
-		class="userAvailableClients">
-		<label class="control-label"><span th:text="#{clientDefault}"></span></label>
-		<select id="defaultClientGroupSelect" class="form-control">
-			<option th:each="client : ${availableClients}"
-				th:value="${client.id}" th:text="${client.name}"
-				th:selected="${client.id.toString() == defaultClient}"></option>
-		</select>
 	</div>
 </body>
 </html>

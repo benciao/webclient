@@ -24,8 +24,10 @@ import com.ecg.webclient.feature.administration.accessrole.SecurityAdminAccessRo
 import com.ecg.webclient.feature.administration.accessrole.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.service.ClientService;
+import com.ecg.webclient.feature.administration.service.GroupService;
 import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserConfig;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.UserDtoValidator;
@@ -46,6 +48,8 @@ public class UserController
     private UserService        userService;
     @Autowired
     private ClientService      clientService;
+    @Autowired
+    private GroupService       groupService;
     @Autowired
     private AuthenticationUtil authUtil;
     @Autowired
@@ -170,6 +174,23 @@ public class UserController
         }
 
         return result.size() != 0 ? result : null;
+    }
+    
+    /**
+     * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten gehörende Gruppen.
+     * 
+     * @return
+     */
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+    @RequestMapping(value = "/clientgroups/{clientId}", method = RequestMethod.GET)
+    public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
+    {
+        List<GroupDto> groups = groupService.getAllGroupsForClient(Long.parseLong(clientId));
+
+        model.addAttribute("groups", groups);
+
+        return "feature/administration/user :: clientGroups";
     }
 
 }

@@ -45,7 +45,7 @@
 									$("#ldapConfigSave").removeClass("disabled");
 								});
 							
-		$("#password").attr("type", "password");
+		$("#ldapPassword").attr("type", "password");
 
 	});
 	/*]]>*/
@@ -178,7 +178,7 @@
 										<span th:text="#{ldapConfigUsernameLabel}"></span>
 									</td>
 									<td>
-										<input type="text" class="form-control" th:field="*{username}"
+										<input id="ldapUsername" type="text" class="form-control" th:field="*{username}"
 											th:errorclass="field-tip" />
 										<span class="tip-content" th:errors="*{username}"></span>
 									</td>
@@ -188,7 +188,7 @@
 										<span th:text="#{ldapConfigPasswordLabel}"></span>
 									</td>
 									<td>
-										<input id="password" type="text" class="form-control"
+										<input id="ldapPassword" type="text" class="form-control"
 											th:field="*{password}" th:errorclass="field-tip" />
 										<span class="tip-content" th:errors="*{password}"></span>
 									</td>

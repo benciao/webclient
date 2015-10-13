@@ -325,6 +325,22 @@
 											</td>
 										</tr>
 									</div>
+									<div>
+										<tr th:if="${selectedItem == 'remotesystem'}" class="warning">
+											<td>
+												<a href="/admin/remotesystem">
+													<span th:text="#{menuTreeRemoteSystemConfig}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'remotesystem'}">
+											<td>
+												<a href="/admin/remotesystem">
+													<span th:text="#{menuTreeRemoteSystemConfig}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
 								</table>
 							</div>
 						</div>
@@ -377,6 +393,22 @@
 											<td>
 												<a href="/admin/ldap">
 													<span th:text="#{menuTreeLdapConfig}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+									<div>
+										<tr th:if="${selectedItem == 'remotesystem'}" class="warning">
+											<td>
+												<a href="/admin/remotesystem">
+													<span th:text="#{menuTreeRemoteSystemConfig}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'remotesystem'}">
+											<td>
+												<a href="/admin/remotesystem">
+													<span th:text="#{menuTreeRemoteSystemConfig}"></span>
 												</a>
 											</td>
 										</tr>
