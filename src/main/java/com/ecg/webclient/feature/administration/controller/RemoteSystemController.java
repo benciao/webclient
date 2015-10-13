@@ -94,6 +94,6 @@ public class RemoteSystemController
 
     protected String getLoadingRedirectTemplate()
     {
-        return "feature/administration/remoteSystem";
+        return "feature/administration/remotesystem";
     }
 }

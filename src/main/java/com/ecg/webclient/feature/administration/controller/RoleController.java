@@ -95,6 +95,6 @@ public class RoleController
 
     protected String getLoadingRedirectTemplate()
     {
-        return "feature/administration/userRole";
+        return "feature/administration/userrole";
     }
 }

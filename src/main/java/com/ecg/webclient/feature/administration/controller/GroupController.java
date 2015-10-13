@@ -126,7 +126,7 @@ public class GroupController
 
     protected String getLoadingRedirectTemplate()
     {
-        return "feature/administration/userGroup";
+        return "feature/administration/usergroup";
     }
 
     @InitBinder("groupConfig")

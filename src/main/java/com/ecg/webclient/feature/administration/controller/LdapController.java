@@ -96,6 +96,6 @@ public class LdapController
 
     protected String getLoadingRedirectTemplate()
     {
-        return "feature/administration/userGroup/ldap";
+        return "feature/administration/ldap";
     }
 }

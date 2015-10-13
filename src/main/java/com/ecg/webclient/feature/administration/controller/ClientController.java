@@ -77,7 +77,7 @@ public class ClientController
 
         if (bindingResult.hasErrors())
         {
-            return getLoadingRedirectTemplate() + "clientConfig";
+            return getLoadingRedirectTemplate();
         }
 
         clientService.saveClients(updateDtos);
@@ -99,12 +99,12 @@ public class ClientController
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.setClients(clientService.getAllClients(false));
         model.addAttribute("clientConfig", clientConfig);
-        return getLoadingRedirectTemplate() + "clientconfig";
+        return getLoadingRedirectTemplate();
     }
 
     protected String getLoadingRedirectTemplate()
     {
-        return "feature/administration/";
+        return "feature/administration/clientconfig";
     }
 
     @InitBinder("clientConfig")
