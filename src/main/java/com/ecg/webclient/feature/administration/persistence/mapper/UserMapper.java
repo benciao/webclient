@@ -79,10 +79,10 @@ public class UserMapper
             dto.setGroupIds(groups);
         }
 
-        if (user.getRemotesSystems() != null)
+        if (user.getRemoteSystems() != null)
         {
             String remoteSystems = "";
-            for (RemoteSystem remoteSystem : user.getRemotesSystems())
+            for (RemoteSystem remoteSystem : user.getRemoteSystems())
             {
                 if (remoteSystems.length() == 0)
                 {
@@ -149,7 +149,7 @@ public class UserMapper
         List<RemoteSystem> remoteSystems = new ArrayList<RemoteSystem>();
         remoteSystemRepo.findAll(dto.getRemoteSystemIdObjects()).forEach(e -> remoteSystems.add(e));
 
-        entity.setGroups(groups);
+        entity.setRemoteSystems(remoteSystems);
 
         User persistentUser = userRepo.findOne(entity.getId());
         if (persistentUser != null)

@@ -50,7 +50,7 @@ public class User
     private List<Group>        groups;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "SEC_USER_SEC_REMOTE_SYSTEM", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "REMOTE_SYSTEM_ID"))
-    private List<RemoteSystem> remotesSystems;
+    private List<RemoteSystem> remoteSystems;
 
     public User()
     {}
@@ -74,7 +74,7 @@ public class User
         setAccountLocked(newUser.isAccountLocked());
         setLoginAttempts(newUser.getLoginAttempts());
         setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
-        setRemotesSystems(newUser.getRemotesSystems());
+        setRemoteSystems(newUser.getRemoteSystems());
 
         return this;
     }
@@ -177,7 +177,7 @@ public class User
     {
         List<RemoteSystem> result = new ArrayList<RemoteSystem>();
 
-        for (RemoteSystem rm : remotesSystems)
+        for (RemoteSystem rm : remoteSystems)
         {
             if (rm.isEnabled())
             {
@@ -228,9 +228,9 @@ public class User
         return passwordChangedTimeStamp;
     }
 
-    public List<RemoteSystem> getRemotesSystems()
+    public List<RemoteSystem> getRemoteSystems()
     {
-        return remotesSystems;
+        return remoteSystems;
     }
 
     @Override
@@ -339,8 +339,8 @@ public class User
         this.passwordChangedTimeStamp = passwordChangedTimeStamp;
     }
 
-    public void setRemotesSystems(List<RemoteSystem> remotesSystems)
+    public void setRemoteSystems(List<RemoteSystem> remoteSystems)
     {
-        this.remotesSystems = remotesSystems;
+        this.remoteSystems = remoteSystems;
     }
 }

@@ -1,11 +1,14 @@
 package com.ecg.webclient.feature.administration.persistence.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.modell.RemoteSystem;
+import com.ecg.webclient.feature.administration.persistence.repo.RemoteSystemRepository;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
 
 /**
@@ -17,6 +20,9 @@ import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
 @Component
 public class RemoteSystemMapper
 {
+    @Autowired
+    RemoteSystemRepository remoteSystemRepo;
+
     /**
      * Wandelt ein attachtes Fremdsystem in ein detachtes um.
      * 
@@ -54,5 +60,49 @@ public class RemoteSystemMapper
         remoteSystems.forEach(e -> result.add(mapToDto(e)));
 
         return result;
+    }
+
+    /**
+     * Wandelt eine Liste von detachten Fremdsystemen in eine Liste von Fremdsystemen Gruppen um.
+     * 
+     * @param dtos
+     *            Liste von detachten Fremdsystemen
+     * @return Liste von attachten Fremdsystemen
+     */
+    public List<RemoteSystem> mapToEntities(List<RemoteSystemDto> dtos)
+    {
+        List<RemoteSystem> result = new ArrayList<RemoteSystem>();
+
+        dtos.forEach(e -> result.add(mapToEntity(e)));
+
+        return result;
+    }
+
+    /**
+     * Wandelt ein detachtes Fremdsystem in eine attachtes um.
+     * 
+     * @param dto
+     *            Detachtes Fremdsystem
+     * @return Attachtes Fremdsystem
+     */
+    public RemoteSystem mapToEntity(RemoteSystemDto dto)
+    {
+        RemoteSystem entity = new RemoteSystem();
+        entity.setId(dto.getId());
+        entity.setDescription(dto.getDescription());
+        entity.setName(dto.getName());
+        entity.setEnabled(dto.isEnabled());
+        entity.setLoginUrl(dto.getLoginUrl());
+        entity.setLoginParameter(dto.getLoginParameter());
+        entity.setPasswordParameter(dto.getPasswordParameter());
+        entity.setLogoutUrl(dto.getLogoutUrl());
+
+        RemoteSystem remoteSystem = remoteSystemRepo.findOne(entity.getId());
+        if (remoteSystem != null)
+        {
+            return remoteSystem.bind(entity);
+        }
+
+        return entity;
     }
 }
