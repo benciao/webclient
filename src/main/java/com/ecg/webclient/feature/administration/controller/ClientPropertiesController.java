@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,7 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.PropertyDto
  * @author arndtmar
  *
  */
+@Scope("request")
 @Controller
 @RequestMapping(value = "/admin/clientp")
 public class ClientPropertiesController
@@ -91,6 +93,7 @@ public class ClientPropertiesController
     {
         ClientProperties clientProperties = new ClientProperties();
         clientProperties.setProperties(authUtil.getSelectedClient().getProperties());
+        clientProperties.setClientId(authUtil.getSelectedClient().getId());
         model.addAttribute("clientProperties", clientProperties);
         return getLoadingRedirectTemplate();
     }

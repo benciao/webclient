@@ -25,85 +25,82 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 @Component("dbAuthenticationProvider")
 public class DbAuthenticationProvider implements AuthenticationProvider
 {
-    @Autowired
-    UserService        userService;
-    @Autowired
-    GroupService       groupService;
-    @Autowired
-    RoleService        roleService;
-    @Autowired
-    AuthenticationUtil util;
-    @Autowired
-    LdapConfigService  ldapConfigService;
+	@Autowired
+	UserService			userService;
+	@Autowired
+	GroupService		groupService;
+	@Autowired
+	RoleService			roleService;
+	@Autowired
+	LdapConfigService	ldapConfigService;
 
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException
-    {
-        String login = authentication.getName();
-        String password = authentication.getCredentials().toString();
+	@Override
+	public Authentication authenticate(Authentication authentication) throws AuthenticationException
+	{
+		String login = authentication.getName();
+		String password = authentication.getCredentials().toString();
 
-        UserDto persistentUser = userService.getUserByLogin(login);
+		UserDto persistentUser = userService.getUserByLogin(login);
 
-        if (persistentUser == null)
-        {
-            throw new BadCredentialsException("");
-        }
-        else
-        {
-            boolean isAuthenticated = false;
-            // Ldap Authentifizierung
-            if (!persistentUser.isInternal())
-            {
-                if (ldapConfigService.getLdapConfig().isEnabled())
-                {
-                    isAuthenticated = userService.isUserAuthenticated(login, password, true);
-                }
-                else
-                {
-                    throw new InsufficientAuthenticationException("");
-                }
-            }
-            // DB Authentifizierung
-            else
-            {
-                isAuthenticated = userService.isUserAuthenticated(login, password, false);
-            }
+		if (persistentUser == null)
+		{
+			throw new BadCredentialsException("");
+		}
+		else
+		{
+			boolean isAuthenticated = false;
+			// Ldap Authentifizierung
+			if (!persistentUser.isInternal())
+			{
+				if (ldapConfigService.getLdapConfig().isEnabled())
+				{
+					isAuthenticated = userService.isUserAuthenticated(login, password, true);
+				}
+				else
+				{
+					throw new InsufficientAuthenticationException("");
+				}
+			}
+			// DB Authentifizierung
+			else
+			{
+				isAuthenticated = userService.isUserAuthenticated(login, password, false);
+			}
 
-            if (isAuthenticated)
-            {
-                UserDto user = userService.getUserByLogin(login);
-                ClientDto defaultClient = userService.getDefaultClientForUser(user);
-                util.setSelectedClient(defaultClient);
+			if (isAuthenticated)
+			{
+				UserDto user = userService.getUserByLogin(login);
+				ClientDto defaultClient = userService.getDefaultClientForUser(user);
 
-                List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-                // zugeordnete Rollen für den Mandanten setzen, welche
-                // selbst aktiv
-                // sind und deren Feature aktiv ist
-                for (GroupDto group : groupService.getEnabledGroupsForIds(user.getGroupIdObjects()))
-                {
-                    if (groupService.getClientForGroupId(group.getId()).getId() == defaultClient.getId())
-                    {
-                        for (RoleDto role : roleService.getEnabledRolesWithEnabledFeatureForIds(group
-                                .getRoleIdObjects()))
-                        {
-                            DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
-                            grantedAuths.add(newAuth);
-                        }
-                    }
-                }
+				List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+				// zugeordnete Rollen für den Mandanten setzen, welche
+				// selbst aktiv
+				// sind und deren Feature aktiv ist
+				for (GroupDto group : groupService.getEnabledGroupsForIds(user.getGroupIdObjects()))
+				{
+					if (groupService.getClientForGroupId(group.getId()).getId() == defaultClient.getId())
+					{
+						for (RoleDto role : roleService
+								.getEnabledRolesWithEnabledFeatureForIds(group.getRoleIdObjects()))
+						{
+							DbGrantedAuthoritiy newAuth = new DbGrantedAuthoritiy(role.getCombinedName());
+							grantedAuths.add(newAuth);
+						}
+					}
+				}
 
-                Authentication auth = new UsernamePasswordAuthenticationToken(login, password, grantedAuths);
+				Authentication auth = new UsernamePasswordAuthenticationToken(login, password, grantedAuths);
 
-                return auth;
-            }
-        }
+				return auth;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public boolean supports(Class<?> authentication)
-    {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
-    }
+	@Override
+	public boolean supports(Class<?> authentication)
+	{
+		return authentication.equals(UsernamePasswordAuthenticationToken.class);
+	}
 }

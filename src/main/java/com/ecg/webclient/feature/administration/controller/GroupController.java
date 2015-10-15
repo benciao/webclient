@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,92 +29,97 @@ import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.GroupDtoValidator;
 
 /**
- * Controller zur Bearbeitung von Requests aus Administrationsdialogen (Gruppen).
+ * Controller zur Bearbeitung von Requests aus Administrationsdialogen
+ * (Gruppen).
  * 
  * @author arndtmar
  *
  */
+@Scope("request")
 @Controller
 @RequestMapping(value = "/admin/usergroup")
 public class GroupController
 {
-    static final Logger        logger = LogManager.getLogger(GroupController.class.getName());
+	static final Logger logger = LogManager.getLogger(GroupController.class.getName());
 
-    @Autowired
-    private GroupService       groupService;
-    @Autowired
-    private RoleService        roleService;
-    @Autowired
-    private AuthenticationUtil authUtil;
-    @Autowired
-    GroupDtoValidator          groupDtoValidator;
+	@Autowired
+	private GroupService		groupService;
+	@Autowired
+	private RoleService			roleService;
+	@Autowired
+	private AuthenticationUtil	authUtil;
+	@Autowired
+	GroupDtoValidator			groupDtoValidator;
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/usergroup/save". Speichert Änderungen an Benutzergruppen.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public String saveGroup(@Valid GroupConfig groupConfig, BindingResult bindingResult)
-    {
-        List<GroupDto> updateDtos = new ArrayList<GroupDto>();
-        List<GroupDto> deleteDtos = new ArrayList<GroupDto>();
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/usergroup/save". Speichert
+	 * Änderungen an Benutzergruppen.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String saveGroup(@Valid GroupConfig groupConfig, BindingResult bindingResult)
+	{
+		List<GroupDto> updateDtos = new ArrayList<GroupDto>();
+		List<GroupDto> deleteDtos = new ArrayList<GroupDto>();
 
-        for (GroupDto dto : groupConfig.getGroups())
-        {
-            if (dto.isDelete())
-            {
-                deleteDtos.add(dto);
-            }
-            else
-            {
-                updateDtos.add(dto);
-            }
-        }
+		for (GroupDto dto : groupConfig.getGroups())
+		{
+			if (dto.isDelete())
+			{
+				deleteDtos.add(dto);
+			}
+			else
+			{
+				updateDtos.add(dto);
+			}
+		}
 
-        groupService.deleteGroups(deleteDtos);
+		groupService.deleteGroups(deleteDtos);
 
-        groupConfig.removeDeleted();
+		groupConfig.removeDeleted();
 
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-        groupService.saveGroups(updateDtos);
+		groupService.saveGroups(updateDtos, authUtil);
 
-        return "redirect:";
-    }
+		return "redirect:";
+	}
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/usergroup". Lädt alle zum aktuell ausgewählten Mandanten
-     * gehörige Benutzergruppen und deren zugeordnete Benutzerrollen.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(method = RequestMethod.GET)
-    public String showGroupConfig(Model model)
-    {
-        GroupConfig groupConfig = new GroupConfig();
-        groupConfig.setGroups(groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId()));
-        groupConfig.setRoles(roleService.getAllRoles(false));
-        model.addAttribute("groupConfig", groupConfig);
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/usergroup". Lädt alle zum aktuell
+	 * ausgewählten Mandanten gehörige Benutzergruppen und deren zugeordnete
+	 * Benutzerrollen.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(method = RequestMethod.GET)
+	public String showGroupConfig(Model model)
+	{
+		GroupConfig groupConfig = new GroupConfig();
+		groupConfig.setGroups(groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId()));
+		groupConfig.setRoles(roleService.getAllRoles(false));
+		groupConfig.setClientId(authUtil.getSelectedClient().getId());
+		model.addAttribute("groupConfig", groupConfig);
 
-        return getLoadingRedirectTemplate();
-    }
+		return getLoadingRedirectTemplate();
+	}
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/usergroup";
-    }
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/usergroup";
+	}
 
-    @InitBinder("groupConfig")
-    protected void initGroupBinder(WebDataBinder binder)
-    {
-        binder.setValidator(groupDtoValidator);
-    }
+	@InitBinder("groupConfig")
+	protected void initGroupBinder(WebDataBinder binder)
+	{
+		binder.setValidator(groupDtoValidator);
+	}
 }

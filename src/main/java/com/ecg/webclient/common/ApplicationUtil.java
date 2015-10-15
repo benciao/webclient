@@ -1,10 +1,12 @@
 package com.ecg.webclient.common;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.ecg.webclient.feature.administration.service.EnvironmentService;
 
+@Scope("session")
 @Component
 public class ApplicationUtil
 {

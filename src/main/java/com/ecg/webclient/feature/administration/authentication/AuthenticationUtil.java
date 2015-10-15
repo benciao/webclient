@@ -6,6 +6,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,6 +25,7 @@ import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
+@Scope("session")
 @Component
 public class AuthenticationUtil
 {
@@ -68,7 +70,7 @@ public class AuthenticationUtil
 
 		assignRolesToUserSession(user, auth, login, password);
 	}
-	
+
 	private void assignRolesToUserSession(UserDto user, Authentication auth, String login, String password)
 	{
 		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
