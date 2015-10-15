@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -20,7 +21,7 @@ import javax.persistence.Transient;
 import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
 
 /**
- * Implementierung eines Benutzers. OrientDb spezifisch.
+ * Entität eines Benutzers.
  * 
  * @author arndtmar
  */
@@ -30,27 +31,26 @@ public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long               id;
+    private long              id;
     @Column(unique = true)
-    private String             login;
-    private String             password;
-    private Date               passwordChangedTimeStamp;
-    private int                loginAttempts;
-    private String             firstname;
-    private String             lastname;
-    private boolean            enabled;
-    private boolean            accountLocked;
-    private boolean            changePasswordOnNextLogin;
-    private boolean            internal;
-    private String             email;
+    private String            login;
+    private String            password;
+    private Date              passwordChangedTimeStamp;
+    private int               loginAttempts;
+    private String            firstname;
+    private String            lastname;
+    private boolean           enabled;
+    private boolean           accountLocked;
+    private boolean           changePasswordOnNextLogin;
+    private boolean           internal;
+    private String            email;
     @OneToOne
-    private Client             defaultClient;
+    private Client            defaultClient;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "SEC_USER_SEC_GROUP", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "GROUP_ID"))
-    private List<Group>        groups;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "SEC_USER_SEC_REMOTE_SYSTEM", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "REMOTE_SYSTEM_ID"))
-    private List<RemoteSystem> remoteSystems;
+    private List<Group>       groups;
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<RemoteLogin> remoteLogins;
 
     public User()
     {}
@@ -74,7 +74,7 @@ public class User
         setAccountLocked(newUser.isAccountLocked());
         setLoginAttempts(newUser.getLoginAttempts());
         setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
-        setRemoteSystems(newUser.getRemoteSystems());
+        setRemoteLogins(newUser.getRemoteLogins());
 
         return this;
     }
@@ -173,15 +173,15 @@ public class User
     }
 
     @Transient
-    public List<RemoteSystem> getEnabledRemoteSystems()
+    public List<RemoteLogin> getEnabledRemoteLogins()
     {
-        List<RemoteSystem> result = new ArrayList<RemoteSystem>();
+        List<RemoteLogin> result = new ArrayList<RemoteLogin>();
 
-        for (RemoteSystem rm : remoteSystems)
+        for (RemoteLogin rl : remoteLogins)
         {
-            if (rm.isEnabled())
+            if (rl.isEnabled())
             {
-                result.add(rm);
+                result.add(rl);
             }
         }
 
@@ -228,9 +228,9 @@ public class User
         return passwordChangedTimeStamp;
     }
 
-    public List<RemoteSystem> getRemoteSystems()
+    public List<RemoteLogin> getRemoteLogins()
     {
-        return remoteSystems;
+        return remoteLogins;
     }
 
     @Override
@@ -339,8 +339,9 @@ public class User
         this.passwordChangedTimeStamp = passwordChangedTimeStamp;
     }
 
-    public void setRemoteSystems(List<RemoteSystem> remoteSystems)
+    public void setRemoteLogins(List<RemoteLogin> remoteLogins)
     {
-        this.remoteSystems = remoteSystems;
+        this.remoteLogins = remoteLogins;
     }
+
 }

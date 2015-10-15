@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
-import com.ecg.webclient.feature.administration.persistence.modell.RemoteSystem;
 import com.ecg.webclient.feature.administration.persistence.modell.User;
 import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
@@ -79,23 +78,6 @@ public class UserMapper
             dto.setGroupIds(groups);
         }
 
-        if (user.getRemoteSystems() != null)
-        {
-            String remoteSystems = "";
-            for (RemoteSystem remoteSystem : user.getRemoteSystems())
-            {
-                if (remoteSystems.length() == 0)
-                {
-                    remoteSystems = Long.toString(remoteSystem.getId());
-                }
-                else
-                {
-                    remoteSystems = remoteSystems + "," + remoteSystem.getId();
-                }
-            }
-            dto.setRemoteSystemIds(remoteSystems);
-        }
-
         return dto;
     }
 
@@ -145,11 +127,6 @@ public class UserMapper
         groupRepo.findAll(dto.getGroupIdObjects()).forEach(e -> groups.add(e));
 
         entity.setGroups(groups);
-
-        List<RemoteSystem> remoteSystems = new ArrayList<RemoteSystem>();
-        remoteSystemRepo.findAll(dto.getRemoteSystemIdObjects()).forEach(e -> remoteSystems.add(e));
-
-        entity.setRemoteSystems(remoteSystems);
 
         User persistentUser = userRepo.findOne(entity.getId());
         if (persistentUser != null)
