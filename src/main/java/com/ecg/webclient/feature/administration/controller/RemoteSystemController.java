@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -21,6 +23,7 @@ import com.ecg.webclient.feature.administration.accessrole.SetupSystemAccessRole
 import com.ecg.webclient.feature.administration.service.RemoteSystemService;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemConfig;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
+import com.ecg.webclient.feature.administration.viewmodell.validator.RemoteSystemDtoValidator;
 
 /**
  * Controller zur Bearbeitung von Requests aus Administrationsdialogen (Fremdsystem).
@@ -32,9 +35,11 @@ import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
 @RequestMapping(value = "/admin/remotesystem")
 public class RemoteSystemController
 {
-    static final Logger logger = LogManager.getLogger(RemoteSystemController.class.getName());
+    static final Logger      logger = LogManager.getLogger(RemoteSystemController.class.getName());
     @Autowired
-    RemoteSystemService remoteSystemService;
+    RemoteSystemService      remoteSystemService;
+    @Autowired
+    RemoteSystemDtoValidator remoteSystemDtoValidator;
 
     /**
      * Behandelt POST-Requests vom Typ "/admin/remotesystem/save". Speichert Änderungen an Benutzerrollen.
@@ -95,5 +100,11 @@ public class RemoteSystemController
     protected String getLoadingRedirectTemplate()
     {
         return "feature/administration/remotesystem";
+    }
+
+    @InitBinder("remoteSystemConfig")
+    protected void initRemoteSystemBinder(WebDataBinder binder)
+    {
+        binder.setValidator(remoteSystemDtoValidator);
     }
 }

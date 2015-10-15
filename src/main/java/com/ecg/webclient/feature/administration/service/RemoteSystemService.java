@@ -96,6 +96,34 @@ public class RemoteSystemService
     }
 
     /**
+     * @param name
+     *            Name des Fremdsystems
+     * @return Das Fremdsystem, welches zum übergebenen Namen gehört
+     */
+    public RemoteSystemDto getRemoteSystemByName(String name)
+    {
+        try
+        {
+            RemoteSystem persistentRemoteSystem = null;
+
+            Iterable<RemoteSystem> remoteSystems = remoteSystemRepo.findByName(name);
+            if (remoteSystems.iterator().hasNext())
+            {
+                persistentRemoteSystem = remoteSystems.iterator().next();
+            }
+
+            return (persistentRemoteSystem != null) ? remoteSystemMapper.mapToDto(persistentRemoteSystem)
+                    : null;
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+
+        return null;
+    }
+
+    /**
      * @param remoteSystemIds
      *            Liste mit IDs von Fremdsystemen
      * @return Liste mit zu den IDs gehörenden Fremdsystemen

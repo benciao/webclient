@@ -32,34 +32,27 @@
 						$('#remoteSystemsAddRow')
 								.click(
 										function() {
-											var rowIndex = $('#remoteSystemTable tbody')
+											var rowIndex = $(
+													'#remoteSystemTable tbody')
 													.children().length;
 											$('#remoteSystemTable tbody')
 													.append(
 															"<tr>"
 																	+ "<td>"
-																	+ "<input class='form-control' placeholder='[[#{usersTableLogin}]]' id='login-" + rowIndex + "' name='users[" + rowIndex + "].login' />"
+																	+ "<input class='form-control' placeholder='[[#{remoteSystemsTableName}]]' id='name-" + rowIndex + "' name='remoteSystems[" + rowIndex + "].name' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<select class='form-control' id='type-" + rowIndex + "' name='users[" + rowIndex + "].internal'><option value='true' text='[[#{usersTypeSelectDb}]]'>[[#{usersTypeSelectDb}]]</option><option value='false' text='[[#{usersTypeSelectLdap}]]'>[[#{usersTypeSelectLdap}]]</option></select>"
+																	+ "<input class='form-control' placeholder='[[#{remoteSystemsTableDescription}]]' id='description-" + rowIndex + "' name='remoteSystems[" + rowIndex + "].description' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<input class='form-control' placeholder='[[#{usersTableFirstName}]]' id='firstname-" + rowIndex + "' name='users[" + rowIndex + "].firstname' />"
+																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='remoteSystem-state-switch' data-size='mini' data-checked='true' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='remoteSystems[" + rowIndex + "].enabled' value='true' />"
 																	+ "</td>"
 																	+ "<td>"
-																	+ "<input class='form-control' placeholder='[[#{usersTableLastName}]]' id='lastname-" + rowIndex + "' name='users[" + rowIndex + "].lastname' />"
-																	+ "</td>"
-																	+ "<td>"
-																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='user-state-switch' data-size='mini' data-checked='true' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='users[" + rowIndex + "].enabled' value='true' />"
-																	+ "</td>"
-																	+ "<td>"
-																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' value='false' />"
-																	+ "<input type='hidden' id='hiddenGroupRids-"+ rowIndex +"' name='users["+ rowIndex +"].groupIds'/>"
-																	+ "<input type='hidden' id='hiddenEmail-"+ rowIndex +"' name='users["+ rowIndex +"].email' />"
-																	+ "<input type='hidden' id='hiddenDefaultClient-"+ rowIndex +"' name='users["+ rowIndex +"].defaultClient' />"
-																	+ "<input type='hidden' id='hiddenChangePasswordOnNextLogin-"+ rowIndex +"' name='users["+ rowIndex +"].changePasswordOnNextLogin' />"
-																	+ "<input type='hidden' id='hiddenPassword-"+ rowIndex +"' name='users["+ rowIndex +"].password' />"
-																	+ "<input type='hidden' id='hiddenLoginAttempts-"+ rowIndex +"' name='users["+ rowIndex +"].loginAttempts' value='0' />"
+																	+ "<a href='#' class='a_delete' title='[[#{remoteSystemsActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{remoteSystemsActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='remoteSystems[" + rowIndex + "].delete' value='false' />"
+																	+ "<input type='hidden' id='hiddenLoginUrl-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].loginUrl' />"
+																	+ "<input type='hidden' id='hiddenLoginParameter-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].loginParameter' />"
+																	+ "<input type='hidden' id='hiddenPasswordParameter-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].passwordParameter' />"
+																	+ "<input type='hidden' id='hiddenLogoutUrl-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].logoutUrl' />"
 																	+ "</td>"
 																	+ "</tr>");
 
@@ -81,13 +74,14 @@
 																				+ collectionIndex[1])
 																		.val(
 																				state);
-																$("#remoteSystemsSave")
+																$(
+																		"#remoteSystemsSave")
 																		.removeClass(
 																				"disabled");
 															});
 
-											$("#remoteSystemsSave").removeClass(
-													"disabled");
+											$("#remoteSystemsSave")
+													.removeClass("disabled");
 
 											$("#hiddenSwitch-" + rowIndex).val(
 													false);
@@ -100,22 +94,27 @@
 
 						$("#remoteSystemEditPanel").hide();
 
-						$("[name='remoteSystem-state-switch']").bootstrapSwitch().on(
-								'switchChange.bootstrapSwitch',
-								function(event, state) {
-									var collectionIndex = event.target.id
-											.split("-");
-									$("#hiddenSwitch-" + collectionIndex[1])
-											.val(state);
-									$("#remoteSystemsSave").removeClass("disabled");
-								});
+						$("[name='remoteSystem-state-switch']")
+								.bootstrapSwitch()
+								.on(
+										'switchChange.bootstrapSwitch',
+										function(event, state) {
+											var collectionIndex = event.target.id
+													.split("-");
+											$(
+													"#hiddenSwitch-"
+															+ collectionIndex[1])
+													.val(state);
+											$("#remoteSystemsSave")
+													.removeClass("disabled");
+										});
 
 						$('.form-control').change(function() {
 							$("#remoteSystemsSave").removeClass("disabled");
 						});
 
 						$("#remoteSystemsSave").click(function() {
-							$("#usersForm").submit();
+							$("#remoteSystemsForm").submit();
 						});
 
 						$('.a_delete').click(function(event) {
@@ -125,34 +124,74 @@
 						$('.a_edit').click(function(event) {
 							editOnClick(event);
 						});
+						
+						$("#loginUrl").change(function(event, state) {
+							var rowIndex = $("#hiddenRemoteSystemIndex").val();
+							var value = $("#loginUrl").val();
+
+							$("#hiddenLoginUrl-" + rowIndex).val(value);
+						});
+						
+						$("#remoteSystemLoginParameter").change(function(event, state) {
+							var rowIndex = $("#hiddenRemoteSystemIndex").val();
+							var value = $("#remoteSystemLoginParameter").val();
+
+							$("#hiddenLoginParameter-" + rowIndex).val(value);
+						});
+						
+						$("#remoteSystemPasswordParameter").change(function(event, state) {
+							var rowIndex = $("#hiddenRemoteSystemIndex").val();
+							var value = $("#remoteSystemPasswordParameter").val();
+
+							$("#hiddenPasswordParameter-" + rowIndex).val(value);
+						});
+						
+						$("#remoteSystemLogoutUrl").change(function(event, state) {
+							var rowIndex = $("#hiddenRemoteSystemIndex").val();
+							var value = $("#remoteSystemLogoutUrl").val();
+
+							$("#hiddenLogoutUrl-" + rowIndex).val(value);
+						});
 
 						$('#buttonRemoteSystemEditDone').click(function(event) {
 
 							$("#remoteSystemEditPanel").hide();
 							$("table tbody tr").removeClass('highlight');
 						});
+					});
 
 	function editOnClick(event) {
 		var collectionIndex = $(event.target).parent().attr('id').split("-");
 
-		var userName = $("#login-" + collectionIndex[1]).val();
+		var remoteSystemName = $("#name-" + collectionIndex[1]).val();
 
 		// Headertext setzen
-		$("#userEditPanelHeadingName").text(" " + userName);
+		$("#remoteSystemEditPanelHeadingName").text(" " + remoteSystemName);
+		
+		// Login-URL setzen
+		var urlValue = $("#hiddenLoginUrl-" + collectionIndex[1]).val();
+		$("#loginUrl").val(urlValue);
+		
+		// Login-Parameter setzen
+		var loginParamValue = $("#hiddenLoginParameter-" + collectionIndex[1]).val();
+		$("#remoteSystemLoginParameter").val(loginParamValue);
+		
+		// Passwort-Parameter setzen
+		var passwordParamValue = $("#hiddenPasswordParameter-" + collectionIndex[1]).val();
+		$("#remoteSystemPasswordParameter").val(passwordParamValue);
+		
+		// Logout-URL setzen
+		var urlLogoutValue = $("#hiddenLogoutUrl-" + collectionIndex[1]).val();
+		$("#remoteSystemLogoutUrl").val(urlLogoutValue);
 
-		$("#userEditPanel").show();
-		$("#pwChangeArea").hide();
-		$("#pw-change-switch").bootstrapSwitch('state', false);
+		$("#remoteSystemEditPanel").show();
 
 		// Zuordnung EditPanel zu Benutzer festlegen
-		$("#hiddenUserIndex").val(collectionIndex[1]);
+		$("#hiddenRemoteSystemIndex").val(collectionIndex[1]);
 
 		// Row highlighting
 		var row = $(event.target).parent().parent().parent();
 		row.addClass('highlight').siblings().removeClass('highlight');
-
-		// bereits zugeordnete Gruppen initialisieren
-		setAssignedGroups(collectionIndex[1]);
 	}
 
 	function onDeleteClick(event) {
@@ -161,41 +200,17 @@
 		var row = $(event.target).parent().parent().parent();
 
 		$("#hiddenDelete-" + collectionIndex[1]).val(true);
-		$("#usersSave").removeClass("disabled");
+		$("#remoteSystemsSave").removeClass("disabled");
 
 		// Editierfenster ausblenden
-		var userName = $("#login-" + collectionIndex[1]).val();
-		var userEditPanel = $("#userEditPanelHeadingName").text();
+		var remoteSystemName = $("#name-" + collectionIndex[1]).val();
+		var remoteSystemEditPanel = $("#remoteSystemEditPanelHeadingName").text();
 
-		if (" " + userName == userEditPanel) {
-			$("#userEditPanel").hide();
+		if (" " + remoteSystemName == remoteSystemEditPanel) {
+			$("#remoteSystemEditPanel").hide();
 		}
 
 		row.hide();
-	}
-
-	function removeGroupRid(groupRids, ridToRemove) {
-		var groupRidsArray = groupRids.split(",");
-
-		var index = groupRidsArray.indexOf(ridToRemove);
-
-		if (index > -1) {
-			groupRidsArray.splice(index, 1);
-			var result = "";
-
-			for (var i = 0; i < groupRidsArray.length; i++) {
-				if (result.length == 0) {
-					result = result + groupRidsArray[i];
-				} else {
-					result = result + "," + groupRidsArray[i];
-				}
-			}
-
-			return result;
-
-		} else {
-			return groupRids;
-		}
 	}
 
 	/*]]>*/
@@ -248,8 +263,9 @@ body {
 			</nav>
 			<div class="container-fluid">
 
-				<form id="usersForm" role="form" th:action="@{/admin/remotesystem/save}"
-					method="post" th:object="${remoteSystemConfig}">
+				<form id="remoteSystemsForm" role="form"
+					th:action="@{/admin/remotesystem/save}" method="post"
+					th:object="${remoteSystemConfig}">
 
 					<div th:if="${#fields.hasErrors('*')}"
 						class="alert alert-danger alert-dismissible fade in" role="alert">
@@ -273,12 +289,13 @@ body {
 						<tbody>
 							<tr th:each="item, stat : *{remoteSystems}">
 								<td><input th:id="${'name-'+stat.index}" type="text"
-									class="form-control" placeholder="Name"
+									class="form-control" th:placeholder="#{remoteSystemsTableName}"
 									th:field="*{remoteSystems[__${stat.index}__].name}"
 									th:errorclass="field-tip" /><span class="tip-content"
 									th:errors="*{remoteSystems[__${stat.index}__].name}"></span></td>
 								<td><input th:id="${'description-'+stat.index}" type="text"
-									class="form-control" placeholder="Beschreibung"
+									class="form-control"
+									th:placeholder="#{remoteSystemsTableDescription}"
 									th:field="*{remoteSystems[__${stat.index}__].description}"
 									th:errorclass="field-tip" /><span class="tip-content"
 									th:errors="*{remoteSystems[__${stat.index}__].description}"></span></td>
@@ -297,7 +314,18 @@ body {
 									th:id="${'hiddenRid-'+stat.index}"
 									th:field="*{remoteSystems[__${stat.index}__].id}" /><input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
-									th:field="*{remoteSystems[__${stat.index}__].delete}" /></td>
+									th:field="*{remoteSystems[__${stat.index}__].delete}" /><input type="hidden"
+									th:id="${'hiddenLoginUrl-'+stat.index}"
+									th:field="*{remoteSystems[__${stat.index}__].loginUrl}" />
+									<input type="hidden"
+									th:id="${'hiddenLoginParameter-'+stat.index}"
+									th:field="*{remoteSystems[__${stat.index}__].loginParameter}" />
+									<input type="hidden"
+									th:id="${'hiddenPasswordParameter-'+stat.index}"
+									th:field="*{remoteSystems[__${stat.index}__].passwordParameter}" />
+									<input type="hidden"
+									th:id="${'hiddenLogoutUrl-'+stat.index}"
+									th:field="*{remoteSystems[__${stat.index}__].logoutUrl}" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -324,7 +352,8 @@ body {
 													<label class="control-label"><span
 														th:text="#{remoteSystemLoginParameterLabel}"></span></label>
 													<div>
-														<input type="text" class="form-control" id="remoteSystemLoginParameter"
+														<input type="text" class="form-control"
+															id="remoteSystemLoginParameter"
 															th:placeholder="#{remoteSystemLoginParameterLabel}" />
 													</div>
 												</div></li>
@@ -332,7 +361,8 @@ body {
 													<label class="control-label"><span
 														th:text="#{remoteSystemPasswordParameterLabel}"></span></label>
 													<div>
-														<input type="text" class="form-control" id="remoteSystemPasswordParameter"
+														<input type="text" class="form-control"
+															id="remoteSystemPasswordParameter"
 															th:placeholder="#{remoteSystemPasswordParameterLabel}" />
 													</div>
 												</div></li>
@@ -340,15 +370,16 @@ body {
 													<label class="control-label"><span
 														th:text="#{remoteSystemLogoutUrlLabel}"></span></label>
 													<div>
-														<input type="text" class="form-control" id="remoteSystemLogoutUrl"
+														<input type="text" class="form-control"
+															id="remoteSystemLogoutUrl"
 															th:placeholder="#{remoteSystemLogoutUrlLabel}" />
 													</div>
 												</div></li>
 										</ul>
 									</div>
 								</div>
-								<button id="buttonRemoteSystemEditDone" class="btn btn-primary btn-done"
-									type="button">
+								<button id="buttonRemoteSystemEditDone"
+									class="btn btn-primary btn-done" type="button">
 									<span th:text="#{buttonDone}"></span>
 								</button>
 							</div>
