@@ -124,39 +124,69 @@
 						$('.a_edit').click(function(event) {
 							editOnClick(event);
 						});
-						
+
 						$("#loginUrl").change(function(event, state) {
 							var rowIndex = $("#hiddenRemoteSystemIndex").val();
 							var value = $("#loginUrl").val();
 
 							$("#hiddenLoginUrl-" + rowIndex).val(value);
 						});
-						
-						$("#remoteSystemLoginParameter").change(function(event, state) {
-							var rowIndex = $("#hiddenRemoteSystemIndex").val();
-							var value = $("#remoteSystemLoginParameter").val();
 
-							$("#hiddenLoginParameter-" + rowIndex).val(value);
-						});
-						
-						$("#remoteSystemPasswordParameter").change(function(event, state) {
-							var rowIndex = $("#hiddenRemoteSystemIndex").val();
-							var value = $("#remoteSystemPasswordParameter").val();
+						$("#remoteSystemLoginParameter")
+								.change(
+										function(event, state) {
+											var rowIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var value = $(
+													"#remoteSystemLoginParameter")
+													.val();
 
-							$("#hiddenPasswordParameter-" + rowIndex).val(value);
-						});
-						
-						$("#remoteSystemLogoutUrl").change(function(event, state) {
-							var rowIndex = $("#hiddenRemoteSystemIndex").val();
-							var value = $("#remoteSystemLogoutUrl").val();
+											$(
+													"#hiddenLoginParameter-"
+															+ rowIndex).val(
+													value);
+										});
 
-							$("#hiddenLogoutUrl-" + rowIndex).val(value);
-						});
+						$("#remoteSystemPasswordParameter")
+								.change(
+										function(event, state) {
+											var rowIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var value = $(
+													"#remoteSystemPasswordParameter")
+													.val();
+
+											$(
+													"#hiddenPasswordParameter-"
+															+ rowIndex).val(
+													value);
+										});
+
+						$("#remoteSystemLogoutUrl")
+								.change(
+										function(event, state) {
+											var rowIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var value = $(
+													"#remoteSystemLogoutUrl")
+													.val();
+
+											$("#hiddenLogoutUrl-" + rowIndex)
+													.val(value);
+										});
 
 						$('#buttonRemoteSystemEditDone').click(function(event) {
 
 							$("#remoteSystemEditPanel").hide();
 							$("table tbody tr").removeClass('highlight');
+						});
+
+						$("#myTab a").click(function(e) {
+							e.preventDefault();
+							$(this).tab('show');
 						});
 					});
 
@@ -167,19 +197,21 @@
 
 		// Headertext setzen
 		$("#remoteSystemEditPanelHeadingName").text(" " + remoteSystemName);
-		
+
 		// Login-URL setzen
 		var urlValue = $("#hiddenLoginUrl-" + collectionIndex[1]).val();
 		$("#loginUrl").val(urlValue);
-		
+
 		// Login-Parameter setzen
-		var loginParamValue = $("#hiddenLoginParameter-" + collectionIndex[1]).val();
+		var loginParamValue = $("#hiddenLoginParameter-" + collectionIndex[1])
+				.val();
 		$("#remoteSystemLoginParameter").val(loginParamValue);
-		
+
 		// Passwort-Parameter setzen
-		var passwordParamValue = $("#hiddenPasswordParameter-" + collectionIndex[1]).val();
+		var passwordParamValue = $(
+				"#hiddenPasswordParameter-" + collectionIndex[1]).val();
 		$("#remoteSystemPasswordParameter").val(passwordParamValue);
-		
+
 		// Logout-URL setzen
 		var urlLogoutValue = $("#hiddenLogoutUrl-" + collectionIndex[1]).val();
 		$("#remoteSystemLogoutUrl").val(urlLogoutValue);
@@ -204,7 +236,8 @@
 
 		// Editierfenster ausblenden
 		var remoteSystemName = $("#name-" + collectionIndex[1]).val();
-		var remoteSystemEditPanel = $("#remoteSystemEditPanelHeadingName").text();
+		var remoteSystemEditPanel = $("#remoteSystemEditPanelHeadingName")
+				.text();
 
 		if (" " + remoteSystemName == remoteSystemEditPanel) {
 			$("#remoteSystemEditPanel").hide();
@@ -314,17 +347,15 @@ body {
 									th:id="${'hiddenRid-'+stat.index}"
 									th:field="*{remoteSystems[__${stat.index}__].id}" /><input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
-									th:field="*{remoteSystems[__${stat.index}__].delete}" /><input type="hidden"
-									th:id="${'hiddenLoginUrl-'+stat.index}"
-									th:field="*{remoteSystems[__${stat.index}__].loginUrl}" />
-									<input type="hidden"
-									th:id="${'hiddenLoginParameter-'+stat.index}"
+									th:field="*{remoteSystems[__${stat.index}__].delete}" /><input
+									type="hidden" th:id="${'hiddenLoginUrl-'+stat.index}"
+									th:field="*{remoteSystems[__${stat.index}__].loginUrl}" /> <input
+									type="hidden" th:id="${'hiddenLoginParameter-'+stat.index}"
 									th:field="*{remoteSystems[__${stat.index}__].loginParameter}" />
 									<input type="hidden"
 									th:id="${'hiddenPasswordParameter-'+stat.index}"
 									th:field="*{remoteSystems[__${stat.index}__].passwordParameter}" />
-									<input type="hidden"
-									th:id="${'hiddenLogoutUrl-'+stat.index}"
+									<input type="hidden" th:id="${'hiddenLogoutUrl-'+stat.index}"
 									th:field="*{remoteSystems[__${stat.index}__].logoutUrl}" /></td>
 							</tr>
 						</tbody>
@@ -335,53 +366,72 @@ body {
 								id="remoteSystemEditPanelHeadingName"></span>
 						</div>
 						<div class="panel-body">
-							<div class="container-fluid">
-								<div class="row margin-content">
+							<br></br>
+							<ul class="nav nav-tabs" id="myTab">
+								<li class="active"><a href="#sectionA">Section A</a></li>
+								<li><a href="#sectionB">Section B</a></li>
+							</ul>
 
-									<div class="col-md-12">
-										<ul class="list-group">
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{remoteSystemLoginUrlLabel}"></span></label>
-													<div>
-														<input type="text" class="form-control" id="loginUrl"
-															th:placeholder="#{remoteSystemLoginUrlLabel}" />
-													</div>
-												</div></li>
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{remoteSystemLoginParameterLabel}"></span></label>
-													<div>
-														<input type="text" class="form-control"
-															id="remoteSystemLoginParameter"
-															th:placeholder="#{remoteSystemLoginParameterLabel}" />
-													</div>
-												</div></li>
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{remoteSystemPasswordParameterLabel}"></span></label>
-													<div>
-														<input type="text" class="form-control"
-															id="remoteSystemPasswordParameter"
-															th:placeholder="#{remoteSystemPasswordParameterLabel}" />
-													</div>
-												</div></li>
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{remoteSystemLogoutUrlLabel}"></span></label>
-													<div>
-														<input type="text" class="form-control"
-															id="remoteSystemLogoutUrl"
-															th:placeholder="#{remoteSystemLogoutUrlLabel}" />
-													</div>
-												</div></li>
-										</ul>
+							<div class="tab-content">
+								<div id="sectionA" class="tab-pane fade in active">
+									<div class="container-fluid">
+										<div class="row margin-content">
+
+											<div class="col-md-12">
+												<ul class="list-group">
+													<li class="list-group-item"><div>
+															<label class="control-label"><span
+																th:text="#{remoteSystemLoginUrlLabel}"></span></label>
+															<div>
+																<input type="text" class="form-control" id="loginUrl"
+																	th:placeholder="#{remoteSystemLoginUrlLabel}" />
+															</div>
+														</div></li>
+													<li class="list-group-item"><div>
+															<label class="control-label"><span
+																th:text="#{remoteSystemLoginParameterLabel}"></span></label>
+															<div>
+																<input type="text" class="form-control"
+																	id="remoteSystemLoginParameter"
+																	th:placeholder="#{remoteSystemLoginParameterLabel}" />
+															</div>
+														</div></li>
+													<li class="list-group-item"><div>
+															<label class="control-label"><span
+																th:text="#{remoteSystemPasswordParameterLabel}"></span></label>
+															<div>
+																<input type="text" class="form-control"
+																	id="remoteSystemPasswordParameter"
+																	th:placeholder="#{remoteSystemPasswordParameterLabel}" />
+															</div>
+														</div></li>
+													<li class="list-group-item"><div>
+															<label class="control-label"><span
+																th:text="#{remoteSystemLogoutUrlLabel}"></span></label>
+															<div>
+																<input type="text" class="form-control"
+																	id="remoteSystemLogoutUrl"
+																	th:placeholder="#{remoteSystemLogoutUrlLabel}" />
+															</div>
+														</div></li>
+												</ul>
+											</div>
+										</div>
+										<button id="buttonRemoteSystemEditDone"
+											class="btn btn-primary btn-done" type="button">
+											<span th:text="#{buttonDone}"></span>
+										</button>
 									</div>
 								</div>
-								<button id="buttonRemoteSystemEditDone"
-									class="btn btn-primary btn-done" type="button">
-									<span th:text="#{buttonDone}"></span>
-								</button>
+								<div id="sectionB" class="tab-pane fade">
+									<h3>Section B</h3>
+									<p>Vestibulum nec erat eu nulla rhoncus fringilla ut non
+										neque. Vivamus nibh urna, ornare id gravida ut, mollis a
+										magna. Aliquam porttitor condimentum nisi, eu viverra ipsum
+										porta ut. Nam hendrerit bibendum turpis, sed molestie mi
+										fermentum id. Aenean volutpat velit sem. Sed consequat ante in
+										rutrum convallis. Nunc facilisis leo at faucibus adipiscing.</p>
+								</div>
 							</div>
 						</div>
 					</div>
