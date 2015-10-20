@@ -11,6 +11,16 @@ public class RemoteSystemConfig
 {
     @Valid
     private List<RemoteSystemDto> remoteSystems;
+    private List<UserDto>         availableUsers;
+
+    public List<UserDto> getAvailableUsers()
+    {
+        if (availableUsers == null)
+        {
+            availableUsers = new AutoPopulatingList<UserDto>(UserDto.class);
+        }
+        return availableUsers;
+    }
 
     public List<RemoteSystemDto> getRemoteSystems()
     {
@@ -32,6 +42,11 @@ public class RemoteSystemConfig
             }
         }
         remoteSystems.removeAll(remoteSystemsToRemove);
+    }
+
+    public void setAvailableUsers(List<UserDto> availableUsers)
+    {
+        this.availableUsers = availableUsers;
     }
 
     public void setRemoteSystems(List<RemoteSystemDto> remoteSystems)

@@ -22,6 +22,7 @@ import com.ecg.webclient.feature.administration.accessrole.AdministrationFeature
 import com.ecg.webclient.feature.administration.accessrole.SecurityAdminAccessRole;
 import com.ecg.webclient.feature.administration.accessrole.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.service.RemoteSystemService;
+import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemConfig;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.RemoteSystemDtoValidator;
@@ -42,6 +43,8 @@ public class RemoteSystemController
     RemoteSystemService      remoteSystemService;
     @Autowired
     RemoteSystemDtoValidator remoteSystemDtoValidator;
+    @Autowired
+    UserService              userService;
 
     /**
      * Behandelt POST-Requests vom Typ "/admin/remotesystem/save". Speichert Änderungen an Benutzerrollen.
@@ -94,6 +97,7 @@ public class RemoteSystemController
     {
         RemoteSystemConfig rmConfig = new RemoteSystemConfig();
         rmConfig.setRemoteSystems(remoteSystemService.getAllRemoteSystems(false));
+        rmConfig.setAvailableUsers(userService.getAllUsers(false));
         model.addAttribute("remoteSystemConfig", rmConfig);
 
         return getLoadingRedirectTemplate();
