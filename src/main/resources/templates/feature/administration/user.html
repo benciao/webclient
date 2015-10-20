@@ -98,7 +98,7 @@
 
 										});
 
-						$("#userEditPanel").hide();
+						$("#userEditPanel").modal('hide');
 						$("#pwChangeArea").hide();
 
 						$("[name='user-state-switch']").bootstrapSwitch().on(
@@ -164,7 +164,7 @@
 
 						$('#buttonUserEditDone').click(function(event) {
 
-							$("#userEditPanel").hide();
+							$("#userEditPanel").modal('hide');
 							$("table tbody tr").removeClass('highlight');
 						});
 
@@ -365,7 +365,7 @@
 		// Headertext setzen
 		$("#userEditPanelHeadingName").text(" " + userName);
 
-		$("#userEditPanel").show();
+		$("#userEditPanel").modal('show');
 		$("#pwChangeArea").hide();
 		$("#pw-change-switch").bootstrapSwitch('state', false);
 
@@ -429,7 +429,7 @@
 		var userEditPanel = $("#userEditPanelHeadingName").text();
 
 		if (" " + userName == userEditPanel) {
-			$("#userEditPanel").hide();
+			$("#userEditPanel").modal('hide');
 		}
 
 		row.hide();
@@ -644,109 +644,118 @@ body {
 							</tr>
 						</tbody>
 					</table>
-					<div id="userEditPanel" class="panel panel-info">
-						<div class="panel-heading">
-							<span th:text="#{userEditPanelHeader}"></span><span
-								id="userEditPanelHeadingName"></span>
-						</div>
-						<div class="panel-body">
-							<div class="container-fluid">
-								<div class="row margin-content">
+					<div id="userEditPanel" class="modal fade modal-dock-to-navigation">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">
+										<span th:text="#{userEditPanelHeader}"></span><span
+											id="userEditPanelHeadingName"></span>
+									</h5>
+								</div>
+								<div class="modal-body">
+									<div class="container-fluid">
+										<div class="row margin-content">
 
-									<div class="col-md-6">
-										<ul class="list-group">
-											<li class="list-group-item"><div
-													id="availableClientsResult"></div></li>
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{userEmailLabel}"></span></label>
-													<div>
-														<input type="email" class="form-control" id="email"
-															th:placeholder="#{userEmailLabel}" />
-													</div>
-												</div></li>
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{pwChangedLabel}"></span></label>
-													<div>
-														<input type="text" class="form-control" id="pwChangedDate"
-															th:placeholder="#{pwChangedLabel}" readonly="true" />
-													</div>
-												</div></li>
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{userChangePwOnNextLogonLabel}"></span></label>
-													<div>
-														<input class="changePwOnNextLogonSwitch form-control"
-															name="pw-change-on-next-login-switch"
-															id="pw-change-on-next-login-switch" type="checkbox"
-															data-size="mini" data-on-color="success"
-															data-off-color="warning"></input>
-													</div>
-												</div></li>
-											<li class="list-group-item"><div>
-													<label class="control-label"><span
-														th:text="#{userChangePw}"></span></label>
-													<div>
-														<input class="changePwSwitch form-control"
-															id="pw-change-switch" type="checkbox" data-size="mini"
-															data-on-color="success" data-off-color="warning"></input>
-													</div>
-													<div id="pwChangeArea">
-														<div>
+											<div class="col-md-6">
+												<ul class="list-group">
+													<li class="list-group-item"><div
+															id="availableClientsResult"></div></li>
+													<li class="list-group-item"><div>
 															<label class="control-label"><span
-																th:text="#{userPwLabel}"></span></label> <input type="password"
-																class="form-control" id="password"
-																th:placeholder="#{userPwLabel}" />
-														</div>
-														<div>
-															<label class="control-label"><span
-																th:text="#{userPasswordConfirmLabel}"></span></label> <input
-																type="password" class="form-control"
-																id="password-confirm"
-																th:placeholder="#{userPasswordConfirmLabel}" />
-														</div>
-														<div>
-															<label class="control-label"><span
-																th:text="#{userPasswordScore}"></span></label>
-															<div class="progress">
-																<div class="progress-bar" role="progressbar"
-																	id="password_progress_bar" aria-valuemin="0"
-																	aria-valuemax="100" style="width: 0%;"
-																	aria-valuenow="0"></div>
+																th:text="#{userEmailLabel}"></span></label>
+															<div>
+																<input type="email" class="form-control" id="email"
+																	th:placeholder="#{userEmailLabel}" />
 															</div>
-														</div>
-													</div>
-												</div></li>
-										</ul>
-									</div>
+														</div></li>
+													<li class="list-group-item"><div>
+															<label class="control-label"><span
+																th:text="#{pwChangedLabel}"></span></label>
+															<div>
+																<input type="text" class="form-control"
+																	id="pwChangedDate" th:placeholder="#{pwChangedLabel}"
+																	readonly="true" />
+															</div>
+														</div></li>
+													<li class="list-group-item"><div>
+															<label class="control-label"><span
+																th:text="#{userChangePwOnNextLogonLabel}"></span></label>
+															<div>
+																<input class="changePwOnNextLogonSwitch form-control"
+																	name="pw-change-on-next-login-switch"
+																	id="pw-change-on-next-login-switch" type="checkbox"
+																	data-size="mini" data-on-color="success"
+																	data-off-color="warning"></input>
+															</div>
+														</div></li>
+													<li class="list-group-item"><div>
+															<label class="control-label"><span
+																th:text="#{userChangePw}"></span></label>
+															<div>
+																<input class="changePwSwitch form-control"
+																	id="pw-change-switch" type="checkbox" data-size="mini"
+																	data-on-color="success" data-off-color="warning"></input>
+															</div>
+															<div id="pwChangeArea">
+																<div>
+																	<label class="control-label"><span
+																		th:text="#{userPwLabel}"></span></label> <input
+																		type="password" class="form-control" id="password"
+																		th:placeholder="#{userPwLabel}" />
+																</div>
+																<div>
+																	<label class="control-label"><span
+																		th:text="#{userPasswordConfirmLabel}"></span></label> <input
+																		type="password" class="form-control"
+																		id="password-confirm"
+																		th:placeholder="#{userPasswordConfirmLabel}" />
+																</div>
+																<div>
+																	<label class="control-label"><span
+																		th:text="#{userPasswordScore}"></span></label>
+																	<div class="progress">
+																		<div class="progress-bar" role="progressbar"
+																			id="password_progress_bar" aria-valuemin="0"
+																			aria-valuemax="100" style="width: 0%;"
+																			aria-valuenow="0"></div>
+																	</div>
+																</div>
+															</div>
+														</div></li>
+												</ul>
+											</div>
 
 
-									<div class="col-md-6">
-										<label class="control-label"><span
-											th:text="#{userEditGroupAssignmentHeader}"></span></label>
-										<div class="panel panel-default">
-											<div class="row margin-content">
+											<div class="col-md-6">
 												<label class="control-label"><span
-													th:text="#{clientSelection}"></span></label> <select
-													id="clientGroupSelect" class="form-control">
-													<option
-														th:each="client : ${beans.authenticationUtil.getClients()}"
-														th:value="${client.id}" th:text="${client.name}">
-													</option>
-												</select>
+													th:text="#{userEditGroupAssignmentHeader}"></span></label>
+												<div class="panel panel-default">
+													<div class="row margin-content">
+														<label class="control-label"><span
+															th:text="#{clientSelection}"></span></label> <select
+															id="clientGroupSelect" class="form-control">
+															<option
+																th:each="client : ${beans.authenticationUtil.getClients()}"
+																th:value="${client.id}" th:text="${client.name}">
+															</option>
+														</select>
 
-												<!-- Results block -->
-												<div id="clientGroupsResult"></div>
+														<!-- Results block -->
+														<div id="clientGroupsResult"></div>
+													</div>
+												</div>
+
 											</div>
 										</div>
-
 									</div>
 								</div>
-								<button id="buttonUserEditDone" class="btn btn-primary btn-done"
-									type="button">
-									<span th:text="#{buttonDone}"></span>
-								</button>
+								<div class="modal-footer">
+									<button id="buttonUserEditDone" type="button"
+										class="btn btn-primary btn-don" data-dismiss="modal">
+										<span th:text="#{buttonDone}"></span>
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>

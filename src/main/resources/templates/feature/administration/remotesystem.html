@@ -92,7 +92,7 @@
 
 										});
 
-						$("#remoteSystemEditPanel").hide();
+						$("#remoteSystemEditPanel").modal('hide');
 
 						$("[name='remoteSystem-state-switch']")
 								.bootstrapSwitch()
@@ -180,7 +180,7 @@
 
 						$('#buttonRemoteSystemEditDone').click(function(event) {
 
-							$("#remoteSystemEditPanel").hide();
+							$("#remoteSystemEditPanel").modal('hide');
 							$("table tbody tr").removeClass('highlight');
 						});
 
@@ -216,7 +216,7 @@
 		var urlLogoutValue = $("#hiddenLogoutUrl-" + collectionIndex[1]).val();
 		$("#remoteSystemLogoutUrl").val(urlLogoutValue);
 
-		$("#remoteSystemEditPanel").show();
+		$("#remoteSystemEditPanel").modal('show');
 
 		// Zuordnung EditPanel zu Benutzer festlegen
 		$("#hiddenRemoteSystemIndex").val(collectionIndex[1]);
@@ -240,7 +240,7 @@
 				.text();
 
 		if (" " + remoteSystemName == remoteSystemEditPanel) {
-			$("#remoteSystemEditPanel").hide();
+			$("#remoteSystemEditPanel").modal('hide');
 		}
 
 		row.hide();
@@ -360,77 +360,79 @@ body {
 							</tr>
 						</tbody>
 					</table>
-					<div id="remoteSystemEditPanel" class="panel panel-info">
-						<div class="panel-heading">
-							<span th:text="#{remoteSystemEditPanelHeader}"></span><span
-								id="remoteSystemEditPanelHeadingName"></span>
-						</div>
-						<div class="panel-body">
-							<br></br>
-							<ul class="nav nav-tabs" id="myTab">
-								<li class="active"><a href="#sectionA">Section A</a></li>
-								<li><a href="#sectionB">Section B</a></li>
-							</ul>
+					<div id="remoteSystemEditPanel"
+						class="modal fade modal-dock-to-navigation">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">
+										<span th:text="#{remoteSystemEditPanelHeader}"></span><span
+											id="remoteSystemEditPanelHeadingName"></span>
+									</h5>
+								</div>
+								<div class="modal-body">
+									<ul class="nav nav-tabs" id="myTab">
+										<li class="active"><a href="#sectionA">Section A</a></li>
+										<li><a href="#sectionB">Section B</a></li>
+									</ul>
 
-							<div class="tab-content">
-								<div id="sectionA" class="tab-pane fade in active">
-									<div class="container-fluid">
-										<div class="row margin-content">
-
-											<div class="col-md-12">
-												<ul class="list-group">
-													<li class="list-group-item"><div>
-															<label class="control-label"><span
-																th:text="#{remoteSystemLoginUrlLabel}"></span></label>
-															<div>
-																<input type="text" class="form-control" id="loginUrl"
-																	th:placeholder="#{remoteSystemLoginUrlLabel}" />
-															</div>
-														</div></li>
-													<li class="list-group-item"><div>
-															<label class="control-label"><span
-																th:text="#{remoteSystemLoginParameterLabel}"></span></label>
-															<div>
-																<input type="text" class="form-control"
-																	id="remoteSystemLoginParameter"
-																	th:placeholder="#{remoteSystemLoginParameterLabel}" />
-															</div>
-														</div></li>
-													<li class="list-group-item"><div>
-															<label class="control-label"><span
-																th:text="#{remoteSystemPasswordParameterLabel}"></span></label>
-															<div>
-																<input type="text" class="form-control"
-																	id="remoteSystemPasswordParameter"
-																	th:placeholder="#{remoteSystemPasswordParameterLabel}" />
-															</div>
-														</div></li>
-													<li class="list-group-item"><div>
-															<label class="control-label"><span
-																th:text="#{remoteSystemLogoutUrlLabel}"></span></label>
-															<div>
-																<input type="text" class="form-control"
-																	id="remoteSystemLogoutUrl"
-																	th:placeholder="#{remoteSystemLogoutUrlLabel}" />
-															</div>
-														</div></li>
-												</ul>
-											</div>
+									<div class="tab-content">
+										<div id="sectionA" class="tab-pane fade in active">
+											<ul class="list-group">
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{remoteSystemLoginUrlLabel}"></span></label>
+														<div>
+															<input type="text" class="form-control" id="loginUrl"
+																th:placeholder="#{remoteSystemLoginUrlLabel}" />
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{remoteSystemLoginParameterLabel}"></span></label>
+														<div>
+															<input type="text" class="form-control"
+																id="remoteSystemLoginParameter"
+																th:placeholder="#{remoteSystemLoginParameterLabel}" />
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{remoteSystemPasswordParameterLabel}"></span></label>
+														<div>
+															<input type="text" class="form-control"
+																id="remoteSystemPasswordParameter"
+																th:placeholder="#{remoteSystemPasswordParameterLabel}" />
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{remoteSystemLogoutUrlLabel}"></span></label>
+														<div>
+															<input type="text" class="form-control"
+																id="remoteSystemLogoutUrl"
+																th:placeholder="#{remoteSystemLogoutUrlLabel}" />
+														</div>
+													</div></li>
+											</ul>
 										</div>
-										<button id="buttonRemoteSystemEditDone"
-											class="btn btn-primary btn-done" type="button">
-											<span th:text="#{buttonDone}"></span>
-										</button>
+										<div id="sectionB" class="tab-pane fade">
+											<h3>Section B</h3>
+											<p>Vestibulum nec erat eu nulla rhoncus fringilla ut non
+												neque. Vivamus nibh urna, ornare id gravida ut, mollis a
+												magna. Aliquam porttitor condimentum nisi, eu viverra ipsum
+												porta ut. Nam hendrerit bibendum turpis, sed molestie mi
+												fermentum id. Aenean volutpat velit sem. Sed consequat ante
+												in rutrum convallis. Nunc facilisis leo at faucibus
+												adipiscing.</p>
+										</div>
 									</div>
 								</div>
-								<div id="sectionB" class="tab-pane fade">
-									<h3>Section B</h3>
-									<p>Vestibulum nec erat eu nulla rhoncus fringilla ut non
-										neque. Vivamus nibh urna, ornare id gravida ut, mollis a
-										magna. Aliquam porttitor condimentum nisi, eu viverra ipsum
-										porta ut. Nam hendrerit bibendum turpis, sed molestie mi
-										fermentum id. Aenean volutpat velit sem. Sed consequat ante in
-										rutrum convallis. Nunc facilisis leo at faucibus adipiscing.</p>
+								<div class="modal-footer">
+									<button id="buttonRemoteSystemEditDone" type="button"
+										class="btn btn-primary btn-don" data-dismiss="modal">
+										<span th:text="#{buttonDone}"></span>
+									</button>
 								</div>
 							</div>
 						</div>
