@@ -34,7 +34,7 @@
 								<form id="clientSelectForm"
 									th:action="@{${beans.authenticationUtil.getClientChangePath()}}"
 									method="POST">
-									<select id="clientSelect" class="selectpicker select-xs"
+									<select id="clientSelect" class="selectpicker btn-ws select-xs"
 										th:name="selectedClient">
 										<option
 											th:each="client : ${beans.authenticationUtil.getClients()}"
