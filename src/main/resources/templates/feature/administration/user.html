@@ -229,6 +229,11 @@
 																'invalidPassword');
 											}
 										});
+
+						$("#tabs a").click(function(e) {
+							e.preventDefault();
+							$(this).tab('show');
+						});
 					});
 
 	function determinAvailableClients() {
@@ -365,7 +370,6 @@
 		// Headertext setzen
 		$("#userEditPanelHeadingName").text(" " + userName);
 
-		$("#userEditPanel").modal('show');
 		$("#pwChangeArea").hide();
 		$("#pw-change-switch").bootstrapSwitch('state', false);
 
@@ -414,6 +418,8 @@
 
 		// Auswahl für Standardmandant aktualisieren
 		determinAvailableClients();
+
+		$("#userEditPanel").modal('show');
 	}
 
 	function onDeleteClick(event) {
@@ -654,98 +660,95 @@ body {
 									</h5>
 								</div>
 								<div class="modal-body">
-									<div class="container-fluid">
-										<div class="row margin-content">
+									<ul class="nav nav-tabs" id="tabs">
+										<li class="active"><a href="#propertySection">Eigenschaften</a></li>
+										<li><a href="#groupSection">Gruppenzuordnung</a></li>
+									</ul>
 
-											<div class="col-md-6">
-												<ul class="list-group">
-													<li class="list-group-item"><div
-															id="availableClientsResult"></div></li>
-													<li class="list-group-item"><div>
-															<label class="control-label"><span
-																th:text="#{userEmailLabel}"></span></label>
-															<div>
-																<input type="email" class="form-control" id="email"
-																	th:placeholder="#{userEmailLabel}" />
-															</div>
-														</div></li>
-													<li class="list-group-item"><div>
-															<label class="control-label"><span
-																th:text="#{pwChangedLabel}"></span></label>
-															<div>
-																<input type="text" class="form-control"
-																	id="pwChangedDate" th:placeholder="#{pwChangedLabel}"
-																	readonly="true" />
-															</div>
-														</div></li>
-													<li class="list-group-item"><div>
-															<label class="control-label"><span
-																th:text="#{userChangePwOnNextLogonLabel}"></span></label>
-															<div>
-																<input class="changePwOnNextLogonSwitch form-control"
-																	name="pw-change-on-next-login-switch"
-																	id="pw-change-on-next-login-switch" type="checkbox"
-																	data-size="mini" data-on-color="success"
-																	data-off-color="warning"></input>
-															</div>
-														</div></li>
-													<li class="list-group-item"><div>
-															<label class="control-label"><span
-																th:text="#{userChangePw}"></span></label>
-															<div>
-																<input class="changePwSwitch form-control"
-																	id="pw-change-switch" type="checkbox" data-size="mini"
-																	data-on-color="success" data-off-color="warning"></input>
-															</div>
-															<div id="pwChangeArea">
-																<div>
-																	<label class="control-label"><span
-																		th:text="#{userPwLabel}"></span></label> <input
-																		type="password" class="form-control" id="password"
-																		th:placeholder="#{userPwLabel}" />
-																</div>
-																<div>
-																	<label class="control-label"><span
-																		th:text="#{userPasswordConfirmLabel}"></span></label> <input
-																		type="password" class="form-control"
-																		id="password-confirm"
-																		th:placeholder="#{userPasswordConfirmLabel}" />
-																</div>
-																<div>
-																	<label class="control-label"><span
-																		th:text="#{userPasswordScore}"></span></label>
-																	<div class="progress">
-																		<div class="progress-bar" role="progressbar"
-																			id="password_progress_bar" aria-valuemin="0"
-																			aria-valuemax="100" style="width: 0%;"
-																			aria-valuenow="0"></div>
-																	</div>
-																</div>
-															</div>
-														</div></li>
-												</ul>
-											</div>
-
-
-											<div class="col-md-6">
-												<label class="control-label"><span
-													th:text="#{userEditGroupAssignmentHeader}"></span></label>
-												<div class="panel panel-default">
-													<div class="row margin-content">
+									<div class="tab-content">
+										<div id="propertySection" class="tab-pane fade in active">
+											<ul class="list-group">
+												<li class="list-group-item"><div
+														id="availableClientsResult"></div></li>
+												<li class="list-group-item"><div>
 														<label class="control-label"><span
-															th:text="#{clientSelection}"></span></label> <select
-															id="clientGroupSelect" class="form-control">
-															<option
-																th:each="client : ${beans.authenticationUtil.getClients()}"
-																th:value="${client.id}" th:text="${client.name}">
-															</option>
-														</select>
+															th:text="#{userEmailLabel}"></span></label>
+														<div>
+															<input type="email" class="form-control" id="email"
+																th:placeholder="#{userEmailLabel}" />
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{pwChangedLabel}"></span></label>
+														<div>
+															<input type="text" class="form-control"
+																id="pwChangedDate" th:placeholder="#{pwChangedLabel}"
+																readonly="true" />
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{userChangePwOnNextLogonLabel}"></span></label>
+														<div>
+															<input class="changePwOnNextLogonSwitch form-control"
+																name="pw-change-on-next-login-switch"
+																id="pw-change-on-next-login-switch" type="checkbox"
+																data-size="mini" data-on-color="success"
+																data-off-color="warning"></input>
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{userChangePw}"></span></label>
+														<div>
+															<input class="changePwSwitch form-control"
+																id="pw-change-switch" type="checkbox" data-size="mini"
+																data-on-color="success" data-off-color="warning"></input>
+														</div>
+														<div id="pwChangeArea">
+															<div>
+																<label class="control-label"><span
+																	th:text="#{userPwLabel}"></span></label> <input type="password"
+																	class="form-control" id="password"
+																	th:placeholder="#{userPwLabel}" />
+															</div>
+															<div>
+																<label class="control-label"><span
+																	th:text="#{userPasswordConfirmLabel}"></span></label> <input
+																	type="password" class="form-control"
+																	id="password-confirm"
+																	th:placeholder="#{userPasswordConfirmLabel}" />
+															</div>
+															<div>
+																<label class="control-label"><span
+																	th:text="#{userPasswordScore}"></span></label>
+																<div class="progress">
+																	<div class="progress-bar" role="progressbar"
+																		id="password_progress_bar" aria-valuemin="0"
+																		aria-valuemax="100" style="width: 0%;"
+																		aria-valuenow="0"></div>
+																</div>
+															</div>
+														</div>
+													</div></li>
+											</ul>
+										</div>
+										<div id="groupSection" class="tab-pane fade">
+											<div class="margin-content">
+												<div>
+													<label class="control-label"><span
+														th:text="#{clientSelection}"></span></label> <select
+														id="clientGroupSelect" class="form-control">
+														<option
+															th:each="client : ${beans.authenticationUtil.getClients()}"
+															th:value="${client.id}" th:text="${client.name}">
+														</option>
+													</select>
 
-														<!-- Results block -->
-														<div id="clientGroupsResult"></div>
-													</div>
+													<!-- Results block -->
+													<div id="clientGroupsResult"></div>
 												</div>
-
 											</div>
 										</div>
 									</div>
