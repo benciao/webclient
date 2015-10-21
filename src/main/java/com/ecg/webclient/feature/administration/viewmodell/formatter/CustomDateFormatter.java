@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomDateFormatter implements Formatter<Date>
 {
-
     @Autowired
     private MessageSource messageSource;
 

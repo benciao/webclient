@@ -31,7 +31,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter
     private CustomDateFormatter dateFormatter;
 
     @Override
-    public void addFormatters(FormatterRegistry registry) {
+    public void addFormatters(FormatterRegistry registry)
+    {
         registry.addFormatter(dateFormatter);
     }
 
@@ -76,5 +77,4 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter
         slr.setDefaultLocale(Locale.GERMAN);
         return slr;
     }
-
 }
