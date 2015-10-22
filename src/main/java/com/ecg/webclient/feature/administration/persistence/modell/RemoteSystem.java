@@ -1,14 +1,9 @@
 package com.ecg.webclient.feature.administration.persistence.modell;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -31,8 +26,6 @@ public class RemoteSystem
     private String            loginParameter;
     private String            passwordParameter;
     private String            logoutUrl;
-    @OneToMany(mappedBy = "remoteSystem", fetch = FetchType.EAGER)
-    private List<RemoteLogin> remoteLogins;
 
     public RemoteSystem()
     {}
@@ -47,7 +40,6 @@ public class RemoteSystem
         setLoginParameter(newRemoteSystem.getLoginParameter());
         setPasswordParameter(newRemoteSystem.getPasswordParameter());
         setLogoutUrl(newRemoteSystem.getLogoutUrl());
-        setRemoteLogins(newRemoteSystem.getRemoteLogins());
 
         return this;
     }
@@ -135,22 +127,6 @@ public class RemoteSystem
         return description;
     }
 
-    @Transient
-    public List<RemoteLogin> getEnabledRemoteLogins()
-    {
-        List<RemoteLogin> result = new ArrayList<RemoteLogin>();
-
-        for (RemoteLogin rl : remoteLogins)
-        {
-            if (rl.isEnabled())
-            {
-                result.add(rl);
-            }
-        }
-
-        return result;
-    }
-
     public long getId()
     {
         return id;
@@ -179,11 +155,6 @@ public class RemoteSystem
     public String getPasswordParameter()
     {
         return passwordParameter;
-    }
-
-    public List<RemoteLogin> getRemoteLogins()
-    {
-        return remoteLogins;
     }
 
     @Override
@@ -243,10 +214,5 @@ public class RemoteSystem
     public void setPasswordParameter(String passwordParameter)
     {
         this.passwordParameter = passwordParameter;
-    }
-
-    public void setRemoteLogins(List<RemoteLogin> remoteLogins)
-    {
-        this.remoteLogins = remoteLogins;
     }
 }

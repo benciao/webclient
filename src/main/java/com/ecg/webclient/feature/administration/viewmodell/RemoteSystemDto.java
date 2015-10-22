@@ -1,5 +1,9 @@
 package com.ecg.webclient.feature.administration.viewmodell;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Implementierung eines von der Persistenz detachten Fremdsystems.
  * 
@@ -14,9 +18,32 @@ public class RemoteSystemDto extends BaseObjectDto
     private String  loginParameter;
     private String  passwordParameter;
     private String  logoutUrl;
+    private String  assignedUserIds;
 
     public RemoteSystemDto()
     {}
+
+    public List<Long> getAssignedUserIdObjects()
+    {
+        List<Long> result = new ArrayList<Long>();
+
+        if (assignedUserIds != null && !assignedUserIds.isEmpty())
+        {
+            List<String> ids = Arrays.asList(assignedUserIds.split(","));
+
+            for (String id : ids)
+            {
+                result.add(Long.parseLong(id));
+            }
+        }
+
+        return result;
+    }
+
+    public String getAssignedUserIds()
+    {
+        return assignedUserIds;
+    }
 
     public String getDescription()
     {
@@ -51,6 +78,11 @@ public class RemoteSystemDto extends BaseObjectDto
     public boolean isEnabled()
     {
         return enabled;
+    }
+
+    public void setAssignedUserIds(String assignedUserIds)
+    {
+        this.assignedUserIds = assignedUserIds;
     }
 
     public void setDescription(String description)

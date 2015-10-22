@@ -9,6 +9,8 @@ import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.modell.RemoteSystem;
 import com.ecg.webclient.feature.administration.persistence.repo.RemoteSystemRepository;
+import com.ecg.webclient.feature.administration.service.RemoteLoginService;
+import com.ecg.webclient.feature.administration.viewmodell.RemoteLoginDto;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
 
 /**
@@ -22,6 +24,10 @@ public class RemoteSystemMapper
 {
     @Autowired
     RemoteSystemRepository remoteSystemRepo;
+    @Autowired
+    RemoteLoginMapper      remoteLoginMapper;
+    @Autowired
+    RemoteLoginService     remoteLoginService;
 
     /**
      * Wandelt ein attachtes Fremdsystem in ein detachtes um.
@@ -42,6 +48,7 @@ public class RemoteSystemMapper
         dto.setLoginParameter(rm.getLoginParameter());
         dto.setPasswordParameter(rm.getPasswordParameter());
         dto.setLogoutUrl(rm.getLogoutUrl());
+        dto.setAssignedUserIds(getAssignedUsers(rm.getId()));
 
         return dto;
     }
@@ -104,5 +111,26 @@ public class RemoteSystemMapper
         }
 
         return entity;
+    }
+
+    private String getAssignedUsers(long remoteSystemId)
+    {
+        String assignedUserIds = "";
+        List<RemoteLoginDto> assignedRemoteLogins = remoteLoginService
+                .findAllForRemoteSystemId(remoteSystemId);
+
+        for (RemoteLoginDto assignedRemoteLogin : assignedRemoteLogins)
+        {
+            if (assignedUserIds.isEmpty() || assignedUserIds.length() == 0)
+            {
+                assignedUserIds = assignedRemoteLogin.getUserId();
+            }
+            else
+            {
+                assignedUserIds = assignedUserIds + "," + assignedRemoteLogin.getUserId();
+            }
+        }
+
+        return assignedUserIds;
     }
 }

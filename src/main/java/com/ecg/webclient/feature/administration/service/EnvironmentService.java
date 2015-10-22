@@ -1,7 +1,5 @@
 package com.ecg.webclient.feature.administration.service;
 
-import javax.transaction.Transactional;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +56,6 @@ public class EnvironmentService
      *            zu aktualisierende Umgebung
      * @return Aktualisierte Umgebung
      */
-    @Transactional
     public EnvironmentDto saveEnvironment(EnvironmentDto detachedEnvironment)
     {
         try

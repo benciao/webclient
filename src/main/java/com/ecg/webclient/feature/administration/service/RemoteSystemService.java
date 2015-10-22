@@ -7,11 +7,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.mapper.RemoteSystemMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.RemoteSystem;
 import com.ecg.webclient.feature.administration.persistence.repo.RemoteSystemRepository;
+import com.ecg.webclient.feature.administration.viewmodell.RemoteLoginDto;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
 
 /**
@@ -24,13 +27,16 @@ public class RemoteSystemService
 {
     static final Logger            logger = LogManager.getLogger(RemoteSystemService.class.getName());
     private RemoteSystemRepository remoteSystemRepo;
+    private RemoteLoginService     remoteLoginService;
     private RemoteSystemMapper     remoteSystemMapper;
 
     @Autowired
-    public RemoteSystemService(RemoteSystemRepository remoteSystemRepo, RemoteSystemMapper remoteSystemMapper)
+    public RemoteSystemService(RemoteSystemRepository remoteSystemRepo,
+            RemoteSystemMapper remoteSystemMapper, RemoteLoginService remoteLoginService)
     {
         this.remoteSystemRepo = remoteSystemRepo;
         this.remoteSystemMapper = remoteSystemMapper;
+        this.remoteLoginService = remoteLoginService;
     }
 
     /**
@@ -49,6 +55,7 @@ public class RemoteSystemService
 
                 if (persistentRemoteSystem != null)
                 {
+                    remoteLoginService.deleteRemoteLoginsForRemoteSystemId(persistentRemoteSystem.getId());
                     remoteSystemRepo.delete(persistentRemoteSystem);
                 }
             }
@@ -112,8 +119,14 @@ public class RemoteSystemService
                 persistentRemoteSystem = remoteSystems.iterator().next();
             }
 
-            return (persistentRemoteSystem != null) ? remoteSystemMapper.mapToDto(persistentRemoteSystem)
-                    : null;
+            if (persistentRemoteSystem != null)
+            {
+                RemoteSystemDto result = remoteSystemMapper.mapToDto(persistentRemoteSystem);
+
+                return result;
+            }
+
+            return null;
         }
         catch (final Exception e)
         {
@@ -155,16 +168,31 @@ public class RemoteSystemService
      *            das zu speichernde Fremdsystem
      * @return Das gespeicherte Fremdsystem
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RemoteSystemDto saveRemoteSystem(RemoteSystemDto detachedRemoteSystem)
     {
         try
         {
             RemoteSystem draftRemoteSystem = remoteSystemMapper.mapToEntity(detachedRemoteSystem);
+
             RemoteSystem persistedRemoteSystem = remoteSystemRepo.save(draftRemoteSystem);
 
             if (persistedRemoteSystem != null)
             {
-                return remoteSystemMapper.mapToDto(persistedRemoteSystem);
+                remoteLoginService.deleteRemoteLoginsForRemoteSystemId(persistedRemoteSystem.getId());
+
+                for (Long userId : detachedRemoteSystem.getAssignedUserIdObjects())
+                {
+                    RemoteLoginDto rl = new RemoteLoginDto();
+                    rl.setEnabled(false);
+                    rl.setUserId(userId.toString());
+                    rl.setRemoteSystemId(Long.toString(persistedRemoteSystem.getId()));
+                    remoteLoginService.save(rl);
+                }
+
+                RemoteSystemDto result = remoteSystemMapper.mapToDto(persistedRemoteSystem);
+
+                return result;
             }
             else
             {

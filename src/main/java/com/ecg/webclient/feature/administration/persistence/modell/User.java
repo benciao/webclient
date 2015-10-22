@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -49,8 +48,6 @@ public class User
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "SEC_USER_SEC_GROUP", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "GROUP_ID"))
     private List<Group>       groups;
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<RemoteLogin> remoteLogins;
 
     public User()
     {}
@@ -74,7 +71,6 @@ public class User
         setAccountLocked(newUser.isAccountLocked());
         setLoginAttempts(newUser.getLoginAttempts());
         setChangePasswordOnNextLogin(newUser.isChangePasswordOnNextLogin());
-        setRemoteLogins(newUser.getRemoteLogins());
 
         return this;
     }
@@ -172,22 +168,6 @@ public class User
         return result;
     }
 
-    @Transient
-    public List<RemoteLogin> getEnabledRemoteLogins()
-    {
-        List<RemoteLogin> result = new ArrayList<RemoteLogin>();
-
-        for (RemoteLogin rl : remoteLogins)
-        {
-            if (rl.isEnabled())
-            {
-                result.add(rl);
-            }
-        }
-
-        return result;
-    }
-
     public String getFirstname()
     {
         return firstname;
@@ -226,11 +206,6 @@ public class User
     public Date getPasswordChangedTimeStamp()
     {
         return passwordChangedTimeStamp;
-    }
-
-    public List<RemoteLogin> getRemoteLogins()
-    {
-        return remoteLogins;
     }
 
     @Override
@@ -337,11 +312,6 @@ public class User
     public void setPasswordChangedTimeStamp(Date passwordChangedTimeStamp)
     {
         this.passwordChangedTimeStamp = passwordChangedTimeStamp;
-    }
-
-    public void setRemoteLogins(List<RemoteLogin> remoteLogins)
-    {
-        this.remoteLogins = remoteLogins;
     }
 
 }

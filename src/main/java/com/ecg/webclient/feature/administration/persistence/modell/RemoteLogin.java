@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Entität eines Remote Logins für Fremdsysteme.
@@ -36,6 +37,29 @@ public class RemoteLogin
     public RemoteLogin()
     {}
 
+    @Transient
+    public RemoteLogin bind(RemoteLogin newRemoteLogin)
+    {
+        setEnabled(newRemoteLogin.isEnabled());
+        setUser(newRemoteLogin.getUser());
+        setRemoteSystem(newRemoteLogin.getRemoteSystem());
+        setRemoteSystemLoginName(newRemoteLogin.getRemoteSystemLoginName());
+        setRemoteSystemPassword(newRemoteLogin.getRemoteSystemPassword());
+
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        RemoteLogin other = (RemoteLogin) obj;
+        if (id != other.id) return false;
+        return true;
+    }
+
     public long getId()
     {
         return id;
@@ -59,6 +83,15 @@ public class RemoteLogin
     public User getUser()
     {
         return user;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (id ^ (id >>> 32));
+        return result;
     }
 
     public boolean isEnabled()

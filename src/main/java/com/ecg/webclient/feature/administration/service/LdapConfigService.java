@@ -1,7 +1,6 @@
 package com.ecg.webclient.feature.administration.service;
 
 import javax.naming.ldap.LdapName;
-import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,7 +97,6 @@ public class LdapConfigService
      *            zu aktualisierende LDAP-Konfiguration
      * @return Aktualisierte LDAP-Konfiguration
      */
-    @Transactional
     public LdapConfigDto saveLdapConfig(LdapConfigDto detachedLdapConfig)
     {
         try

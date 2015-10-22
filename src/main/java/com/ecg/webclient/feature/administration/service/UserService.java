@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.naming.ldap.LdapName;
-import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +19,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.authentication.PasswordEncoder;
