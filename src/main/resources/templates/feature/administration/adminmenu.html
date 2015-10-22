@@ -225,7 +225,7 @@
 						<h4 class="panel-title">
 							<a data-toggle="collapse" data-parent="#accordion"
 								href="#collapseThree"> <span
-								class="glyphicon glyphicon-globe"> </span> <span
+								class="glyphicon glyphicon-th"> </span> <span
 								th:text="#{menuTreeSystem}"></span>
 							</a>
 						</h4>
@@ -324,7 +324,7 @@
 						<h4 class="panel-title">
 							<a data-toggle="collapse" data-parent="#accordion"
 								href="#collapseFour"> <span
-								class="glyphicon glyphicon-globe"> </span> <span
+								class="glyphicon glyphicon-hdd"> </span> <span
 								th:text="#{menuTreeRemoteSystem}"></span>
 							</a>
 						</h4>
@@ -348,6 +348,18 @@
 										</a></td>
 									</tr>
 								</div>
+								<div>
+									<tr th:if="${selectedItem == 'remotelogin'}" class="warning">
+										<td><a href="/admin/remotelogin"> <span
+												th:text="#{menuTreeRemoteLogin}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'remotelogin'}">
+										<td><a href="/admin/remotelogin"> <span
+												th:text="#{menuTreeRemoteLogin}"></span>
+										</a></td>
+									</tr>
+								</div>
 							</table>
 						</div>
 					</div>
@@ -367,6 +379,18 @@
 										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
 										<td><a href="/admin/remotesystem"> <span
 												th:text="#{menuTreeRemoteSystemConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<div>
+									<tr th:if="${selectedItem == 'remotelogin'}" class="warning">
+										<td><a href="/admin/remotelogin"> <span
+												th:text="#{menuTreeRemoteLogin}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'remotelogin'}">
+										<td><a href="/admin/remotelogin"> <span
+												th:text="#{menuTreeRemoteLogin}"></span>
 										</a></td>
 									</tr>
 								</div>

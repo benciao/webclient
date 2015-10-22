@@ -221,4 +221,14 @@ public class AuthenticationUtil
 			this.selectedClient = clients.get(0);
 		}
 	}
+	
+	public UserDto getCurrentUser()
+	{
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String login = auth.getName();
+
+		UserDto user = userService.getUserByLogin(login);
+		
+		return user;
+	}
 }

@@ -47,7 +47,7 @@ public class RemoteSystemController
     UserService              userService;
 
     /**
-     * Behandelt POST-Requests vom Typ "/admin/remotesystem/save". Speichert Änderungen an Benutzerrollen.
+     * Behandelt POST-Requests vom Typ "/admin/remotesystem/save". Speichert Änderungen an Fremdsystemen.
      * 
      * @return Template
      */
