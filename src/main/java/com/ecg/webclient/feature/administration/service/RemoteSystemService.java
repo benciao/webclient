@@ -103,6 +103,34 @@ public class RemoteSystemService
     }
 
     /**
+     * @param id
+     *            Id des Fremdsystems
+     * @return Das Fremdsystem, welches zur übergebenen Id gehört
+     */
+    public RemoteSystemDto getRemoteSystemById(Long id)
+    {
+        try
+        {
+            RemoteSystem persistentRemoteSystem = remoteSystemRepo.findOne(id);
+
+            if (persistentRemoteSystem != null)
+            {
+                RemoteSystemDto result = remoteSystemMapper.mapToDto(persistentRemoteSystem);
+
+                return result;
+            }
+
+            return null;
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+
+        return null;
+    }
+
+    /**
      * @param name
      *            Name des Fremdsystems
      * @return Das Fremdsystem, welches zum übergebenen Namen gehört

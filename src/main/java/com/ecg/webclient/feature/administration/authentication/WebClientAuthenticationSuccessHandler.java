@@ -33,11 +33,11 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 public class WebClientAuthenticationSuccessHandler implements AuthenticationSuccessHandler
 {
     @Autowired
-    UserService        userService;
+    UserService         userService;
     @Autowired
-    EnvironmentService environmentService;
+    EnvironmentService  environmentService;
 
-    RedirectStrategy   redirectStrategy = new DefaultRedirectStrategy();
+    RedirectStrategy    redirectStrategy = new DefaultRedirectStrategy();
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -88,5 +88,4 @@ public class WebClientAuthenticationSuccessHandler implements AuthenticationSucc
 
         return passwortChangedCal.getTimeInMillis() <= todayCal.getTimeInMillis();
     }
-
 }

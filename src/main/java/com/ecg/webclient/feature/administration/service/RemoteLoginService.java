@@ -85,6 +85,63 @@ public class RemoteLoginService
 	}
 
 	/**
+	 * @param userId
+	 *            Id des Benutzers, für welchen die Fremdsystemanmeldungen
+	 *            ermittelt werden sollen
+	 * @return Eine Liste aller Fremdsystemanmeldungen für einen Benutzer
+	 */
+	public List<RemoteLoginDto> getAllRemoteLoginsForUserId(long userId)
+	{
+		List<RemoteLogin> attachedRemoteLogins = new ArrayList<RemoteLogin>();
+
+		try
+		{
+			remoteLoginRepository.findAllForForUserId(userId).forEach(e -> attachedRemoteLogins.add(e));
+		}
+		catch (final Exception e)
+		{
+			logger.error(e);
+		}
+
+		AutoPopulatingList<RemoteLoginDto> result = new AutoPopulatingList<RemoteLoginDto>(RemoteLoginDto.class);
+
+		for (RemoteLogin attachedRemoteLogin : attachedRemoteLogins)
+		{
+			result.add(remoteLoginMapper.mapToDto(attachedRemoteLogin));
+		}
+
+		return result;
+	}
+
+	    /**
+     * @param userId
+     *            Id des Benutzers, für welchen die Fremdsystemanmeldungen ermittelt werden sollen
+     * @return Eine Liste aller aktiven Fremdsystemanmeldungen für einen Benutzer
+     */
+    public List<RemoteLoginDto> getEnabledRemoteLoginsForUserId(long userId)
+    {
+        List<RemoteLogin> attachedRemoteLogins = new ArrayList<RemoteLogin>();
+
+        try
+        {
+            remoteLoginRepository.findEnabledForForUserId(userId).forEach(e -> attachedRemoteLogins.add(e));
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+
+        AutoPopulatingList<RemoteLoginDto> result = new AutoPopulatingList<RemoteLoginDto>(RemoteLoginDto.class);
+
+        for (RemoteLogin attachedRemoteLogin : attachedRemoteLogins)
+        {
+            result.add(remoteLoginMapper.mapToDto(attachedRemoteLogin));
+        }
+
+        return result;
+    }
+
+    /**
 	 * Speichert das zu übergebende RemoteLogin.
 	 * 
 	 * @param detachedRemoteLogin
@@ -113,35 +170,6 @@ public class RemoteLoginService
 		}
 
 		return null;
-	}
-
-	/**
-	 * @param userId
-	 *            Id des Benutzers, für welchen die Fremdsystemanmeldungen
-	 *            ermittelt werden sollen
-	 * @return Eine Liste aller Fremdsystemanmeldungen für einen Benutzer
-	 */
-	public List<RemoteLoginDto> getAllRemoteLoginsForUserId(long userId)
-	{
-		List<RemoteLogin> attachedRemoteLogins = new ArrayList<RemoteLogin>();
-
-		try
-		{
-			remoteLoginRepository.findAllForForUserId(userId).forEach(e -> attachedRemoteLogins.add(e));
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-
-		AutoPopulatingList<RemoteLoginDto> result = new AutoPopulatingList<RemoteLoginDto>(RemoteLoginDto.class);
-
-		for (RemoteLogin attachedRemoteLogin : attachedRemoteLogins)
-		{
-			result.add(remoteLoginMapper.mapToDto(attachedRemoteLogin));
-		}
-
-		return result;
 	}
 
 	/**
