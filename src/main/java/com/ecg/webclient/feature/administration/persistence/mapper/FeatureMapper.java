@@ -37,6 +37,9 @@ public class FeatureMapper
 		detachedFeature.setEnabled(attachedFeature.isEnabled());
 		detachedFeature.setId(attachedFeature.getId());
 		detachedFeature.setDeactivatable(attachedFeature.isDeactivatable());
+		detachedFeature.setIconPath(attachedFeature.getIconPath());
+		detachedFeature.setLink(attachedFeature.getLink());
+		detachedFeature.setI18nVariable(attachedFeature.getI18nVariable());
 
 		return detachedFeature;
 	}
@@ -88,6 +91,9 @@ public class FeatureMapper
         entity.setName(detachedFeature.getName());
         entity.setEnabled(detachedFeature.isEnabled());
         entity.setDeactivatable(detachedFeature.isDeactivatable());
+        entity.setIconPath(detachedFeature.getIconPath());
+        entity.setLink(detachedFeature.getLink());
+        entity.setI18nVariable(detachedFeature.getI18nVariable());
         
         Feature persistentFeature = featureRepo.findOne(entity.getId());
         if (persistentFeature != null)

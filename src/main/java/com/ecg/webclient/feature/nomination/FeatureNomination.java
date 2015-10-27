@@ -1,54 +1,35 @@
 package com.ecg.webclient.feature.nomination;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.feature.Feature;
+import com.ecg.webclient.common.autorisation.WebClientFeature;
 
-@Controller
-public class FeatureNomination implements Feature
+@Component
+public class FeatureNomination extends WebClientFeature
 {
-    private boolean isActive;
+	public static final String KEY = "NOM";
 
-    @Override
-    public boolean equals(Feature other)
+    public FeatureNomination()
     {
-        return other.getText().equalsIgnoreCase(getText());
+        super(KEY, true);
     }
 
-    @Override
-    public String getIconPath()
-    {
-        return "/icons/nomination_24_white.png";
-    }
+	@Override
+	public String getIconPath()
+	{
+		return "/icons/nomination_24_white.png";
+	}
 
-    @Override
-    public String getId()
-    {
-        return "nom-feature";
-    }
+	@Override
+	public String getLink()
+	{
+		return "/nom";
+	}
 
-    @Override
-    public String getLink()
-    {
-        return "/nom";
-    }
-
-    @Override
-    public String getText()
-    {
-        return "nomination";
-    }
-
-    @Override
-    public boolean isActive()
-    {
-        return this.isActive;
-    }
-
-    @Override
-    public void setActive(boolean isActive)
-    {
-        this.isActive = isActive;
-    }
+	@Override
+	public String getI18nVariable()
+	{
+		return "feature.nomination.title";
+	}
 
 }

@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ecg.webclient.feature.administration.accessrole.AdministrationFeature;
-import com.ecg.webclient.feature.administration.accessrole.SecurityAdminAccessRole;
-import com.ecg.webclient.feature.administration.accessrole.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.service.RemoteSystemService;
 import com.ecg.webclient.feature.administration.service.UserService;
+import com.ecg.webclient.feature.administration.setup.AdministrationFeature;
+import com.ecg.webclient.feature.administration.setup.SecurityAdminAccessRole;
+import com.ecg.webclient.feature.administration.setup.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemConfig;
 import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.RemoteSystemDtoValidator;

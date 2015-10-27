@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ecg.webclient.common.feature.FeatureRegistry;
-import com.ecg.webclient.feature.administration.FeatureAdministration;
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.service.ClientService;
 import com.ecg.webclient.feature.administration.service.EnvironmentService;
@@ -23,6 +21,7 @@ import com.ecg.webclient.feature.administration.service.RoleService;
 import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.EnvironmentDto;
+import com.ecg.webclient.feature.administration.viewmodell.FeatureDto;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
@@ -44,8 +43,6 @@ public class AdministrationController
 
 	@Autowired
 	private AuthenticationUtil	authUtil;
-	@Autowired
-	private FeatureRegistry		featureRegistry;
 	@Autowired
 	private RoleService			roleService;
 	@Autowired
@@ -77,9 +74,9 @@ public class AdministrationController
 	 * @return Template
 	 */
 	@RequestMapping(method = RequestMethod.POST)
-	public String load(@ModelAttribute("currentFeature") FeatureAdministration feature)
+	public String load(@ModelAttribute("currentFeature") FeatureDto feature)
 	{
-		featureRegistry.updateActiveFeature(feature);
+		authUtil.setSelectedFeature(feature);
 		return getLoadingRedirectTemplate();
 	}
 

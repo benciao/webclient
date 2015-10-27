@@ -1,4 +1,4 @@
-package com.ecg.webclient.common.authentication;
+package com.ecg.webclient.common.autorisation;
 
 import com.ecg.webclient.feature.administration.service.RoleService;
 
@@ -22,7 +22,7 @@ public abstract class WebClientAccessRole
 	/**
 	 * @return Name der Rolle zusammengesetzt aus FeatureId und Rollenname
 	 */
-	public String getCombinedName()
+	public String getName()
 	{
         return feature.getFeatureKey().toUpperCase() + "_" + roleKey.toUpperCase();
 	}

@@ -24,6 +24,9 @@ public class Feature
 	private String	name;
 	boolean			enabled;
 	boolean			deactivatable;
+	String			iconPath;
+	String			link;
+	String			i18nVariable;
 
 	public Feature()
 	{
@@ -35,6 +38,18 @@ public class Feature
 		setName(newFeature.getName());
 		setEnabled(newFeature.isEnabled());
 		setDeactivatable(newFeature.isDeactivatable());
+		if (newFeature.getIconPath() != null)
+		{
+			setIconPath(newFeature.getIconPath());
+		}
+		if (newFeature.getLink() != null)
+		{
+			setLink(newFeature.getLink());
+		}
+		if (newFeature.getI18nVariable() != null)
+		{
+			setI18nVariable(newFeature.getI18nVariable());
+		}
 
 		return this;
 	}
@@ -112,5 +127,35 @@ public class Feature
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	public String getIconPath()
+	{
+		return iconPath;
+	}
+
+	public void setIconPath(String iconPath)
+	{
+		this.iconPath = iconPath;
+	}
+
+	public String getLink()
+	{
+		return link;
+	}
+
+	public void setLink(String link)
+	{
+		this.link = link;
+	}
+
+	public String getI18nVariable()
+	{
+		return i18nVariable;
+	}
+
+	public void setI18nVariable(String i18nVariable)
+	{
+		this.i18nVariable = i18nVariable;
 	}
 }

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ecg.webclient.common.ApplicationUtil;
-import com.ecg.webclient.common.feature.FeatureRegistry;
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.service.ClientService;
 import com.ecg.webclient.feature.administration.service.UserService;
@@ -31,76 +30,74 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 @Controller
 public class MainController
 {
-    static final Logger        logger = LogManager.getLogger(MainController.class.getName());
+	static final Logger logger = LogManager.getLogger(MainController.class.getName());
 
-    @Autowired
-    RemoteSessionManager       remoteSessionManager;
-    @Autowired
-    private FeatureRegistry    featureRegistry;
-    @Autowired
-    private ClientService      clientService;
-    @Autowired
-    UserService                userService;
-    @Autowired
-    private AuthenticationUtil authUtil;
+	@Autowired
+	RemoteSessionManager		remoteSessionManager;
+	@Autowired
+	private ClientService		clientService;
+	@Autowired
+	UserService					userService;
+	@Autowired
+	private AuthenticationUtil	authUtil;
 
-    @Autowired
-    private ApplicationUtil    util;
+	@Autowired
+	private ApplicationUtil util;
 
-    public MainController()
-    {
-    }
+	public MainController()
+	{
+	}
 
-    @RequestMapping(value = "/changeClient", method = RequestMethod.POST)
-    public String changeClient(@ModelAttribute("selectedClient") Long selectedClient)
-    {
-        authUtil.setSelectedClientWithNewAuthority(clientService.getClient(selectedClient));
-        featureRegistry.resetActiveFeature();
-        return "/main";
-    }
+	@RequestMapping(value = "/changeClient", method = RequestMethod.POST)
+	public String changeClient(@ModelAttribute("selectedClient") Long selectedClient)
+	{
+		authUtil.setSelectedClientWithNewAuthority(clientService.getClient(selectedClient));
+		authUtil.setSelectedFeature(null);
+		return "/main";
+	}
 
-    @RequestMapping(value = "/main/tooglemenue/true", method = RequestMethod.GET)
-    public void hideMenu()
-    {
-        util.setMenuMinimized(true);
-    }
+	@RequestMapping(value = "/main/tooglemenue/true", method = RequestMethod.GET)
+	public void hideMenu()
+	{
+		util.setMenuMinimized(true);
+	}
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String loginOk(HttpServletRequest request, HttpServletResponse response)
-    {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String loginOk(HttpServletRequest request, HttpServletResponse response)
+	{
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        featureRegistry.resetActiveFeature();
-        UserDto user = userService.getUserByLogin(auth.getName());
-        ClientDto defaultClient = userService.getDefaultClientForUser(user);
-        authUtil.setSelectedClient(defaultClient);
+		authUtil.setSelectedFeature(null);
+		UserDto user = userService.getUserByLogin(auth.getName());
+		ClientDto defaultClient = userService.getDefaultClientForUser(user);
+		authUtil.setSelectedClient(defaultClient);
 
-        // Anmeldung an Fremdsystemen versuchen
-        try
-        {
-            List<HttpCookie> cookies = remoteSessionManager.createSessions(user.getId());
+		// Anmeldung an Fremdsystemen versuchen
+		try
+		{
+			List<HttpCookie> cookies = remoteSessionManager.createSessions(user.getId());
 
-            for (HttpCookie httpCookie : cookies)
-            {
-                Cookie cookie = new Cookie(httpCookie.getName(), httpCookie.getValue());
-                cookie.setDomain(httpCookie.getDomain());
-                cookie.setPath(httpCookie.getPath());
+			for (HttpCookie httpCookie : cookies)
+			{
+				Cookie cookie = new Cookie(httpCookie.getName(), httpCookie.getValue());
+				cookie.setDomain(httpCookie.getDomain());
+				cookie.setPath(httpCookie.getPath());
 
-                response.addCookie(cookie);
-            }
+				response.addCookie(cookie);
+			}
 
-        }
-        catch (Exception ex)
-        {
-            logger.error("remote login failed.", ex);
-        }
+		}
+		catch (Exception ex)
+		{
+			logger.error("remote login failed.", ex);
+		}
 
-        return "/main";
-    }
+		return "/main";
+	}
 
-    @RequestMapping(value = "/main/tooglemenue/false", method = RequestMethod.GET)
-    public void showMenu()
-    {
-        util.setMenuMinimized(false);
-    }
+	@RequestMapping(value = "/main/tooglemenue/false", method = RequestMethod.GET)
+	public void showMenu()
+	{
+		util.setMenuMinimized(false);
+	}
 }

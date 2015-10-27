@@ -15,4 +15,7 @@ public interface FeatureRepository extends CrudRepository<Feature, Long>
 {
 	@Query("select f from Feature f where f.name = :name")
 	public Feature findFeatureByName(@Param("name") String name);
+
+	@Query("select f from Feature f where f.enabled = :enabled")
+	public Iterable<Feature> findAllEnabled(@Param("enabled") boolean isEnabled);
 }

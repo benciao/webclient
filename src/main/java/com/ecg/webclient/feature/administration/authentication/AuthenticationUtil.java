@@ -12,14 +12,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ecg.webclient.feature.administration.accessrole.AdministrationFeature;
-import com.ecg.webclient.feature.administration.accessrole.SecurityAdminAccessRole;
-import com.ecg.webclient.feature.administration.accessrole.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.service.ClientService;
 import com.ecg.webclient.feature.administration.service.GroupService;
 import com.ecg.webclient.feature.administration.service.RoleService;
 import com.ecg.webclient.feature.administration.service.UserService;
+import com.ecg.webclient.feature.administration.setup.AdministrationFeature;
+import com.ecg.webclient.feature.administration.setup.SecurityAdminAccessRole;
+import com.ecg.webclient.feature.administration.setup.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.FeatureDto;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
@@ -30,6 +31,7 @@ public class AuthenticationUtil
 {
 	private List<ClientDto>	clients;
 	private ClientDto		selectedClient;
+	private FeatureDto		selectedFeature;
 	private ClientService	clientService;
 	private UserService		userService;
 	private GroupService	groupService;
@@ -49,6 +51,16 @@ public class AuthenticationUtil
 		this.groupService = groupService;
 		this.roleService = roleService;
 		initSelectedClient();
+	}
+
+	public FeatureDto getSelectedFeature()
+	{
+		return selectedFeature;
+	}
+
+	public void setSelectedFeature(FeatureDto selectedFeature)
+	{
+		this.selectedFeature = selectedFeature;
 	}
 
 	@Transactional
@@ -84,8 +96,8 @@ public class AuthenticationUtil
 
 		clients = new ArrayList<ClientDto>();
 
-		if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getCombinedName()))
-				|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getCombinedName())))
+		if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getName()))
+				|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getName())))
 		{
 			clients = clientService.getAllClients(true);
 		}
@@ -185,8 +197,8 @@ public class AuthenticationUtil
 		{
 			// Nutzer mit dieser Rolle erhält alle ihm zugeordneten Rollen über
 			// alle Mandanten
-			if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getCombinedName()))
-					|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getCombinedName())))
+			if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getName()))
+					|| auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getName())))
 			{
 				for (RoleDto role : roleService.getEnabledRolesWithEnabledFeatureForIds(group.getRoleIdObjects()))
 				{
@@ -221,14 +233,14 @@ public class AuthenticationUtil
 			this.selectedClient = clients.get(0);
 		}
 	}
-	
+
 	public UserDto getCurrentUser()
 	{
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String login = auth.getName();
 
 		UserDto user = userService.getUserByLogin(login);
-		
+
 		return user;
 	}
 }

@@ -10,9 +10,53 @@ public class FeatureDto extends BaseObjectDto
 	private String	name;
 	private boolean	enabled;
 	private boolean	deactivatable;
+	private boolean	selected;
+	private String	iconPath;
+	private String	link;
+	private String	i18nVariable;
 
 	public FeatureDto()
 	{
+	}
+
+	public boolean isSelected()
+	{
+		return selected;
+	}
+
+	public void setSelected(boolean selected)
+	{
+		this.selected = selected;
+	}
+
+	public String getIconPath()
+	{
+		return iconPath;
+	}
+
+	public void setIconPath(String iconPath)
+	{
+		this.iconPath = iconPath;
+	}
+
+	public String getLink()
+	{
+		return link;
+	}
+
+	public void setLink(String link)
+	{
+		this.link = link;
+	}
+
+	public String getI18nVariable()
+	{
+		return i18nVariable;
+	}
+
+	public void setI18nVariable(String i18nVariable)
+	{
+		this.i18nVariable = i18nVariable;
 	}
 
 	public String getName()

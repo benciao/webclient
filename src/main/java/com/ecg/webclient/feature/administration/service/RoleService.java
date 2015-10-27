@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.common.authentication.WebClientAccessRole;
+import com.ecg.webclient.common.autorisation.WebClientAccessRole;
 import com.ecg.webclient.feature.administration.persistence.mapper.RoleMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.Role;
 import com.ecg.webclient.feature.administration.persistence.repo.FeatureRepository;

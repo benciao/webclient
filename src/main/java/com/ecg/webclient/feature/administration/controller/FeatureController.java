@@ -13,10 +13,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ecg.webclient.feature.administration.accessrole.AdministrationFeature;
-import com.ecg.webclient.feature.administration.accessrole.SecurityAdminAccessRole;
-import com.ecg.webclient.feature.administration.accessrole.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.service.FeatureService;
+import com.ecg.webclient.feature.administration.setup.AdministrationFeature;
+import com.ecg.webclient.feature.administration.setup.SecurityAdminAccessRole;
+import com.ecg.webclient.feature.administration.setup.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.viewmodell.FeatureConfig;
 
 /**
@@ -66,7 +66,7 @@ public class FeatureController
     public String showFeatureConfig(Model model)
     {
         FeatureConfig featureConfig = new FeatureConfig();
-        featureConfig.setFeatures(featureService.getAllFeatures());
+        featureConfig.setFeatures(featureService.getAllFeatures(false));
         model.addAttribute("featureConfig", featureConfig);
 
         return getLoadingRedirectTemplate();
