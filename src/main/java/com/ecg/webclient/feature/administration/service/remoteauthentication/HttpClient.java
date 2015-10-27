@@ -195,6 +195,15 @@ public class HttpClient
         connection.setRequestMethod(REQUEST_METHOD);
         connection.setDoOutput(true);
         final DataOutputStream request = new DataOutputStream(connection.getOutputStream());
+
+        if (connection.toString().contains("?"))
+        {
+            request.writeBytes("&");
+        }
+        else
+        {
+            request.writeBytes("?");
+        }
         request.writeBytes(content);
         request.flush();
         request.close();

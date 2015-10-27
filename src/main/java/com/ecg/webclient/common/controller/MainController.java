@@ -3,6 +3,7 @@ package com.ecg.webclient.common.controller;
 import java.net.HttpCookie;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,7 +49,6 @@ public class MainController
 
     public MainController()
     {
-        System.out.print("MainController instantiated");
     }
 
     @RequestMapping(value = "/changeClient", method = RequestMethod.POST)
@@ -79,6 +79,16 @@ public class MainController
         try
         {
             List<HttpCookie> cookies = remoteSessionManager.createSessions(user.getId());
+
+            for (HttpCookie httpCookie : cookies)
+            {
+                Cookie cookie = new Cookie(httpCookie.getName(), httpCookie.getValue());
+                cookie.setDomain(httpCookie.getDomain());
+                cookie.setPath(httpCookie.getPath());
+
+                response.addCookie(cookie);
+            }
+
         }
         catch (Exception ex)
         {
