@@ -19,34 +19,20 @@ public class RemoteLoginDto extends BaseObjectDto
 	{
 	}
 
-	public String getRemoteSystemId()
+	public RemoteLoginDto copy()
 	{
-		return remoteSystemId;
-	}
-
-	public void setRemoteSystemId(String remoteSystemId)
-	{
-		this.remoteSystemId = remoteSystemId;
-	}
-
-	public String getUserId()
-	{
-		return userId;
-	}
-
-	public void setUserId(String userId)
-	{
-		this.userId = userId;
-	}
-
-	public String getRemoteSystemName()
-	{
-		return remoteSystemName;
-	}
-
-	public void setRemoteSystemName(String remoteSystemName)
-	{
-		this.remoteSystemName = remoteSystemName;
+	    RemoteLoginDto copy = new RemoteLoginDto();
+	    copy.setDelete(this.isDelete());
+	    copy.setEnabled(this.isEnabled());
+	    copy.setId(this.getId());
+	    copy.setRemoteSystemDescription(this.getRemoteSystemDescription());
+	    copy.setRemoteSystemId(this.getRemoteSystemId());
+	    copy.setRemoteSystemLoginName(this.getRemoteSystemLoginName());
+	    copy.setRemoteSystemName(this.getRemoteSystemName());
+	    copy.setRemoteSystemPassword(this.getRemoteSystemPassword());
+	    copy.setUserId(this.getUserId());
+	    
+	    return copy;
 	}
 
 	public String getRemoteSystemDescription()
@@ -54,9 +40,9 @@ public class RemoteLoginDto extends BaseObjectDto
 		return remoteSystemDescription;
 	}
 
-	public void setRemoteSystemDescription(String remoteSystemDescription)
+	public String getRemoteSystemId()
 	{
-		this.remoteSystemDescription = remoteSystemDescription;
+		return remoteSystemId;
 	}
 
 	public String getRemoteSystemLoginName()
@@ -64,9 +50,19 @@ public class RemoteLoginDto extends BaseObjectDto
 		return remoteSystemLoginName;
 	}
 
+	public String getRemoteSystemName()
+	{
+		return remoteSystemName;
+	}
+
 	public String getRemoteSystemPassword()
 	{
 		return remoteSystemPassword;
+	}
+
+	public String getUserId()
+	{
+		return userId;
 	}
 
 	public boolean isEnabled()
@@ -79,13 +75,33 @@ public class RemoteLoginDto extends BaseObjectDto
 		this.enabled = enabled;
 	}
 
+	public void setRemoteSystemDescription(String remoteSystemDescription)
+	{
+		this.remoteSystemDescription = remoteSystemDescription;
+	}
+
+	public void setRemoteSystemId(String remoteSystemId)
+	{
+		this.remoteSystemId = remoteSystemId;
+	}
+
 	public void setRemoteSystemLoginName(String remoteSystemLoginName)
 	{
 		this.remoteSystemLoginName = remoteSystemLoginName;
 	}
 
+	public void setRemoteSystemName(String remoteSystemName)
+	{
+		this.remoteSystemName = remoteSystemName;
+	}
+
 	public void setRemoteSystemPassword(String remoteSystemPassword)
 	{
 		this.remoteSystemPassword = remoteSystemPassword;
+	}
+
+    public void setUserId(String userId)
+	{
+		this.userId = userId;
 	}
 }

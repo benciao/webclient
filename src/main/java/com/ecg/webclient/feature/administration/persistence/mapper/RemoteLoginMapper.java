@@ -103,7 +103,7 @@ public class RemoteLoginMapper
 		entity.setId(dto.getId());
 		entity.setEnabled(dto.isEnabled());
 		entity.setRemoteSystemLoginName(dto.getRemoteSystemLoginName());
-		entity.setRemoteSystemPassword(dto.getRemoteSystemPassword());
+        entity.setRemoteSystemPassword(PasswordEncoder.encode2Way(dto.getRemoteSystemPassword()));
 		entity.setUser(userRepo.findOne(Long.parseLong(dto.getUserId())));
 		entity.setRemoteSystem(remoteSystemRepo.findOne(Long.parseLong(dto.getRemoteSystemId())));
 

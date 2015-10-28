@@ -207,15 +207,37 @@ public class RemoteSystemService
 
             if (persistedRemoteSystem != null)
             {
-                remoteLoginService.deleteRemoteLoginsForRemoteSystemId(persistedRemoteSystem.getId());
-
-                for (Long userId : detachedRemoteSystem.getAssignedUserIdObjects())
+                // auf Grund der Benutzerzuordnung alle Logins löschen und pro zugeordneten Benutzer neue
+                // anlegen
                 {
-                    RemoteLoginDto rl = new RemoteLoginDto();
-                    rl.setEnabled(false);
-                    rl.setUserId(userId.toString());
-                    rl.setRemoteSystemId(Long.toString(persistedRemoteSystem.getId()));
-                    remoteLoginService.save(rl);
+                    List<RemoteLoginDto> oldRemoteLogins = remoteLoginService
+                            .findAllForRemoteSystemId(persistedRemoteSystem.getId());
+
+                    remoteLoginService.deleteRemoteLoginsForRemoteSystemId(persistedRemoteSystem.getId());
+
+                    for (Long userId : detachedRemoteSystem.getAssignedUserIdObjects())
+                    {
+                        RemoteLoginDto rl = new RemoteLoginDto();
+                        rl.setEnabled(false);
+                        rl.setUserId(userId.toString());
+                        rl.setRemoteSystemId(Long.toString(persistedRemoteSystem.getId()));
+
+                        RemoteLoginDto oldEntry = getRelatedOldRemoteLogin(oldRemoteLogins, userId);
+
+                        if (oldEntry != null)
+                        {
+                            rl.setEnabled(oldEntry.isEnabled());
+                            rl.setRemoteSystemLoginName(oldEntry.getRemoteSystemLoginName());
+                            rl.setRemoteSystemPassword(oldEntry.getRemoteSystemPassword());
+                        }
+
+                        remoteLoginService.save(rl);
+                    }
+
+                    for (RemoteLoginDto oldRemoteLogin : oldRemoteLogins)
+                    {
+                        remoteLoginService.deleteForId(oldRemoteLogin.getId());
+                    }
                 }
 
                 RemoteSystemDto result = remoteSystemMapper.mapToDto(persistedRemoteSystem);
@@ -251,5 +273,30 @@ public class RemoteSystemService
         {
             logger.error(e);
         }
+    }
+
+    /**
+     * Sucht einen Eintrag mit gleicher userId, gibt den Eintrag zurück und löscht diesen dann in der List.
+     * 
+     * @param oldRemoteLogins
+     *            Liste alter Fremdsystemlogins
+     * @param userId
+     *            BenutzerId
+     * @return null, wenn Eintrag nicht gefunden wird, sonst Kopie des Eintrags
+     */
+    private RemoteLoginDto getRelatedOldRemoteLogin(List<RemoteLoginDto> oldRemoteLogins, long userId)
+    {
+        for (RemoteLoginDto oldRemoteLogin : oldRemoteLogins)
+        {
+            if (userId == Long.parseLong(oldRemoteLogin.getUserId()))
+            {
+                RemoteLoginDto result = oldRemoteLogin.copy();
+                oldRemoteLogins.remove(oldRemoteLogin);
+
+                return result;
+            }
+        }
+
+        return null;
     }
 }
