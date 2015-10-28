@@ -80,7 +80,7 @@
 							<div class="menu">
 								<ul class="nav nav-pills">
 									<li
-										th:each="feature : ${beans.featureService.getAllFeatures(true)}"
+										th:each="feature : ${beans.featureService.getAllFeatures(true, true)}"
 										role="presentation"
 										th:attr="class=${beans.authenticationUtil.getSelectedFeature() == null ? 'inactive' : (beans.authenticationUtil.getSelectedFeature().getName() == feature.name ? 'active' : 'inactive') }">
 										<form th:attr="id=${feature.name}" th:action="@{${feature.link}}"
@@ -109,7 +109,7 @@
 								<ul class="nav nav-pills">
 									<li
 										th:attr="class=${beans.authenticationUtil.getSelectedFeature() == null ? 'text-color-inactive' : (beans.authenticationUtil.getSelectedFeature().getName() == feature.name ? 'text-color-active' : 'text-color-inactive') }"
-										th:each="feature : ${beans.featureService.getAllFeatures(true)}"
+										th:each="feature : ${beans.featureService.getAllFeatures(true, true)}"
 										role="presentation">
 										<form th:attr="id=${feature.name}" th:action="@{${feature.link}}"
 											method="POST">

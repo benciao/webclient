@@ -66,7 +66,7 @@ public class FeatureController
     public String showFeatureConfig(Model model)
     {
         FeatureConfig featureConfig = new FeatureConfig();
-        featureConfig.setFeatures(featureService.getAllFeatures(false));
+        featureConfig.setFeatures(featureService.getAllFeatures(false, false));
         model.addAttribute("featureConfig", featureConfig);
 
         return getLoadingRedirectTemplate();
