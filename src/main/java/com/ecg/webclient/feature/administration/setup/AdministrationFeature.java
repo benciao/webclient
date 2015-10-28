@@ -36,4 +36,10 @@ public class AdministrationFeature extends WebClientFeature
 	{
 		return "feature.administration.title";
 	}
+
+	@Override
+	public String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/administration";
+	}
 }

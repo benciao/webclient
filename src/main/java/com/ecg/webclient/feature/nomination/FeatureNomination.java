@@ -32,4 +32,10 @@ public class FeatureNomination extends WebClientFeature
 		return "feature.nomination.title";
 	}
 
+	@Override
+	public String getLoadingRedirectTemplate()
+	{
+		return "nomination";
+	}
+
 }

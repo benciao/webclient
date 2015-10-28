@@ -197,6 +197,7 @@ public class FeatureService
 				newFeature.setIconPath(feature.getIconPath());
 				newFeature.setLink(feature.getLink());
 				newFeature.setI18nVariable(feature.getI18nVariable());
+				newFeature.setLoadingRedirectTemplate(feature.getLoadingRedirectTemplate());
 
 				featureRepo.save(newFeature);
 			}

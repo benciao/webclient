@@ -14,6 +14,7 @@ public class FeatureDto extends BaseObjectDto
 	private String	iconPath;
 	private String	link;
 	private String	i18nVariable;
+	private String	loadingRedirectTemplate;
 
 	public FeatureDto()
 	{
@@ -37,6 +38,16 @@ public class FeatureDto extends BaseObjectDto
 	public void setIconPath(String iconPath)
 	{
 		this.iconPath = iconPath;
+	}
+
+	public String getLoadingRedirectTemplate()
+	{
+		return loadingRedirectTemplate;
+	}
+
+	public void setLoadingRedirectTemplate(String loadingRedirectTemplate)
+	{
+		this.loadingRedirectTemplate = loadingRedirectTemplate;
 	}
 
 	public String getLink()

@@ -27,6 +27,7 @@ public class Feature
 	String			iconPath;
 	String			link;
 	String			i18nVariable;
+	String			loadingRedirectTemplate;
 
 	public Feature()
 	{
@@ -49,6 +50,10 @@ public class Feature
 		if (newFeature.getI18nVariable() != null)
 		{
 			setI18nVariable(newFeature.getI18nVariable());
+		}
+		if (newFeature.getLoadingRedirectTemplate() != null)
+		{
+			setLoadingRedirectTemplate(newFeature.getLoadingRedirectTemplate());
 		}
 
 		return this;
@@ -82,6 +87,16 @@ public class Feature
 		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
+	}
+
+	public String getLoadingRedirectTemplate()
+	{
+		return loadingRedirectTemplate;
+	}
+
+	public void setLoadingRedirectTemplate(String loadingRedirectTemplate)
+	{
+		this.loadingRedirectTemplate = loadingRedirectTemplate;
 	}
 
 	@Override

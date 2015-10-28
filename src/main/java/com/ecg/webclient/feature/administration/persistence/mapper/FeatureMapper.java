@@ -21,8 +21,8 @@ import com.ecg.webclient.feature.administration.viewmodell.FeatureDto;
 public class FeatureMapper
 {
 	@Autowired
-    FeatureRepository  featureRepo;
-	
+	FeatureRepository featureRepo;
+
 	/**
 	 * Wandelt ein attachtes Feature in ein detachtes um.
 	 * 
@@ -40,6 +40,7 @@ public class FeatureMapper
 		detachedFeature.setIconPath(attachedFeature.getIconPath());
 		detachedFeature.setLink(attachedFeature.getLink());
 		detachedFeature.setI18nVariable(attachedFeature.getI18nVariable());
+		detachedFeature.setLoadingRedirectTemplate(attachedFeature.getLoadingRedirectTemplate());
 
 		return detachedFeature;
 	}
@@ -60,47 +61,49 @@ public class FeatureMapper
 
 		return result;
 	}
-	
+
 	/**
-     * Wandelt eine Liste von detachten Features in eine Liste von attachten Features um.
-     * 
-     * @param detachedFeatures
-     *            Liste von detachten Features
-     * @return Liste von zum Speichern vorbereiteten Features
-     */
-    public List<Feature> mapToEntities(List<FeatureDto> detachedFeatures)
-    {
-        List<Feature> result = new ArrayList<Feature>();
+	 * Wandelt eine Liste von detachten Features in eine Liste von attachten
+	 * Features um.
+	 * 
+	 * @param detachedFeatures
+	 *            Liste von detachten Features
+	 * @return Liste von zum Speichern vorbereiteten Features
+	 */
+	public List<Feature> mapToEntities(List<FeatureDto> detachedFeatures)
+	{
+		List<Feature> result = new ArrayList<Feature>();
 
-        detachedFeatures.forEach(e -> result.add(mapToEntity(e)));
+		detachedFeatures.forEach(e -> result.add(mapToEntity(e)));
 
-        return result;
-    }
+		return result;
+	}
 
-    /**
-     * Wandelt ein detachtes Feature in eine attachtes um.
-     * 
-     * @param detachedFeature
-     *            Detachtes Feature
-     * @return zum Speichern vorbereitetes Feature
-     */
-    public Feature mapToEntity(FeatureDto detachedFeature)
-    {
-    	Feature entity = new Feature();
-        entity.setId(detachedFeature.getId());
-        entity.setName(detachedFeature.getName());
-        entity.setEnabled(detachedFeature.isEnabled());
-        entity.setDeactivatable(detachedFeature.isDeactivatable());
-        entity.setIconPath(detachedFeature.getIconPath());
-        entity.setLink(detachedFeature.getLink());
-        entity.setI18nVariable(detachedFeature.getI18nVariable());
-        
-        Feature persistentFeature = featureRepo.findOne(entity.getId());
-        if (persistentFeature != null)
-        {
-            return persistentFeature.bind(entity);
-        }
+	/**
+	 * Wandelt ein detachtes Feature in eine attachtes um.
+	 * 
+	 * @param detachedFeature
+	 *            Detachtes Feature
+	 * @return zum Speichern vorbereitetes Feature
+	 */
+	public Feature mapToEntity(FeatureDto detachedFeature)
+	{
+		Feature entity = new Feature();
+		entity.setId(detachedFeature.getId());
+		entity.setName(detachedFeature.getName());
+		entity.setEnabled(detachedFeature.isEnabled());
+		entity.setDeactivatable(detachedFeature.isDeactivatable());
+		entity.setIconPath(detachedFeature.getIconPath());
+		entity.setLink(detachedFeature.getLink());
+		entity.setI18nVariable(detachedFeature.getI18nVariable());
+		entity.setLoadingRedirectTemplate(detachedFeature.getLoadingRedirectTemplate());
 
-        return entity;
-    }
+		Feature persistentFeature = featureRepo.findOne(entity.getId());
+		if (persistentFeature != null)
+		{
+			return persistentFeature.bind(entity);
+		}
+
+		return entity;
+	}
 }

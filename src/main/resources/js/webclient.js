@@ -100,6 +100,18 @@ $(document).ready(function() {
 	$("#clientSelect").change(function() {
 		$("#clientSelectForm").submit();
 	});
+	
+	$(".feature-href").on('mousedown', null, function(e) { 
+		var element = e.target;
+		var featureName = $(element).attr('featurename');
+		
+		if( (e.which == 2) ) {
+			$(featureName).attr('target', '_blank');
+	   }	   
+	   
+	   document.getElementById(featureName).submit();
+	   e.preventDefault();
+	});
 
 	var classContent = $('#minimizedMenu').attr('class');
 	if (classContent.indexOf("hide-menu") > -1) {

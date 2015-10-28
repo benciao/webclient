@@ -88,7 +88,7 @@
 											<input type="hidden" th:name="currentFeature" th:value="${feature.id}" />
 										</form>
 										<a
-											th:href="'javascript:document.getElementById(' + '\'' + ${feature.name} + '\'' + ').submit();'">
+											href="#" th:attr="featurename=${feature.name}" class="feature-href">
 											<img th:src="@{${feature.iconPath}}"></img>
 											<br></br>
 											<div th:text="#{${feature.i18nVariable}}" />

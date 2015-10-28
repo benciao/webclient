@@ -22,6 +22,7 @@ import com.ecg.webclient.feature.administration.service.RoleService;
 import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.EnvironmentDto;
+import com.ecg.webclient.feature.administration.viewmodell.FeatureDto;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
@@ -66,7 +67,7 @@ public class AdministrationController
 	@RequestMapping(method = RequestMethod.GET)
 	public String load()
 	{
-		return getLoadingRedirectTemplate();
+		return "feature/administration/administration";
 	}
 
 	/**
@@ -78,8 +79,10 @@ public class AdministrationController
 	@RequestMapping(method = RequestMethod.POST)
 	public String load(@ModelAttribute("currentFeature") long id)
 	{
-		authUtil.setSelectedFeature(featureService.getFeatureById(id));
-		return getLoadingRedirectTemplate();
+		FeatureDto selectedFeature = featureService.getFeatureById(id);
+		authUtil.setSelectedFeature(selectedFeature);
+		
+		return selectedFeature.getLoadingRedirectTemplate();
 	}
 
 	/**
@@ -175,10 +178,5 @@ public class AdministrationController
 		}
 
 		return "login";
-	}
-
-	protected String getLoadingRedirectTemplate()
-	{
-		return "feature/administration/administration";
 	}
 }

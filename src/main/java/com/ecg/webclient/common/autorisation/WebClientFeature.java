@@ -43,4 +43,9 @@ public abstract class WebClientFeature
      * @return i18n Variable.
      */
     public abstract String getI18nVariable();
+    
+    /**
+     * @return Pfad zum Default-Template des Features.
+     */
+    public abstract String getLoadingRedirectTemplate();
 }
