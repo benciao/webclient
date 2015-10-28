@@ -83,9 +83,9 @@
 										th:each="feature : ${beans.featureService.getAllFeatures(true, true)}"
 										role="presentation"
 										th:attr="class=${beans.authenticationUtil.getSelectedFeature() == null ? 'inactive' : (beans.authenticationUtil.getSelectedFeature().getName() == feature.name ? 'active' : 'inactive') }">
-										<form th:attr="id=${feature.name}" th:action="@{${feature.link}}"
+										<form th:attr="id=${feature.name}" th:action="@{'/admin'}"
 											method="POST">
-											<input type="hidden" th:name="currentFeature" th:value="*{feature}" />
+											<input type="hidden" th:name="currentFeature" th:value="${feature.id}" />
 										</form>
 										<a
 											th:href="'javascript:document.getElementById(' + '\'' + ${feature.name} + '\'' + ').submit();'">
@@ -111,9 +111,9 @@
 										th:attr="class=${beans.authenticationUtil.getSelectedFeature() == null ? 'text-color-inactive' : (beans.authenticationUtil.getSelectedFeature().getName() == feature.name ? 'text-color-active' : 'text-color-inactive') }"
 										th:each="feature : ${beans.featureService.getAllFeatures(true, true)}"
 										role="presentation">
-										<form th:attr="id=${feature.name}" th:action="@{${feature.link}}"
+										<form th:attr="id=${feature.name}" th:action="@{'/admin'}"
 											method="POST">
-											<input type="hidden" th:name="currentFeature" th:value="*{feature}" />
+											<input type="hidden" th:name="currentFeature" th:value="${feature.id}" />
 										</form>
 										<a
 											th:href="'javascript:document.getElementById(' + '\'' + ${feature.name} + '\'' + ').submit();'">
