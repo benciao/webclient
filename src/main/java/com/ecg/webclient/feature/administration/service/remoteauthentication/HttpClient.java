@@ -91,7 +91,7 @@ public class HttpClient
         return connectionCreator.createConnection(url);
     }
 
-    private RequestResult executePostRequest(final String url, final String content,
+    private RequestResult executePostRequest(String url, final String content,
             final Optional<HttpCookie> optHttpCookie)
     {
         HttpCookie cookie = null;
@@ -104,6 +104,14 @@ public class HttpClient
         HttpURLConnection httpConnection = null;
         try
         {
+            if (url.contains("?"))
+            {
+                url = url + "&" + content;
+            }
+            else
+            {
+                url = url + "?" + content;
+            }
             httpConnection = createConnection(url);
             responseCode = sendPostRequest(httpConnection, content, optHttpCookie);
             cookie = extractSessionCookie(cookieManager.getCookieStore());
@@ -149,15 +157,15 @@ public class HttpClient
         HttpCookie cookie = null;
         final List<HttpCookie> cookies = cookieStore.getCookies();
 
-        if (cookies.size() == 1)
-        {
+//        if (cookies.size() == 1)
+//        {
             cookie = cookies.get(0);
-            cookieStore.removeAll();
-        }
-        else if (cookies.size() > 1)
-        {
-            logger.error("cookie size > 1");
-        }
+        // cookieStore.removeAll();
+        // }
+        // else if (cookies.size() > 1)
+        // {
+        // logger.error("cookie size > 1");
+        // }
 
         return cookie;
     }
@@ -196,15 +204,15 @@ public class HttpClient
         connection.setDoOutput(true);
         final DataOutputStream request = new DataOutputStream(connection.getOutputStream());
 
-        if (connection.toString().contains("?"))
-        {
-            request.writeBytes("&");
-        }
-        else
-        {
-            request.writeBytes("?");
-        }
-        request.writeBytes(content);
+        // if (connection.toString().contains("?"))
+        // {
+        // request.writeBytes("&");
+        // }
+        // else
+        // {
+        // request.writeBytes("?");
+        // }
+        // request.writeBytes(content);
         request.flush();
         request.close();
 
