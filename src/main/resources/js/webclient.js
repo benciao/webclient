@@ -101,12 +101,16 @@ $(document).ready(function() {
 		$("#clientSelectForm").submit();
 	});
 	
-	$(".feature-href").on('mousedown', null, function(e) { 
+	$("a").mousedown(function (e) { 
 		var element = e.target;
-		var featureName = $(element).attr('featurename');
+		var link = $(element).parent(".feature-link");
+		var featureLinkId = $(link).attr('id');
+		
+		var collectionIndex = featureLinkId.split("_");
+		var featureName = collectionIndex[1];
 		
 		if( (e.which == 2) ) {
-			$(featureName).attr('target', '_blank');
+			$("#" + featureName).attr('target', '_blank');
 	   }	   
 	   
 	   document.getElementById(featureName).submit();

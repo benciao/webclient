@@ -240,30 +240,29 @@ a {
 	background: #004b7d;
 }
 
-
 .modal-header {
-    padding:9px 15px;
-    border-bottom:1px solid #eee;
-    background-color: #fcf8e3;
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 5px;
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 5px;
-     border-top-left-radius: 5px;
-     border-top-right-radius: 5px;
- }
- 
- .modal-footer {
-    padding:9px 15px;
-    border-top:1px solid #eee;
-    background-color: #fcf8e3;
-    -webkit-border-bottom-left-radius: 5px;
-    -webkit-border-bottom-right-radius: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    -moz-border-radius-bottomright: 5px;
-     border-bottom-left-radius: 5px;
-     border-bottom-right-radius: 5px;
- }
+	padding: 9px 15px;
+	border-bottom: 1px solid #eee;
+	background-color: #fcf8e3;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-top-right-radius: 5px;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.modal-footer {
+	padding: 9px 15px;
+	border-top: 1px solid #eee;
+	background-color: #fcf8e3;
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
 
 .table {
 	color: #222;
@@ -366,22 +365,31 @@ a {
 }
 
 .tab-content {
-    border: 1px solid #ddd;
-    border-width: 0 1px 1px; /* Removes the top border */
-    padding: 1px;
+	border: 1px solid #ddd;
+	border-width: 0 1px 1px; /* Removes the top border */
+	padding: 1px;
 }
-.nav-tabs > li {
-    float: left;
+
+.nav-tabs>li {
+	float: left;
 }
-.nav-tabs > li > a {
-    margin-right: 0;
-    margin-left: 2px;
+
+.nav-tabs>li>a {
+	margin-right: 0;
+	margin-left: 2px;
 }
-.list-group-item{
+
+.list-group-item {
 	border: none;
 }
-.list-group{
+
+.list-group {
 	border: none;
 	webkit-box-shadow: none !important;
 	box-shadow: none !important;
+}
+
+.feature-link {
+	cursor: pointer;
+	cursor: hand;
 }
