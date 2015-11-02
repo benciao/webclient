@@ -116,7 +116,7 @@
 											<input type="hidden" th:name="currentFeature" th:value="${feature.id}" />
 										</form>
 										<a
-											th:href="'javascript:document.getElementById(' + '\'' + ${feature.name} + '\'' + ').submit();'">
+											th:id="'link_' + ${feature.name}" class="feature-link">
 											<div th:text="#{${feature.i18nVariable}}" />
 										</a>
 									</li>

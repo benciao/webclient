@@ -26,7 +26,7 @@ public class HttpClient
 {
     private static final Logger            logger            = LoggerFactory.getLogger(HttpClient.class);
 
-    private static final String            REQUEST_METHOD    = "POST";
+    private static final String            REQUEST_METHOD    = "GET";
     private static final String            COOKIE_FIELD_NAME = "Set-Cookie";
 
     private final HttpUrlConnectionCreator connectionCreator;
