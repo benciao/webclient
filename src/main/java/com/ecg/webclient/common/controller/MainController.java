@@ -72,25 +72,28 @@ public class MainController
 		ClientDto defaultClient = userService.getDefaultClientForUser(user);
 		authUtil.setSelectedClient(defaultClient);
 
-		// Anmeldung an Fremdsystemen versuchen
-		try
-		{
-			List<HttpCookie> cookies = remoteSessionManager.createSessions(user.getId());
+        // Anmeldung an Fremdsystemen versuchen
+        try
+        {
+            List<HttpCookie> cookies = remoteSessionManager.createSessions(user.getId());
 
-			for (HttpCookie httpCookie : cookies)
-			{
-				Cookie cookie = new Cookie(httpCookie.getName(), httpCookie.getValue());
-				cookie.setDomain(httpCookie.getDomain());
-				cookie.setPath(httpCookie.getPath());
+            for (HttpCookie httpCookie : cookies)
+            {
+                Cookie cookie = new Cookie(httpCookie.getName(), httpCookie.getValue());
+                cookie.setDomain(httpCookie.getDomain());
+                cookie.setPath(httpCookie.getPath());
+                cookie.setSecure(true);
+                cookie.setMaxAge(10000);
+                cookie.setHttpOnly(true);
 
-				response.addCookie(cookie);
-			}
+                response.addCookie(cookie);
+            }
 
-		}
-		catch (Exception ex)
-		{
-			logger.error("remote login failed.", ex);
-		}
+        }
+        catch (Exception ex)
+        {
+            logger.error("remote login failed.", ex);
+        }
 
 		return "/main";
 	}
