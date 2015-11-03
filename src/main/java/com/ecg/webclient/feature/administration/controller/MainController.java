@@ -1,9 +1,5 @@
-package com.ecg.webclient.common.controller;
+package com.ecg.webclient.feature.administration.controller;
 
-import java.net.HttpCookie;
-import java.util.List;
-
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,14 +14,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ecg.webclient.common.ApplicationUtil;
+import com.ecg.webclient.app.ApplicationUtil;
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.service.ClientService;
+import com.ecg.webclient.feature.administration.service.RemoteSystemService;
 import com.ecg.webclient.feature.administration.service.UserService;
-import com.ecg.webclient.feature.administration.service.remoteauthentication.RemoteSessionManager;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
+/**
+ * Controller zur Bearbeitung von Requests der Startseite des Features
+ * Administration.
+ * 
+ * @author arndtmar
+ *
+ */
 @Scope("request")
 @Controller
 public class MainController
@@ -33,16 +36,15 @@ public class MainController
 	static final Logger logger = LogManager.getLogger(MainController.class.getName());
 
 	@Autowired
-	RemoteSessionManager		remoteSessionManager;
-	@Autowired
 	private ClientService		clientService;
 	@Autowired
 	UserService					userService;
 	@Autowired
 	private AuthenticationUtil	authUtil;
-
 	@Autowired
-	private ApplicationUtil util;
+	private RemoteSystemService	remoteSystemService;
+	@Autowired
+	private ApplicationUtil		util;
 
 	public MainController()
 	{
@@ -72,28 +74,10 @@ public class MainController
 		ClientDto defaultClient = userService.getDefaultClientForUser(user);
 		authUtil.setSelectedClient(defaultClient);
 
-        // Anmeldung an Fremdsystemen versuchen
-        try
-        {
-            List<HttpCookie> cookies = remoteSessionManager.createSessions(user.getId());
-
-            for (HttpCookie httpCookie : cookies)
-            {
-                Cookie cookie = new Cookie(httpCookie.getName(), httpCookie.getValue());
-                cookie.setDomain(httpCookie.getDomain());
-                cookie.setPath(httpCookie.getPath());
-                cookie.setSecure(true);
-                cookie.setMaxAge(10000);
-                cookie.setHttpOnly(true);
-
-                response.addCookie(cookie);
-            }
-
-        }
-        catch (Exception ex)
-        {
-            logger.error("remote login failed.", ex);
-        }
+		// Anmeldung an Fremdsystemen
+		new Thread(() -> {
+			remoteSystemService.doRemoteLogin(user.getId());
+		});
 
 		return "/main";
 	}

@@ -1,4 +1,4 @@
-package com.ecg.webclient.common.autorisation;
+package com.ecg.webclient.feature.administration.autorisation;
 
 import com.ecg.webclient.feature.administration.service.FeatureService;
 

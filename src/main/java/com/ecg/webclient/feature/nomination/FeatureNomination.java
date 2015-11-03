@@ -2,7 +2,7 @@ package com.ecg.webclient.feature.nomination;
 
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.common.autorisation.WebClientFeature;
+import com.ecg.webclient.feature.administration.autorisation.WebClientFeature;
 
 @Component
 public class FeatureNomination extends WebClientFeature
