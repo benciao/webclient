@@ -1,10 +1,14 @@
 package com.ecg.webclient.feature.administration.service;
 
-import java.io.DataOutputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,335 +32,354 @@ import com.ecg.webclient.feature.administration.viewmodell.RemoteSystemDto;
 @Component
 public class RemoteSystemService
 {
-	static final Logger				logger	= LogManager.getLogger(RemoteSystemService.class.getName());
-	private RemoteSystemRepository	remoteSystemRepo;
-	private RemoteLoginService		remoteLoginService;
-	private RemoteSystemMapper		remoteSystemMapper;
+    static final Logger            logger = LogManager.getLogger(RemoteSystemService.class.getName());
+    private RemoteSystemRepository remoteSystemRepo;
+    private RemoteLoginService     remoteLoginService;
+    private RemoteSystemMapper     remoteSystemMapper;
 
-	@Autowired
-	public RemoteSystemService(RemoteSystemRepository remoteSystemRepo, RemoteSystemMapper remoteSystemMapper,
-			RemoteLoginService remoteLoginService)
-	{
-		this.remoteSystemRepo = remoteSystemRepo;
-		this.remoteSystemMapper = remoteSystemMapper;
-		this.remoteLoginService = remoteLoginService;
-	}
+    @Autowired
+    public RemoteSystemService(RemoteSystemRepository remoteSystemRepo,
+            RemoteSystemMapper remoteSystemMapper, RemoteLoginService remoteLoginService)
+    {
+        this.remoteSystemRepo = remoteSystemRepo;
+        this.remoteSystemMapper = remoteSystemMapper;
+        this.remoteLoginService = remoteLoginService;
+    }
 
-	/**
-	 * Löscht die in der Liste enthaltenen Fremdsysteme.
-	 * 
-	 * @param detachedRemoteSystems
-	 *            Liste mit zu löschenden Fremdsystemen
-	 */
-	public void deleteRemoteSystems(List<RemoteSystemDto> detachedRemoteSystems)
-	{
-		try
-		{
-			for (RemoteSystemDto detachedRemoteSystem : detachedRemoteSystems)
-			{
-				RemoteSystem persistentRemoteSystem = remoteSystemRepo.findOne(detachedRemoteSystem.getId());
+    /**
+     * Löscht die in der Liste enthaltenen Fremdsysteme.
+     * 
+     * @param detachedRemoteSystems
+     *            Liste mit zu löschenden Fremdsystemen
+     */
+    public void deleteRemoteSystems(List<RemoteSystemDto> detachedRemoteSystems)
+    {
+        try
+        {
+            for (RemoteSystemDto detachedRemoteSystem : detachedRemoteSystems)
+            {
+                RemoteSystem persistentRemoteSystem = remoteSystemRepo.findOne(detachedRemoteSystem.getId());
 
-				if (persistentRemoteSystem != null)
-				{
-					remoteLoginService.deleteRemoteLoginsForRemoteSystemId(persistentRemoteSystem.getId());
-					remoteSystemRepo.delete(persistentRemoteSystem);
-				}
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-	}
+                if (persistentRemoteSystem != null)
+                {
+                    remoteLoginService.deleteRemoteLoginsForRemoteSystemId(persistentRemoteSystem.getId());
+                    remoteSystemRepo.delete(persistentRemoteSystem);
+                }
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+    }
 
-	/**
-	 * @param onlyEnabledRemoteSystems
-	 *            true, wenn nur die aktiven Fremdsysteme geladen werden sollen,
-	 *            sonst false
-	 * @return Alle Fremdsysteme, wenn false, sonst nur die aktivierten
-	 *         Fremdsysteme
-	 */
-	public List<RemoteSystemDto> getAllRemoteSystems(boolean onlyEnabledRemoteSystems)
-	{
-		List<RemoteSystem> attachedRemoteSystems = new ArrayList<RemoteSystem>();
+    /**
+     * @param userId
+     *            Id des Nutzers, für welchen die Anmeldung an Fremdsystemen durchgeführt werden soll.
+     */
+    public void doRemoteLogin(final long userId)
+    {
+        HttpURLConnection connection = null;
+        try
+        {
+            // make sure cookies is turn on
+            CookieHandler.setDefault(new CookieManager());
 
-		try
-		{
-			if (!onlyEnabledRemoteSystems)
-			{
-				remoteSystemRepo.findAll().forEach(e -> attachedRemoteSystems.add(e));
-			}
-			else
-			{
-				remoteSystemRepo.findAllEnabledRemoteSystems().forEach(e -> attachedRemoteSystems.add(e));
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+            List<RemoteLoginDto> enabledRemoteLogins = remoteLoginService
+                    .getEnabledRemoteLoginsForUserId(userId);
 
-		AutoPopulatingList<RemoteSystemDto> result = new AutoPopulatingList<RemoteSystemDto>(RemoteSystemDto.class);
+            for (RemoteLoginDto enabledRemoteLogin : enabledRemoteLogins)
+            {
+                final String login = enabledRemoteLogin.getRemoteSystemLoginName();
+                final String password = enabledRemoteLogin.getRemoteSystemPassword();
 
-		for (RemoteSystem attachedRemoteSystem : attachedRemoteSystems)
-		{
-			result.add(remoteSystemMapper.mapToDto(attachedRemoteSystem));
-		}
+                RemoteSystemDto remoteSystem = getRemoteSystemById(Long.parseLong(enabledRemoteLogin
+                        .getRemoteSystemId()));
 
-		return result;
-	}
+                if (remoteSystem.isEnabled())
+                {
+                    Map<String, Object> params = new LinkedHashMap<>();
+                    params.put(remoteSystem.getLoginParameter(), login);
+                    params.put(remoteSystem.getPasswordParameter(), password);
 
-	/**
-	 * @param id
-	 *            Id des Fremdsystems
-	 * @return Das Fremdsystem, welches zur übergebenen Id gehört
-	 */
-	public RemoteSystemDto getRemoteSystemById(Long id)
-	{
-		try
-		{
-			RemoteSystem persistentRemoteSystem = remoteSystemRepo.findOne(id);
+                    StringBuilder postData = new StringBuilder();
+                    for (Map.Entry<String, Object> param : params.entrySet())
+                    {
+                        if (postData.length() != 0)
+                        {
+                            postData.append('&');
 
-			if (persistentRemoteSystem != null)
-			{
-				RemoteSystemDto result = remoteSystemMapper.mapToDto(persistentRemoteSystem);
+                        }
+                        postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                        postData.append('=');
+                        postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+                    }
+                    byte[] postDataBytes = postData.toString().getBytes("UTF-8");
 
-				return result;
-			}
+                    URL url = new URL(remoteSystem.getLoginUrl());
 
-			return null;
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+                    conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+                    conn.setRequestProperty("Accept",
+                            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                    conn.setDoOutput(true);
+                    conn.setDoInput(true);
+                    conn.setUseCaches(false);
+                    conn.getOutputStream().write(postDataBytes);
 
-		return null;
-	}
+                    conn.getOutputStream().flush();
+                    conn.getOutputStream().close();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.error("Remote Login failed", ex);
+        }
+        finally
+        {
+            if (connection != null)
+            {
+                connection.disconnect();
+            }
+        }
+    }
 
-	/**
-	 * @param name
-	 *            Name des Fremdsystems
-	 * @return Das Fremdsystem, welches zum übergebenen Namen gehört
-	 */
-	public RemoteSystemDto getRemoteSystemByName(String name)
-	{
-		try
-		{
-			RemoteSystem persistentRemoteSystem = null;
+    /**
+     * @param onlyEnabledRemoteSystems
+     *            true, wenn nur die aktiven Fremdsysteme geladen werden sollen, sonst false
+     * @return Alle Fremdsysteme, wenn false, sonst nur die aktivierten Fremdsysteme
+     */
+    public List<RemoteSystemDto> getAllRemoteSystems(boolean onlyEnabledRemoteSystems)
+    {
+        List<RemoteSystem> attachedRemoteSystems = new ArrayList<RemoteSystem>();
 
-			Iterable<RemoteSystem> remoteSystems = remoteSystemRepo.findByName(name);
-			if (remoteSystems.iterator().hasNext())
-			{
-				persistentRemoteSystem = remoteSystems.iterator().next();
-			}
+        try
+        {
+            if (!onlyEnabledRemoteSystems)
+            {
+                remoteSystemRepo.findAll().forEach(e -> attachedRemoteSystems.add(e));
+            }
+            else
+            {
+                remoteSystemRepo.findAllEnabledRemoteSystems().forEach(e -> attachedRemoteSystems.add(e));
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-			if (persistentRemoteSystem != null)
-			{
-				RemoteSystemDto result = remoteSystemMapper.mapToDto(persistentRemoteSystem);
+        AutoPopulatingList<RemoteSystemDto> result = new AutoPopulatingList<RemoteSystemDto>(
+                RemoteSystemDto.class);
 
-				return result;
-			}
+        for (RemoteSystem attachedRemoteSystem : attachedRemoteSystems)
+        {
+            result.add(remoteSystemMapper.mapToDto(attachedRemoteSystem));
+        }
 
-			return null;
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+        return result;
+    }
 
-		return null;
-	}
+    /**
+     * @param id
+     *            Id des Fremdsystems
+     * @return Das Fremdsystem, welches zur übergebenen Id gehört
+     */
+    public RemoteSystemDto getRemoteSystemById(Long id)
+    {
+        try
+        {
+            RemoteSystem persistentRemoteSystem = remoteSystemRepo.findOne(id);
 
-	/**
-	 * @param remoteSystemIds
-	 *            Liste mit IDs von Fremdsystemen
-	 * @return Liste mit zu den IDs gehörenden Fremdsystemen
-	 */
-	public List<RemoteSystemDto> getRemoteSystemsForIds(List<Long> remoteSystemIds)
-	{
-		List<RemoteSystemDto> result = new ArrayList<RemoteSystemDto>();
+            if (persistentRemoteSystem != null)
+            {
+                RemoteSystemDto result = remoteSystemMapper.mapToDto(persistentRemoteSystem);
 
-		try
-		{
-			Iterable<RemoteSystem> persistentRemoteSystems = remoteSystemRepo.findAll(remoteSystemIds);
-			for (RemoteSystem persistentRemoteSystem : persistentRemoteSystems)
-			{
-				result.add(remoteSystemMapper.mapToDto(persistentRemoteSystem));
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+                return result;
+            }
 
-		return result;
-	}
+            return null;
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-	/**
-	 * Speichert das zu übergebende Fremdsystem.
-	 * 
-	 * @param detachedRemoteSystem
-	 *            das zu speichernde Fremdsystem
-	 * @return Das gespeicherte Fremdsystem
-	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public RemoteSystemDto saveRemoteSystem(RemoteSystemDto detachedRemoteSystem)
-	{
-		try
-		{
-			RemoteSystem draftRemoteSystem = remoteSystemMapper.mapToEntity(detachedRemoteSystem);
+        return null;
+    }
 
-			RemoteSystem persistedRemoteSystem = remoteSystemRepo.save(draftRemoteSystem);
+    /**
+     * @param name
+     *            Name des Fremdsystems
+     * @return Das Fremdsystem, welches zum übergebenen Namen gehört
+     */
+    public RemoteSystemDto getRemoteSystemByName(String name)
+    {
+        try
+        {
+            RemoteSystem persistentRemoteSystem = null;
 
-			if (persistedRemoteSystem != null)
-			{
-				// auf Grund der Benutzerzuordnung alle Logins löschen und pro
-				// zugeordneten Benutzer neue
-				// anlegen
-				{
-					List<RemoteLoginDto> oldRemoteLogins = remoteLoginService
-							.findAllForRemoteSystemId(persistedRemoteSystem.getId());
+            Iterable<RemoteSystem> remoteSystems = remoteSystemRepo.findByName(name);
+            if (remoteSystems.iterator().hasNext())
+            {
+                persistentRemoteSystem = remoteSystems.iterator().next();
+            }
 
-					remoteLoginService.deleteRemoteLoginsForRemoteSystemId(persistedRemoteSystem.getId());
+            if (persistentRemoteSystem != null)
+            {
+                RemoteSystemDto result = remoteSystemMapper.mapToDto(persistentRemoteSystem);
 
-					for (Long userId : detachedRemoteSystem.getAssignedUserIdObjects())
-					{
-						RemoteLoginDto rl = new RemoteLoginDto();
-						rl.setEnabled(false);
-						rl.setUserId(userId.toString());
-						rl.setRemoteSystemId(Long.toString(persistedRemoteSystem.getId()));
+                return result;
+            }
 
-						RemoteLoginDto oldEntry = getRelatedOldRemoteLogin(oldRemoteLogins, userId);
+            return null;
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-						if (oldEntry != null)
-						{
-							rl.setEnabled(oldEntry.isEnabled());
-							rl.setRemoteSystemLoginName(oldEntry.getRemoteSystemLoginName());
-							rl.setRemoteSystemPassword(oldEntry.getRemoteSystemPassword());
-						}
+        return null;
+    }
 
-						remoteLoginService.save(rl);
-					}
+    /**
+     * @param remoteSystemIds
+     *            Liste mit IDs von Fremdsystemen
+     * @return Liste mit zu den IDs gehörenden Fremdsystemen
+     */
+    public List<RemoteSystemDto> getRemoteSystemsForIds(List<Long> remoteSystemIds)
+    {
+        List<RemoteSystemDto> result = new ArrayList<RemoteSystemDto>();
 
-					for (RemoteLoginDto oldRemoteLogin : oldRemoteLogins)
-					{
-						remoteLoginService.deleteForId(oldRemoteLogin.getId());
-					}
-				}
+        try
+        {
+            Iterable<RemoteSystem> persistentRemoteSystems = remoteSystemRepo.findAll(remoteSystemIds);
+            for (RemoteSystem persistentRemoteSystem : persistentRemoteSystems)
+            {
+                result.add(remoteSystemMapper.mapToDto(persistentRemoteSystem));
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-				RemoteSystemDto result = remoteSystemMapper.mapToDto(persistedRemoteSystem);
+        return result;
+    }
 
-				return result;
-			}
-			else
-			{
-				return null;
-			}
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
+    /**
+     * Speichert das zu übergebende Fremdsystem.
+     * 
+     * @param detachedRemoteSystem
+     *            das zu speichernde Fremdsystem
+     * @return Das gespeicherte Fremdsystem
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public RemoteSystemDto saveRemoteSystem(RemoteSystemDto detachedRemoteSystem)
+    {
+        try
+        {
+            RemoteSystem draftRemoteSystem = remoteSystemMapper.mapToEntity(detachedRemoteSystem);
 
-		return null;
-	}
+            RemoteSystem persistedRemoteSystem = remoteSystemRepo.save(draftRemoteSystem);
 
-	/**
-	 * Speichert die in der Liste enthaltenen Fremdsysteme.
-	 * 
-	 * @param detachedRemoteSystems
-	 *            Liste mit zu speichernden Fremdsystemen
-	 */
-	public void saveRemoteSystems(List<RemoteSystemDto> detachedRemoteSystems)
-	{
-		try
-		{
-			detachedRemoteSystems.forEach(e -> saveRemoteSystem(e));
-		}
-		catch (final Exception e)
-		{
-			logger.error(e);
-		}
-	}
+            if (persistedRemoteSystem != null)
+            {
+                // auf Grund der Benutzerzuordnung alle Logins löschen und pro
+                // zugeordneten Benutzer neue
+                // anlegen
+                {
+                    List<RemoteLoginDto> oldRemoteLogins = remoteLoginService
+                            .findAllForRemoteSystemId(persistedRemoteSystem.getId());
 
-	/**
-	 * Sucht einen Eintrag mit gleicher userId, gibt den Eintrag zurück und
-	 * löscht diesen dann in der List.
-	 * 
-	 * @param oldRemoteLogins
-	 *            Liste alter Fremdsystemlogins
-	 * @param userId
-	 *            BenutzerId
-	 * @return null, wenn Eintrag nicht gefunden wird, sonst Kopie des Eintrags
-	 */
-	private RemoteLoginDto getRelatedOldRemoteLogin(List<RemoteLoginDto> oldRemoteLogins, long userId)
-	{
-		for (RemoteLoginDto oldRemoteLogin : oldRemoteLogins)
-		{
-			if (userId == Long.parseLong(oldRemoteLogin.getUserId()))
-			{
-				RemoteLoginDto result = oldRemoteLogin.copy();
-				oldRemoteLogins.remove(oldRemoteLogin);
+                    remoteLoginService.deleteRemoteLoginsForRemoteSystemId(persistedRemoteSystem.getId());
 
-				return result;
-			}
-		}
+                    for (Long userId : detachedRemoteSystem.getAssignedUserIdObjects())
+                    {
+                        RemoteLoginDto rl = new RemoteLoginDto();
+                        rl.setEnabled(false);
+                        rl.setUserId(userId.toString());
+                        rl.setRemoteSystemId(Long.toString(persistedRemoteSystem.getId()));
 
-		return null;
-	}
+                        RemoteLoginDto oldEntry = getRelatedOldRemoteLogin(oldRemoteLogins, userId);
 
-	/**
-	 * @param userId
-	 *            Id des Nutzers, für welchen die Anmeldung an Fremdsystemen
-	 *            durchgeführt werden soll.
-	 */
-	public void doRemoteLogin(final long userId)
-	{
-		HttpURLConnection connection = null;
-		try
-		{
-			List<RemoteLoginDto> enabledRemoteLogins = remoteLoginService.getEnabledRemoteLoginsForUserId(userId);
+                        if (oldEntry != null)
+                        {
+                            rl.setEnabled(oldEntry.isEnabled());
+                            rl.setRemoteSystemLoginName(oldEntry.getRemoteSystemLoginName());
+                            rl.setRemoteSystemPassword(oldEntry.getRemoteSystemPassword());
+                        }
 
-			for (RemoteLoginDto enabledRemoteLogin : enabledRemoteLogins)
-			{
-				final String login = enabledRemoteLogin.getRemoteSystemLoginName();
-				final String password = enabledRemoteLogin.getRemoteSystemPassword();
+                        remoteLoginService.save(rl);
+                    }
 
-				RemoteSystemDto remoteSystem = getRemoteSystemById(Long.parseLong(enabledRemoteLogin.getRemoteSystemId()));
+                    for (RemoteLoginDto oldRemoteLogin : oldRemoteLogins)
+                    {
+                        remoteLoginService.deleteForId(oldRemoteLogin.getId());
+                    }
+                }
 
-				if (remoteSystem.isEnabled())
-				{
-					final StringBuilder parameterContent = new StringBuilder();
-					parameterContent.append(remoteSystem.getLoginParameter());
-					parameterContent.append("=");
-					parameterContent.append(login);
-					parameterContent.append("&");
-					parameterContent.append(remoteSystem.getPasswordParameter());
-					parameterContent.append("=");
-					parameterContent.append(password);
+                RemoteSystemDto result = remoteSystemMapper.mapToDto(persistedRemoteSystem);
 
-					connection = (HttpURLConnection) new URL(remoteSystem.getLoginUrl()).openConnection();
-					connection.setRequestMethod("POST");
-					connection.setDoOutput(true);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
 
-					DataOutputStream request = new DataOutputStream(connection.getOutputStream());
-					request.writeBytes(parameterContent.toString());
-					request.flush();
-					request.close();
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			logger.error("Remote Login failed", ex);
-		}
-		finally
-		{
-			if (connection != null)
-			{
-				connection.disconnect();
-			}
-		}
-	}
+        return null;
+    }
+
+    /**
+     * Speichert die in der Liste enthaltenen Fremdsysteme.
+     * 
+     * @param detachedRemoteSystems
+     *            Liste mit zu speichernden Fremdsystemen
+     */
+    public void saveRemoteSystems(List<RemoteSystemDto> detachedRemoteSystems)
+    {
+        try
+        {
+            detachedRemoteSystems.forEach(e -> saveRemoteSystem(e));
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+    }
+
+    /**
+     * Sucht einen Eintrag mit gleicher userId, gibt den Eintrag zurück und löscht diesen dann in der List.
+     * 
+     * @param oldRemoteLogins
+     *            Liste alter Fremdsystemlogins
+     * @param userId
+     *            BenutzerId
+     * @return null, wenn Eintrag nicht gefunden wird, sonst Kopie des Eintrags
+     */
+    private RemoteLoginDto getRelatedOldRemoteLogin(List<RemoteLoginDto> oldRemoteLogins, long userId)
+    {
+        for (RemoteLoginDto oldRemoteLogin : oldRemoteLogins)
+        {
+            if (userId == Long.parseLong(oldRemoteLogin.getUserId()))
+            {
+                RemoteLoginDto result = oldRemoteLogin.copy();
+                oldRemoteLogins.remove(oldRemoteLogin);
+
+                return result;
+            }
+        }
+
+        return null;
+    }
 }

@@ -23,8 +23,7 @@ import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
 /**
- * Controller zur Bearbeitung von Requests der Startseite des Features
- * Administration.
+ * Controller zur Bearbeitung von Requests der Startseite des Features Administration.
  * 
  * @author arndtmar
  *
@@ -33,58 +32,54 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 @Controller
 public class MainController
 {
-	static final Logger logger = LogManager.getLogger(MainController.class.getName());
+    static final Logger         logger = LogManager.getLogger(MainController.class.getName());
 
-	@Autowired
-	private ClientService		clientService;
-	@Autowired
-	UserService					userService;
-	@Autowired
-	private AuthenticationUtil	authUtil;
-	@Autowired
-	private RemoteSystemService	remoteSystemService;
-	@Autowired
-	private ApplicationUtil		util;
+    @Autowired
+    private ClientService       clientService;
+    @Autowired
+    UserService                 userService;
+    @Autowired
+    private AuthenticationUtil  authUtil;
+    @Autowired
+    private RemoteSystemService remoteSystemService;
+    @Autowired
+    private ApplicationUtil     util;
 
-	public MainController()
-	{
-	}
+    public MainController()
+    {}
 
-	@RequestMapping(value = "/changeClient", method = RequestMethod.POST)
-	public String changeClient(@ModelAttribute("selectedClient") Long selectedClient)
-	{
-		authUtil.setSelectedClientWithNewAuthority(clientService.getClient(selectedClient));
-		authUtil.setSelectedFeature(null);
-		return "/main";
-	}
+    @RequestMapping(value = "/changeClient", method = RequestMethod.POST)
+    public String changeClient(@ModelAttribute("selectedClient") Long selectedClient)
+    {
+        authUtil.setSelectedClientWithNewAuthority(clientService.getClient(selectedClient));
+        authUtil.setSelectedFeature(null);
+        return "/main";
+    }
 
-	@RequestMapping(value = "/main/tooglemenue/true", method = RequestMethod.GET)
-	public void hideMenu()
-	{
-		util.setMenuMinimized(true);
-	}
+    @RequestMapping(value = "/main/tooglemenue/true", method = RequestMethod.GET)
+    public void hideMenu()
+    {
+        util.setMenuMinimized(true);
+    }
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String loginOk(HttpServletRequest request, HttpServletResponse response)
-	{
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String loginOk(HttpServletRequest request, HttpServletResponse response)
+    {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-		authUtil.setSelectedFeature(null);
-		UserDto user = userService.getUserByLogin(auth.getName());
-		ClientDto defaultClient = userService.getDefaultClientForUser(user);
-		authUtil.setSelectedClient(defaultClient);
+        authUtil.setSelectedFeature(null);
+        UserDto user = userService.getUserByLogin(auth.getName());
+        ClientDto defaultClient = userService.getDefaultClientForUser(user);
+        authUtil.setSelectedClient(defaultClient);
 
-		// Anmeldung an Fremdsystemen
-		new Thread(() -> {
-			remoteSystemService.doRemoteLogin(user.getId());
-		});
+        remoteSystemService.doRemoteLogin(user.getId());
 
-		return "/main";
-	}
+        return "/main";
+    }
 
-	@RequestMapping(value = "/main/tooglemenue/false", method = RequestMethod.GET)
-	public void showMenu()
-	{
-		util.setMenuMinimized(false);
-	}
+    @RequestMapping(value = "/main/tooglemenue/false", method = RequestMethod.GET)
+    public void showMenu()
+    {
+        util.setMenuMinimized(false);
+    }
 }
