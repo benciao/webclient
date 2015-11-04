@@ -2,14 +2,16 @@ package com.ecg.webclient.feature.administration.service;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +81,6 @@ public class RemoteSystemService
      */
     public void doRemoteLogin(final long userId)
     {
-        HttpURLConnection connection = null;
         try
         {
             // make sure cookies is turn on
@@ -98,53 +99,23 @@ public class RemoteSystemService
 
                 if (remoteSystem.isEnabled())
                 {
-                    Map<String, Object> params = new LinkedHashMap<>();
-                    params.put(remoteSystem.getLoginParameter(), login);
-                    params.put(remoteSystem.getPasswordParameter(), password);
+                    HttpClient client = new DefaultHttpClient();
+                    HttpPost post = new HttpPost(remoteSystem.getLoginUrl());
 
-                    StringBuilder postData = new StringBuilder();
-                    for (Map.Entry<String, Object> param : params.entrySet())
-                    {
-                        if (postData.length() != 0)
-                        {
-                            postData.append('&');
+                    post.setHeader("User-Agent", "Mozilla/5.0");
 
-                        }
-                        postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-                        postData.append('=');
-                        postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
-                    }
-                    byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+                    List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
+                    urlParameters.add(new BasicNameValuePair(remoteSystem.getLoginParameter(), login));
+                    urlParameters.add(new BasicNameValuePair(remoteSystem.getPasswordParameter(), password));
 
-                    URL url = new URL(remoteSystem.getLoginUrl());
-
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                    conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
-                    conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-                    conn.setRequestProperty("Accept",
-                            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-                    conn.setDoOutput(true);
-                    conn.setDoInput(true);
-                    conn.setUseCaches(false);
-                    conn.getOutputStream().write(postDataBytes);
-
-                    conn.getOutputStream().flush();
-                    conn.getOutputStream().close();
+                    post.setEntity(new UrlEncodedFormEntity(urlParameters));
+                    HttpResponse response = client.execute(post);
                 }
             }
         }
         catch (Exception ex)
         {
             logger.error("Remote Login failed", ex);
-        }
-        finally
-        {
-            if (connection != null)
-            {
-                connection.disconnect();
-            }
         }
     }
 
