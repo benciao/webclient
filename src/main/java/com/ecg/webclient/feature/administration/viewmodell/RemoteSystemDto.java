@@ -19,6 +19,7 @@ public class RemoteSystemDto extends BaseObjectDto
     private String  passwordParameter;
     private String  logoutUrl;
     private String  assignedUserIds;
+    private boolean doPostRequest;
 
     public RemoteSystemDto()
     {}
@@ -75,6 +76,11 @@ public class RemoteSystemDto extends BaseObjectDto
         return passwordParameter;
     }
 
+    public boolean isDoPostRequest()
+    {
+        return doPostRequest;
+    }
+
     public boolean isEnabled()
     {
         return enabled;
@@ -88,6 +94,11 @@ public class RemoteSystemDto extends BaseObjectDto
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public void setDoPostRequest(boolean doPostRequest)
+    {
+        this.doPostRequest = doPostRequest;
     }
 
     public void setEnabled(boolean enabled)

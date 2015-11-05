@@ -18,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import com.ecg.webclient.feature.administration.authentication.RemoteLoginInterceptor;
 import com.ecg.webclient.feature.administration.viewmodell.formatter.CustomDateFormatter;
 
 @Configuration
@@ -30,6 +31,9 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter
     @Autowired
     private CustomDateFormatter dateFormatter;
 
+    @Autowired
+    private RemoteLoginInterceptor remoteLoginInterceptor;
+
     @Override
     public void addFormatters(FormatterRegistry registry)
     {
@@ -40,6 +44,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter
     public void addInterceptors(InterceptorRegistry registry)
     {
         registry.addInterceptor(localeChangeInterceptor());
+        registry.addInterceptor(remoteLoginInterceptor).addPathPatterns("/");
     }
 
     @Override

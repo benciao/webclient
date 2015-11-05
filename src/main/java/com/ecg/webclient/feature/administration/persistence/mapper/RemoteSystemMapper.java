@@ -49,6 +49,7 @@ public class RemoteSystemMapper
         dto.setPasswordParameter(rm.getPasswordParameter());
         dto.setLogoutUrl(rm.getLogoutUrl());
         dto.setAssignedUserIds(getAssignedUsers(rm.getId()));
+        dto.setDoPostRequest(rm.isDoPostRequest());
 
         return dto;
     }
@@ -103,6 +104,7 @@ public class RemoteSystemMapper
         entity.setLoginParameter(dto.getLoginParameter());
         entity.setPasswordParameter(dto.getPasswordParameter());
         entity.setLogoutUrl(dto.getLogoutUrl());
+        entity.setDoPostRequest(dto.isDoPostRequest());
 
         RemoteSystem remoteSystem = remoteSystemRepo.findOne(entity.getId());
         if (remoteSystem != null)

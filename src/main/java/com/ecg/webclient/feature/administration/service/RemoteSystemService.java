@@ -5,12 +5,16 @@ import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,14 +80,18 @@ public class RemoteSystemService
     }
 
     /**
+     * Meldet den zur übergebenen Id gehörenden Benutzer an die für ihn konfigurierten Fremdsysteme an.
+     * 
      * @param userId
      *            Id des Nutzers, für welchen die Anmeldung an Fremdsystemen durchgeführt werden soll.
+     * @return Liste mit den generierten Cookies
      */
-    public void doRemoteLogin(final long userId)
+    public List<Cookie> doRemoteLogin(final long userId)
     {
+        List<Cookie> result = new ArrayList<Cookie>();
+
         try
         {
-            // make sure cookies is turn on
             CookieHandler.setDefault(new CookieManager());
 
             List<RemoteLoginDto> enabledRemoteLogins = remoteLoginService
@@ -99,17 +107,57 @@ public class RemoteSystemService
 
                 if (remoteSystem.isEnabled())
                 {
-                    HttpClient client = new DefaultHttpClient();
-                    HttpPost post = new HttpPost(remoteSystem.getLoginUrl());
-
-                    post.setHeader("User-Agent", "Mozilla/5.0");
+                    CloseableHttpClient client = null;
+                    CloseableHttpResponse response = null;
 
                     List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
                     urlParameters.add(new BasicNameValuePair(remoteSystem.getLoginParameter(), login));
                     urlParameters.add(new BasicNameValuePair(remoteSystem.getPasswordParameter(), password));
 
-                    post.setEntity(new UrlEncodedFormEntity(urlParameters));
-                    HttpResponse response = client.execute(post);
+                    try
+                    {
+                        client = HttpClients.createDefault();
+                        HttpClientContext context = HttpClientContext.create();
+
+                        if (remoteSystem.isDoPostRequest())
+                        {
+                            HttpPost request = new HttpPost(remoteSystem.getLoginUrl());
+                            request.setEntity(new UrlEncodedFormEntity(urlParameters));
+                            response = client.execute(request, context);
+                        }
+                        else
+                        {
+                            String url = remoteSystem.getLoginUrl();
+
+                            for (NameValuePair pair : urlParameters)
+                            {
+                                if (!url.contains("?"))
+                                {
+                                    url = url + "?";
+                                }
+                                else
+                                {
+                                    url = url + "&";
+                                }
+                                url = url + pair.getName() + "=" + pair.getValue();
+                            }
+
+                            HttpGet request = new HttpGet(url);
+                            response = client.execute(request, context);
+                        }
+
+                        CookieStore cookieStore = context.getCookieStore();
+                        List<Cookie> cookies = cookieStore.getCookies();
+
+                        result.addAll(cookies);
+                    }
+                    finally
+                    {
+                        if (response != null)
+                        {
+                            response.close();
+                        }
+                    }
                 }
             }
         }
@@ -117,6 +165,8 @@ public class RemoteSystemService
         {
             logger.error("Remote Login failed", ex);
         }
+
+        return result;
     }
 
     /**

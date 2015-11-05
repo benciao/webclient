@@ -72,8 +72,6 @@ public class MainController
         ClientDto defaultClient = userService.getDefaultClientForUser(user);
         authUtil.setSelectedClient(defaultClient);
 
-        remoteSystemService.doRemoteLogin(user.getId());
-
         return "/main";
     }
 

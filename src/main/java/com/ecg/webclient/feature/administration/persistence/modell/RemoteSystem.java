@@ -18,14 +18,15 @@ public class RemoteSystem
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long              id;
-    private String            name;
-    private String            description;
-    private boolean           enabled;
-    private String            loginUrl;
-    private String            loginParameter;
-    private String            passwordParameter;
-    private String            logoutUrl;
+    private long    id;
+    private String  name;
+    private String  description;
+    private boolean enabled;
+    private String  loginUrl;
+    private String  loginParameter;
+    private String  passwordParameter;
+    private String  logoutUrl;
+    private boolean doPostRequest;
 
     public RemoteSystem()
     {}
@@ -40,6 +41,7 @@ public class RemoteSystem
         setLoginParameter(newRemoteSystem.getLoginParameter());
         setPasswordParameter(newRemoteSystem.getPasswordParameter());
         setLogoutUrl(newRemoteSystem.getLogoutUrl());
+        setDoPostRequest(newRemoteSystem.isDoPostRequest());
 
         return this;
     }
@@ -171,6 +173,11 @@ public class RemoteSystem
         return result;
     }
 
+    public boolean isDoPostRequest()
+    {
+        return doPostRequest;
+    }
+
     public boolean isEnabled()
     {
         return enabled;
@@ -179,6 +186,11 @@ public class RemoteSystem
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public void setDoPostRequest(boolean doPostRequest)
+    {
+        this.doPostRequest = doPostRequest;
     }
 
     public void setEnabled(boolean enabled)

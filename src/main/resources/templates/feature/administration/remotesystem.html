@@ -181,6 +181,22 @@
 													.val(value);
 										});
 
+						$("#remoteSystemRequestMethod")
+								.change(
+										function(event, state) {
+											var rowIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var value = $(
+													"#remoteSystemRequestMethod")
+													.val();
+
+											$(
+													"#hiddenRequestMethod-"
+															+ rowIndex).val(
+													value);
+										});
+
 						$('#buttonRemoteSystemEditDone').click(function(event) {
 
 							$("#remoteSystemEditPanel").modal('hide');
@@ -249,7 +265,7 @@
 													.removeClass("disabled");
 										});
 					});
-	
+
 	function isUserAssigned(rid, assignedRids) {
 		var ridsArray = assignedRids.split(",");
 
@@ -264,18 +280,23 @@
 
 	function editOnClick(event) {
 		var collectionIndex = $(event.target).parent().attr('id').split("-");
-		
+
 		var assignedUserRids = $("#hiddenUserRids-" + collectionIndex[1]).val();
-		
+
 		// bereits zugeordnete Benutzer initialisieren
-		$("tr.userItem").each(
-				function() {
-					var userRid = $(this).find("input.hiddenUserRid").val();
+		$("tr.userItem")
+				.each(
+						function() {
+							var userRid = $(this).find("input.hiddenUserRid")
+									.val();
 
-					$(this).find("input.assignmentSwitch").bootstrapSwitch('state',
-							isUserAssigned(userRid, assignedUserRids));
+							$(this).find("input.assignmentSwitch")
+									.bootstrapSwitch(
+											'state',
+											isUserAssigned(userRid,
+													assignedUserRids));
 
-				});
+						});
 
 		var remoteSystemName = $("#name-" + collectionIndex[1]).val();
 
@@ -299,6 +320,16 @@
 		// Logout-URL setzen
 		var urlLogoutValue = $("#hiddenLogoutUrl-" + collectionIndex[1]).val();
 		$("#remoteSystemLogoutUrl").val(urlLogoutValue);
+
+		// Request-Methode setzen
+		var requestMethodValue = $("#hiddenRequestMethod-" + collectionIndex[1])
+				.val();
+
+		if (requestMethodValue) {
+			$("#remoteSystemRequestMethod").val(requestMethodValue);
+		} else {
+			$("#remoteSystemRequestMethod").val("true");
+		}
 
 		$("#remoteSystemEditPanel").modal('show');
 
@@ -446,7 +477,9 @@ body {
 									th:id="${'hiddenPasswordParameter-'+stat.index}"
 									th:field="*{remoteSystems[__${stat.index}__].passwordParameter}" />
 									<input type="hidden" th:id="${'hiddenLogoutUrl-'+stat.index}"
-									th:field="*{remoteSystems[__${stat.index}__].logoutUrl}" />
+									th:field="*{remoteSystems[__${stat.index}__].logoutUrl}" /> <input
+									type="hidden" th:id="${'hiddenRequestMethod-'+stat.index}"
+									th:field="*{remoteSystems[__${stat.index}__].doPostRequest}" />
 									<input type="hidden" th:id="${'hiddenUserRids-'+stat.index}"
 									th:field="*{remoteSystems[__${stat.index}__].assignedUserIds}" /></td>
 							</tr>
@@ -519,6 +552,22 @@ body {
 															<input type="text" class="form-control"
 																id="remoteSystemLogoutUrl"
 																th:placeholder="#{remoteSystemLogoutUrlLabel}" />
+														</div>
+													</div>
+												</li>
+												<li class="list-group-item">
+													<div>
+														<label class="control-label"> <span
+															th:text="#{remoteSystemRequestMethodLabel}"></span>
+														</label>
+														<div>
+															<select class="form-control"
+																id="remoteSystemRequestMethod">
+																<option value="true"
+																	th:text="#{remoteSystemRequestMethodPost}"></option>
+																<option value="false"
+																	th:text="#{remoteSystemRequestMethodGet}"></option>
+															</select>
 														</div>
 													</div>
 												</li>
