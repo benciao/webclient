@@ -2,27 +2,22 @@ package com.ecg.webclient.feature.administration.viewmodell.validator;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import com.ecg.webclient.feature.administration.service.ClientService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientProperties;
-import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
+import com.ecg.webclient.feature.administration.viewmodell.ClientPropertyDto;
 
 /**
  * Dieser Validator prüft die Eingaben für ein Objekt vom Typ
- * {@link PropertyDto}.
+ * {@link ClientPropertyDto}.
  * 
  * @author arndtmar
  */
 @Component
-public class PropertyDtoValidator implements Validator
+public class ClientPropertyDtoValidator implements Validator
 {
-	@Autowired
-	ClientService clientService;
-
 	@Override
 	public boolean supports(Class<?> clazz)
 	{
@@ -32,15 +27,12 @@ public class PropertyDtoValidator implements Validator
 	@Override
 	public void validate(Object object, Errors errors)
 	{
-		List<PropertyDto> properties = ((ClientProperties) object).getProperties();
-
-		List<PropertyDto> persistedProperties = clientService.getClient(((ClientProperties) object).getClientId())
-				.getProperties();
+		List<ClientPropertyDto> properties = ((ClientProperties) object).getProperties();
 
 		int counter = 0;
-		for (PropertyDto property : properties)
+		for (ClientPropertyDto property : properties)
 		{
-			if (property.getId() == -1 && propertyKeyExists(persistedProperties, property))
+            if (propertyKeyExists(properties, property))
 			{
 				errors.rejectValue("properties[" + counter + "].key", "property.rejected.duplicated.key");
 			}
@@ -58,11 +50,12 @@ public class PropertyDtoValidator implements Validator
 		}
 	}
 
-	private boolean propertyKeyExists(List<PropertyDto> persistedProperties, PropertyDto property)
+	private boolean propertyKeyExists(List<ClientPropertyDto> persistedProperties, ClientPropertyDto property)
 	{
-		for (PropertyDto persistedProperty : persistedProperties)
+		for (ClientPropertyDto persistedProperty : persistedProperties)
 		{
-			if (persistedProperty.getKey().equals(property.getKey()))
+            if (persistedProperty.getKey().equals(property.getKey())
+                    && persistedProperty.getId() != property.getId())
 			{
 				return true;
 			}

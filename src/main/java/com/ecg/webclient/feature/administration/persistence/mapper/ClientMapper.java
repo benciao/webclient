@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
-import com.ecg.webclient.feature.administration.persistence.modell.Property;
 import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 
@@ -23,8 +22,6 @@ public class ClientMapper
 {
     @Autowired
     ClientRepository clientRepo;
-    @Autowired
-    PropertyMapper   propertyMapper;
 
     /**
      * Wandelt einen attachten Mandanten in einen detachten um.
@@ -44,11 +41,6 @@ public class ClientMapper
             dto.setEnabled(client.isEnabled());
             dto.setDelete(false);
             dto.setId(client.getId());
-
-            for (Property property : client.getProperties())
-            {
-                dto.getProperties().add(propertyMapper.mapToDto(property));
-            }
 
             return dto;
         }
@@ -107,7 +99,6 @@ public class ClientMapper
             client.setDescription(dto.getDescription());
             client.setName(dto.getName());
             client.setEnabled(dto.isEnabled());
-            dto.getProperties().forEach(p -> client.getProperties().add(propertyMapper.mapToEntity(p)));
 
             Client persistentClient = clientRepo.findOne(client.getId());
             if (persistentClient != null)

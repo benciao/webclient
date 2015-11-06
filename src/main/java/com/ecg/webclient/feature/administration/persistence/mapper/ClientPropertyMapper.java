@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.persistence.modell.Property;
-import com.ecg.webclient.feature.administration.persistence.repo.PropertyRepository;
-import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
+import com.ecg.webclient.feature.administration.persistence.modell.ClientProperty;
+import com.ecg.webclient.feature.administration.persistence.repo.ClientPropertyRepository;
+import com.ecg.webclient.feature.administration.viewmodell.ClientPropertyDto;
 
 /**
  * Mapped die Eigenschaften einer der Persistenz bekannten Entität auf eine detachted Eigenschaft oder
@@ -18,10 +18,12 @@ import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
  * @author arndtmar
  */
 @Component
-public class PropertyMapper
+public class ClientPropertyMapper
 {
     @Autowired
-    PropertyRepository propertyRepo;
+    ClientPropertyRepository propertyRepo;
+    @Autowired
+    ClientMapper             clientMapper;
 
     /**
      * Wandelt eine attachte Eigenschaft in eine detachte um.
@@ -30,13 +32,14 @@ public class PropertyMapper
      *            attachte Eigenschaft
      * @return Detachete Eigenschaft
      */
-    public PropertyDto mapToDto(Property property)
+    public ClientPropertyDto mapToDto(ClientProperty property)
     {
-        PropertyDto dto = new PropertyDto();
+        ClientPropertyDto dto = new ClientPropertyDto();
         dto.setKey(property.getKey());
         dto.setValue(property.getValue());
         dto.setId(property.getId());
         dto.setDelete(false);
+        dto.setClient(clientMapper.mapToDto(property.getClient()));
 
         return dto;
     }
@@ -48,9 +51,9 @@ public class PropertyMapper
      *            Liste von attachten Eigenschaften
      * @return Liste von detachten Eigenschaften
      */
-    public List<PropertyDto> mapToDtos(List<Property> properties)
+    public List<ClientPropertyDto> mapToDtos(List<ClientProperty> properties)
     {
-        List<PropertyDto> result = new AutoPopulatingList<PropertyDto>(PropertyDto.class);
+        List<ClientPropertyDto> result = new AutoPopulatingList<ClientPropertyDto>(ClientPropertyDto.class);
 
         properties.forEach(e -> result.add(mapToDto(e)));
 
@@ -64,9 +67,9 @@ public class PropertyMapper
      *            Liste von detachten Eigenschaften
      * @return Liste von attachten Eigenschaften
      */
-    public List<Property> mapToEntities(List<PropertyDto> dtos)
+    public List<ClientProperty> mapToEntities(List<ClientPropertyDto> dtos)
     {
-        List<Property> result = new ArrayList<Property>();
+        List<ClientProperty> result = new ArrayList<ClientProperty>();
 
         dtos.forEach(e -> result.add(mapToEntity(e)));
 
@@ -80,14 +83,15 @@ public class PropertyMapper
      *            Detachte Eigenschaft
      * @return attachte Eigenschaft
      */
-    public Property mapToEntity(PropertyDto dto)
+    public ClientProperty mapToEntity(ClientPropertyDto dto)
     {
-        Property property = new Property();
+        ClientProperty property = new ClientProperty();
         property.setId(dto.getId());
         property.setKey(dto.getKey());
         property.setValue(dto.getValue());
+        property.setClient(clientMapper.mapToEntity(dto.getClient()));
 
-        Property persistentProperty = propertyRepo.findOne(property.getId());
+        ClientProperty persistentProperty = propertyRepo.findOne(property.getId());
         if (persistentProperty != null)
         {
             return persistentProperty.bind(property);

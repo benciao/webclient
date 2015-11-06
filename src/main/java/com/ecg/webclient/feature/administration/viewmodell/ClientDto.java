@@ -1,8 +1,5 @@
 package com.ecg.webclient.feature.administration.viewmodell;
 
-import java.util.List;
-
-import org.springframework.util.AutoPopulatingList;
 
 /**
  * Implementierung eines von der Persistenz detachten Mandanten.
@@ -16,7 +13,6 @@ public class ClientDto extends BaseObjectDto
     private String            description;
     private String            name;
     private boolean           enabled;
-    private List<PropertyDto> properties;
     private boolean           selected;
 
     public ClientDto()
@@ -35,15 +31,6 @@ public class ClientDto extends BaseObjectDto
     public String getName()
     {
         return name;
-    }
-
-    public List<PropertyDto> getProperties()
-    {
-        if (properties == null)
-        {
-            properties = new AutoPopulatingList<PropertyDto>(PropertyDto.class);
-        }
-        return properties;
     }
 
     public boolean isEnabled()
@@ -74,11 +61,6 @@ public class ClientDto extends BaseObjectDto
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public void setProperties(List<PropertyDto> properties)
-    {
-        this.properties = properties;
     }
 
     public void setSelected(boolean selected)

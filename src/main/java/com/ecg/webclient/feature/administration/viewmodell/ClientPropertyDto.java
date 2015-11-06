@@ -6,7 +6,7 @@ package com.ecg.webclient.feature.administration.viewmodell;
  * 
  * @author arndtmar
  */
-public class PropertyDto extends BaseObjectDto
+public class ClientPropertyDto extends BaseObjectDto
 {
     private String    key;
     private String    value;

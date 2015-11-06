@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -13,23 +14,27 @@ import javax.persistence.Transient;
  * @author arndtmar
  */
 @Entity
-@Table(name = "SEC_PROPERTY")
-public class Property
+@Table(name = "SEC_CLIENT_PROPERTY")
+public class ClientProperty
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long   id;
     private String prop_key;
     private String prop_value;
+    @ManyToOne
+    private Client client;
 
-    public Property()
+    public ClientProperty()
     {}
 
     @Transient
-    public Property bind(Property newProperty)
+    public ClientProperty bind(ClientProperty newProperty)
     {
         setKey(newProperty.getKey());
         setValue(newProperty.getValue());
+        setClient(client);
+        newProperty.getClient();
 
         return this;
     }
@@ -45,11 +50,11 @@ public class Property
         {
             return false;
         }
-        if (!(obj instanceof Property))
+        if (!(obj instanceof ClientProperty))
         {
             return false;
         }
-        Property other = (Property) obj;
+        ClientProperty other = (ClientProperty) obj;
         if (id != other.id)
         {
             return false;
@@ -79,6 +84,11 @@ public class Property
         return true;
     }
 
+    public Client getClient()
+    {
+        return client;
+    }
+
     public long getId()
     {
         return id;
@@ -103,6 +113,11 @@ public class Property
         result = prime * result + ((prop_key == null) ? 0 : prop_key.hashCode());
         result = prime * result + ((prop_value == null) ? 0 : prop_value.hashCode());
         return result;
+    }
+
+    public void setClient(Client client)
+    {
+        this.client = client;
     }
 
     public void setId(long id)

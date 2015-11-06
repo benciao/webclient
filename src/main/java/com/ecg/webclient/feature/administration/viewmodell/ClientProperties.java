@@ -9,44 +9,33 @@ import org.springframework.util.AutoPopulatingList;
 
 public class ClientProperties
 {
-	@Valid
-	private List<PropertyDto>	properties;
-	private long				clientId;
+    @Valid
+    private List<ClientPropertyDto> properties;
 
-	public List<PropertyDto> getProperties()
-	{
-		if (properties == null)
-		{
-			properties = new AutoPopulatingList<PropertyDto>(PropertyDto.class);
-		}
-		return properties;
-	}
+    public List<ClientPropertyDto> getProperties()
+    {
+        if (properties == null)
+        {
+            properties = new AutoPopulatingList<ClientPropertyDto>(ClientPropertyDto.class);
+        }
+        return properties;
+    }
 
-	public void removeDeleted()
-	{
-		List<PropertyDto> propertiesToRemove = new ArrayList<PropertyDto>();
-		for (PropertyDto property : properties)
-		{
-			if (property.isDelete())
-			{
-				propertiesToRemove.add(property);
-			}
-		}
-		properties.removeAll(propertiesToRemove);
-	}
+    public void removeDeleted()
+    {
+        List<ClientPropertyDto> propertiesToRemove = new ArrayList<ClientPropertyDto>();
+        for (ClientPropertyDto property : properties)
+        {
+            if (property.isDelete())
+            {
+                propertiesToRemove.add(property);
+            }
+        }
+        properties.removeAll(propertiesToRemove);
+    }
 
-	public void setProperties(List<PropertyDto> properties)
-	{
-		this.properties = properties;
-	}
-
-	public long getClientId()
-	{
-		return clientId;
-	}
-
-	public void setClientId(long clientId)
-	{
-		this.clientId = clientId;
-	}
+    public void setProperties(List<ClientPropertyDto> properties)
+    {
+        this.properties = properties;
+    }
 }

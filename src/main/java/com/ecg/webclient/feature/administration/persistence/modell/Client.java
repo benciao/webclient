@@ -1,16 +1,10 @@
 package com.ecg.webclient.feature.administration.persistence.modell;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -25,15 +19,12 @@ public class Client
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long           id;
-    private String         color;
-    private String         description;
+    private long                 id;
+    private String               color;
+    private String               description;
     @Column(unique = true)
-    private String         name;
-    private boolean        enabled;
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "client_id")
-    private List<Property> properties;
+    private String               name;
+    private boolean              enabled;
 
     public Client()
     {}
@@ -45,7 +36,6 @@ public class Client
         setName(newClient.getName());
         setDescription(newClient.getDescription());
         setEnabled(newClient.isEnabled());
-        setProperties(newClient.getProperties());
 
         return this;
     }
@@ -115,15 +105,6 @@ public class Client
         return name;
     }
 
-    public List<Property> getProperties()
-    {
-        if (properties == null)
-        {
-            properties = new ArrayList<Property>();
-        }
-        return properties;
-    }
-
     @Override
     public int hashCode()
     {
@@ -166,10 +147,5 @@ public class Client
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public void setProperties(List<Property> properties)
-    {
-        this.properties = properties;
     }
 }

@@ -13,40 +13,35 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AutoPopulatingList;
 
 import com.ecg.webclient.feature.administration.persistence.mapper.ClientMapper;
-import com.ecg.webclient.feature.administration.persistence.mapper.PropertyMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.Client;
 import com.ecg.webclient.feature.administration.persistence.modell.Group;
-import com.ecg.webclient.feature.administration.persistence.modell.Property;
+import com.ecg.webclient.feature.administration.persistence.repo.ClientPropertyRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
-import com.ecg.webclient.feature.administration.persistence.repo.PropertyRepository;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
-import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
 
 /**
- * Service zum Bearbeiten von Mandanten und deren Eigenschaften.
+ * Service zum Bearbeiten von Mandanten.
  * 
  * @author arndtmar
  */
 @Component
 public class ClientService
 {
-    static final Logger logger = LogManager.getLogger(ClientService.class.getName());
+    static final Logger      logger = LogManager.getLogger(ClientService.class.getName());
 
-    ClientRepository    clientRepo;
-    PropertyRepository  propertyRepo;
-    GroupRepository     groupRepo;
-    PropertyMapper      propertyMapper;
-    ClientMapper        clientMapper;
+    ClientRepository         clientRepo;
+    ClientPropertyRepository propertyRepo;
+    GroupRepository          groupRepo;
+    ClientMapper             clientMapper;
 
     @Autowired
-    public ClientService(PropertyRepository propertyRepo, GroupRepository groupRepo,
-            ClientRepository clientRepo, PropertyMapper propertyMapper, ClientMapper clientMapper)
+    public ClientService(ClientPropertyRepository propertyRepo, GroupRepository groupRepo,
+            ClientRepository clientRepo, ClientMapper clientMapper)
     {
         this.propertyRepo = propertyRepo;
         this.groupRepo = groupRepo;
         this.clientRepo = clientRepo;
-        this.propertyMapper = propertyMapper;
         this.clientMapper = clientMapper;
     }
 
@@ -56,6 +51,7 @@ public class ClientService
      * @param detachedClients
      *            Liste von zu löschenden Mandanten
      */
+    @Transactional
     public void deleteClients(List<ClientDto> detachedClients)
     {
         try
@@ -67,32 +63,7 @@ public class ClientService
                 if (persistentClient != null)
                 {
                     clientRepo.delete(persistentClient);
-                }
-            }
-        }
-        catch (final Exception e)
-        {
-            logger.error(e);
-        }
-    }
-
-    /**
-     * Löscht alle in der Liste enthaltenen Mandanteneigenschaften.
-     * 
-     * @param detachedProperties
-     *            Liste von Mandanteneigenschaften
-     */
-    public void deleteProperties(List<PropertyDto> detachedProperties)
-    {
-        try
-        {
-            for (PropertyDto property : detachedProperties)
-            {
-                Property persistentProperty = propertyRepo.findOne(property.getId());
-
-                if (persistentProperty != null)
-                {
-                    propertyRepo.delete(persistentProperty);
+                    propertyRepo.deleteForClient(persistentClient.getId());
                 }
             }
         }
@@ -219,13 +190,8 @@ public class ClientService
     {
         try
         {
-            List<Property> draftedProperties = propertyMapper.mapToEntities(detachedClient.getProperties());
-            Iterable<Property> persistedProperties = propertyRepo.save(draftedProperties);
-            List<Property> relatedProperties = new ArrayList<Property>();
-            persistedProperties.forEach(e -> relatedProperties.add(e));
 
             Client draftClient = clientMapper.mapToEntity(detachedClient);
-            draftClient.setProperties(relatedProperties);
             Client persistedClient = clientRepo.save(draftClient);
 
             if (persistedClient != null)

@@ -3,6 +3,7 @@ package com.ecg.webclient.feature.administration.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
-import com.ecg.webclient.feature.administration.service.ClientService;
+import com.ecg.webclient.feature.administration.service.ClientPropertyService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.ClientProperties;
-import com.ecg.webclient.feature.administration.viewmodell.PropertyDto;
-import com.ecg.webclient.feature.administration.viewmodell.validator.PropertyDtoValidator;
+import com.ecg.webclient.feature.administration.viewmodell.ClientPropertyDto;
+import com.ecg.webclient.feature.administration.viewmodell.validator.ClientPropertyDtoValidator;
 
 /**
  * Controller zur Bearbeitung von Requests aus Administrationsdialogen (Mandanteneigenschaften).
@@ -35,27 +36,30 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.PropertyDto
 @RequestMapping(value = "/admin/clientp")
 public class ClientPropertiesController
 {
-    static final Logger        logger = LogManager.getLogger(ClientPropertiesController.class.getName());
+    static final Logger           logger = LogManager.getLogger(ClientPropertiesController.class.getName());
 
     @Autowired
-    private AuthenticationUtil authUtil;
+    private AuthenticationUtil    authUtil;
     @Autowired
-    private ClientService      clientService;
+    private ClientPropertyService clientPropertyService;
     @Autowired
-    PropertyDtoValidator       propertyDtoValidator;
+    ClientPropertyDtoValidator    propertyDtoValidator;
 
     /**
      * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert Änderungen an Mandanteneigenschaften.
      * 
      * @return Template
      */
+    @Transactional
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public String saveClientProperties(@Valid ClientProperties clientProperties, BindingResult bindingResult)
     {
-        List<PropertyDto> updateDtos = new ArrayList<PropertyDto>();
-        List<PropertyDto> deleteDtos = new ArrayList<PropertyDto>();
+        List<ClientPropertyDto> updateDtos = new ArrayList<ClientPropertyDto>();
+        List<ClientPropertyDto> deleteDtos = new ArrayList<ClientPropertyDto>();
 
-        for (PropertyDto dto : clientProperties.getProperties())
+        ClientDto selectedClient = authUtil.getSelectedClient();
+
+        for (ClientPropertyDto dto : clientProperties.getProperties())
         {
             if (dto.isDelete())
             {
@@ -63,12 +67,12 @@ public class ClientPropertiesController
             }
             else
             {
+                dto.setClient(selectedClient);
                 updateDtos.add(dto);
             }
         }
 
-        ClientDto updatedClient = authUtil.getSelectedClient();
-        updatedClient.setProperties(updateDtos);
+        clientPropertyService.deleteClientProperties(deleteDtos);
         clientProperties.removeDeleted();
 
         if (bindingResult.hasErrors())
@@ -76,8 +80,7 @@ public class ClientPropertiesController
             return getLoadingRedirectTemplate();
         }
 
-        clientService.saveClient(updatedClient);
-        authUtil.setSelectedClientWithNewAuthority(updatedClient);
+        clientPropertyService.saveClientProperties(updateDtos);
 
         return "redirect:";
     }
@@ -92,8 +95,8 @@ public class ClientPropertiesController
     public String showClientProperties(Model model)
     {
         ClientProperties clientProperties = new ClientProperties();
-        clientProperties.setProperties(authUtil.getSelectedClient().getProperties());
-        clientProperties.setClientId(authUtil.getSelectedClient().getId());
+        clientProperties.setProperties(clientPropertyService.getClientPropertiesForClientId(authUtil
+                .getSelectedClient().getId()));
         model.addAttribute("clientProperties", clientProperties);
         return getLoadingRedirectTemplate();
     }
