@@ -1,5 +1,7 @@
 package com.ecg.webclient.feature.administration.controller;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -79,5 +81,20 @@ public class MainController
     public void showMenu()
     {
         util.setMenuMinimized(false);
+    }
+
+    @RequestMapping(value = "/switchLocale", method = RequestMethod.GET)
+    public String switchLocale(HttpServletRequest request)
+    {
+        if (authUtil.getSessionLocaleResolver().resolveLocale(request).equals(Locale.ENGLISH))
+        {
+            authUtil.getSessionLocaleResolver().setDefaultLocale(Locale.GERMAN);
+        }
+        else
+        {
+            authUtil.getSessionLocaleResolver().setDefaultLocale(Locale.ENGLISH);
+        }
+
+        return "/main";
     }
 }
