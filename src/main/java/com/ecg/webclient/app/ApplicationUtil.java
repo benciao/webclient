@@ -2,6 +2,7 @@ package com.ecg.webclient.app;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.ecg.webclient.feature.administration.service.EnvironmentService;
@@ -10,14 +11,18 @@ import com.ecg.webclient.feature.administration.service.EnvironmentService;
 @Component
 public class ApplicationUtil
 {
-    boolean            isMenuMinimized;
-    EnvironmentService environmentService;
+    static final String PROPERTY_NAME_IS_LOGIN_AS_USER_ALLOWED = "sec.is.login.as.other.user.allowed";
+
+    boolean             isMenuMinimized;
+    EnvironmentService  environmentService;
+    Environment         env;
 
     @Autowired
-    public ApplicationUtil(EnvironmentService environmentService)
+    public ApplicationUtil(EnvironmentService environmentService, Environment env)
     {
         this.isMenuMinimized = false;
         this.environmentService = environmentService;
+        this.env = env;
     }
 
     public String getSystemIdentifier()
@@ -31,6 +36,13 @@ public class ApplicationUtil
         {
             return identifier;
         }
+    }
+
+    public boolean isLoginAsUserAllowed()
+    {
+        String value = env.getRequiredProperty(PROPERTY_NAME_IS_LOGIN_AS_USER_ALLOWED);
+
+        return Boolean.valueOf(value);
     }
 
     public boolean isMenuMinimized()

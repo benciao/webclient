@@ -615,7 +615,7 @@ body {
 									th:title="#{usersActionEdit}"><span
 										class="glyphicon glyphicon-edit"> </span></a> <a
 									sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')"
-									th:if="*{users[__${stat.index}__].login} != ${#authentication.name}"
+									th:if="*{users[__${stat.index}__].login} != ${#authentication.name} and ${beans.applicationUtil.isLoginAsUserAllowed()}"
 									class="a_login-as" th:id="${'a_login-as-'+stat.index}"
 									th:href="'/admin/user/loginas/' + *{users[__${stat.index}__].id}"
 									th:title="#{usersActionLoginAs}"><span
