@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.ecg.webclient.app.ApplicationUtil;
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.service.ClientService;
-import com.ecg.webclient.feature.administration.service.RemoteSystemService;
 import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
@@ -42,8 +41,6 @@ public class MainController
     UserService                 userService;
     @Autowired
     private AuthenticationUtil  authUtil;
-    @Autowired
-    private RemoteSystemService remoteSystemService;
     @Autowired
     private ApplicationUtil     util;
 
